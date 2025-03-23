@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <!-- Define Persistence Unit -->
+  <persistence-unit name="my_persistence_unit">
+    <class>com.cmc.pojo.Comment</class>
+    <class>com.cmc.pojo.Surveyquestion</class>
+    <class>com.cmc.pojo.Reaction</class>
+    <class>com.cmc.pojo.Teacher</class>
+    <class>com.cmc.pojo.Interaction</class>
+    <class>com.cmc.pojo.Alumni</class>
+    <class>com.cmc.pojo.User</class>
+    <class>com.cmc.pojo.Surveypost</class>
+    <class>com.cmc.pojo.Post</class>
+    <class>com.cmc.pojo.Invitationpost</class>
+    <class>com.cmc.pojo.Surveyoption</class>
+    <class>com.cmc.pojo.Group</class>
+    <class>com.cmc.pojo.Posts</class>
+    <class>com.cmc.pojo.Users</class>
+    <class>com.cmc.pojo.Ugroups</class>
+    <class>com.cmc.pojo.SurveyPosts</class>
+    <class>com.cmc.pojo.SurveyDraftAnswers</class>
+    <class>com.cmc.pojo.Teachers</class>
+    <class>com.cmc.pojo.SurveyOptions</class>
+    <class>com.cmc.pojo.SurveyQuestions</class>
+    <class>com.cmc.pojo.PostImages</class>
+    <class>com.cmc.pojo.Comments</class>
+    <class>com.cmc.pojo.InvitationPosts</class>
+    <class>com.cmc.pojo.UserSurveyOptions</class>
+    <class>com.cmc.pojo.SurveyDrafts</class>
+    <class>com.cmc.pojo.Reactions</class>
+  </persistence-unit>
+</persistence>
