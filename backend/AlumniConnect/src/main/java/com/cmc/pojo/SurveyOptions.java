@@ -21,7 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -50,9 +50,9 @@ public class SurveyOptions implements Serializable {
     @ManyToOne(optional = false)
     private SurveyQuestions surveyQuestionId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyOptionId")
-    private Collection<UserSurveyOptions> userSurveyOptionsCollection;
+    private Set<UserSurveyOptions> userSurveyOptionsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "selectedOptionId")
-    private Collection<SurveyDraftAnswers> surveyDraftAnswersCollection;
+    private Set<SurveyDraftAnswers> surveyDraftAnswersSet;
 
     public SurveyOptions() {
     }
@@ -90,20 +90,20 @@ public class SurveyOptions implements Serializable {
         this.surveyQuestionId = surveyQuestionId;
     }
 
-    public Collection<UserSurveyOptions> getUserSurveyOptionsCollection() {
-        return userSurveyOptionsCollection;
+    public Set<UserSurveyOptions> getUserSurveyOptionsSet() {
+        return userSurveyOptionsSet;
     }
 
-    public void setUserSurveyOptionsCollection(Collection<UserSurveyOptions> userSurveyOptionsCollection) {
-        this.userSurveyOptionsCollection = userSurveyOptionsCollection;
+    public void setUserSurveyOptionsSet(Set<UserSurveyOptions> userSurveyOptionsSet) {
+        this.userSurveyOptionsSet = userSurveyOptionsSet;
     }
 
-    public Collection<SurveyDraftAnswers> getSurveyDraftAnswersCollection() {
-        return surveyDraftAnswersCollection;
+    public Set<SurveyDraftAnswers> getSurveyDraftAnswersSet() {
+        return surveyDraftAnswersSet;
     }
 
-    public void setSurveyDraftAnswersCollection(Collection<SurveyDraftAnswers> surveyDraftAnswersCollection) {
-        this.surveyDraftAnswersCollection = surveyDraftAnswersCollection;
+    public void setSurveyDraftAnswersSet(Set<SurveyDraftAnswers> surveyDraftAnswersSet) {
+        this.surveyDraftAnswersSet = surveyDraftAnswersSet;
     }
 
     @Override

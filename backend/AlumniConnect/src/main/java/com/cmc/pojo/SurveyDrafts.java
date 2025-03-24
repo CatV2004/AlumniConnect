@@ -20,8 +20,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -51,7 +51,7 @@ public class SurveyDrafts implements Serializable {
     @ManyToOne(optional = false)
     private Users userId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "draftId")
-    private Collection<SurveyDraftAnswers> surveyDraftAnswersCollection;
+    private Set<SurveyDraftAnswers> surveyDraftAnswersSet;
 
     public SurveyDrafts() {
     }
@@ -92,12 +92,12 @@ public class SurveyDrafts implements Serializable {
         this.userId = userId;
     }
 
-    public Collection<SurveyDraftAnswers> getSurveyDraftAnswersCollection() {
-        return surveyDraftAnswersCollection;
+    public Set<SurveyDraftAnswers> getSurveyDraftAnswersSet() {
+        return surveyDraftAnswersSet;
     }
 
-    public void setSurveyDraftAnswersCollection(Collection<SurveyDraftAnswers> surveyDraftAnswersCollection) {
-        this.surveyDraftAnswersCollection = surveyDraftAnswersCollection;
+    public void setSurveyDraftAnswersSet(Set<SurveyDraftAnswers> surveyDraftAnswersSet) {
+        this.surveyDraftAnswersSet = surveyDraftAnswersSet;
     }
 
     @Override

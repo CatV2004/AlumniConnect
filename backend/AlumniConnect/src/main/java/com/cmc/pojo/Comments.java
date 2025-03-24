@@ -22,8 +22,8 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -68,7 +68,7 @@ public class Comments implements Serializable {
     @Column(name = "active")
     private Boolean active;
     @OneToMany(mappedBy = "parentId")
-    private Collection<Comments> commentsCollection;
+    private Set<Comments> commentsSet;
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne
     private Comments parentId;
@@ -147,12 +147,12 @@ public class Comments implements Serializable {
         this.active = active;
     }
 
-    public Collection<Comments> getCommentsCollection() {
-        return commentsCollection;
+    public Set<Comments> getCommentsSet() {
+        return commentsSet;
     }
 
-    public void setCommentsCollection(Collection<Comments> commentsCollection) {
-        this.commentsCollection = commentsCollection;
+    public void setCommentsSet(Set<Comments> commentsSet) {
+        this.commentsSet = commentsSet;
     }
 
     public Comments getParentId() {

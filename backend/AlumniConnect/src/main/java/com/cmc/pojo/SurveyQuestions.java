@@ -21,7 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -53,9 +53,9 @@ public class SurveyQuestions implements Serializable {
     @ManyToOne(optional = false)
     private SurveyPosts surveyPostId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyQuestionId")
-    private Collection<SurveyOptions> surveyOptionsCollection;
+    private Set<SurveyOptions> surveyOptionsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "questionId")
-    private Collection<SurveyDraftAnswers> surveyDraftAnswersCollection;
+    private Set<SurveyDraftAnswers> surveyDraftAnswersSet;
 
     public SurveyQuestions() {
     }
@@ -101,20 +101,20 @@ public class SurveyQuestions implements Serializable {
         this.surveyPostId = surveyPostId;
     }
 
-    public Collection<SurveyOptions> getSurveyOptionsCollection() {
-        return surveyOptionsCollection;
+    public Set<SurveyOptions> getSurveyOptionsSet() {
+        return surveyOptionsSet;
     }
 
-    public void setSurveyOptionsCollection(Collection<SurveyOptions> surveyOptionsCollection) {
-        this.surveyOptionsCollection = surveyOptionsCollection;
+    public void setSurveyOptionsSet(Set<SurveyOptions> surveyOptionsSet) {
+        this.surveyOptionsSet = surveyOptionsSet;
     }
 
-    public Collection<SurveyDraftAnswers> getSurveyDraftAnswersCollection() {
-        return surveyDraftAnswersCollection;
+    public Set<SurveyDraftAnswers> getSurveyDraftAnswersSet() {
+        return surveyDraftAnswersSet;
     }
 
-    public void setSurveyDraftAnswersCollection(Collection<SurveyDraftAnswers> surveyDraftAnswersCollection) {
-        this.surveyDraftAnswersCollection = surveyDraftAnswersCollection;
+    public void setSurveyDraftAnswersSet(Set<SurveyDraftAnswers> surveyDraftAnswersSet) {
+        this.surveyDraftAnswersSet = surveyDraftAnswersSet;
     }
 
     @Override

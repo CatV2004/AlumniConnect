@@ -20,8 +20,8 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -53,9 +53,9 @@ public class SurveyPosts implements Serializable {
     @Column(name = "survey_type")
     private String surveyType;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
-    private Collection<SurveyDrafts> surveyDraftsCollection;
+    private Set<SurveyDrafts> surveyDraftsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
-    private Collection<SurveyQuestions> surveyQuestionsCollection;
+    private Set<SurveyQuestions> surveyQuestionsSet;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Posts posts;
@@ -97,20 +97,20 @@ public class SurveyPosts implements Serializable {
         this.surveyType = surveyType;
     }
 
-    public Collection<SurveyDrafts> getSurveyDraftsCollection() {
-        return surveyDraftsCollection;
+    public Set<SurveyDrafts> getSurveyDraftsSet() {
+        return surveyDraftsSet;
     }
 
-    public void setSurveyDraftsCollection(Collection<SurveyDrafts> surveyDraftsCollection) {
-        this.surveyDraftsCollection = surveyDraftsCollection;
+    public void setSurveyDraftsSet(Set<SurveyDrafts> surveyDraftsSet) {
+        this.surveyDraftsSet = surveyDraftsSet;
     }
 
-    public Collection<SurveyQuestions> getSurveyQuestionsCollection() {
-        return surveyQuestionsCollection;
+    public Set<SurveyQuestions> getSurveyQuestionsSet() {
+        return surveyQuestionsSet;
     }
 
-    public void setSurveyQuestionsCollection(Collection<SurveyQuestions> surveyQuestionsCollection) {
-        this.surveyQuestionsCollection = surveyQuestionsCollection;
+    public void setSurveyQuestionsSet(Set<SurveyQuestions> surveyQuestionsSet) {
+        this.surveyQuestionsSet = surveyQuestionsSet;
     }
 
     public Posts getPosts() {

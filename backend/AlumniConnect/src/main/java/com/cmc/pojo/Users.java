@@ -22,8 +22,8 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -90,24 +90,24 @@ public class Users implements Serializable {
     private Date deletedDate;
     @Column(name = "active")
     private Boolean active;
-    @ManyToMany(mappedBy = "usersCollection")
-    private Collection<Ugroups> ugroupsCollection;
-    @ManyToMany(mappedBy = "usersCollection")
-    private Collection<InvitationPosts> invitationPostsCollection;
+    @ManyToMany(mappedBy = "usersSet")
+    private Set<Ugroups> ugroupsSet;
+    @ManyToMany(mappedBy = "usersSet")
+    private Set<InvitationPosts> invitationPostsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<Comments> commentsCollection;
+    private Set<Comments> commentsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<SurveyDrafts> surveyDraftsCollection;
+    private Set<SurveyDrafts> surveyDraftsSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<Posts> postsCollection;
+    private Set<Posts> postsSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "users")
     private Alumni alumni;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<UserSurveyOptions> userSurveyOptionsCollection;
+    private Set<UserSurveyOptions> userSurveyOptionsSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "users")
     private Teachers teachers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Collection<Reactions> reactionsCollection;
+    private Set<Reactions> reactionsSet;
 
     public Users() {
     }
@@ -212,44 +212,44 @@ public class Users implements Serializable {
         this.active = active;
     }
 
-    public Collection<Ugroups> getUgroupsCollection() {
-        return ugroupsCollection;
+    public Set<Ugroups> getUgroupsSet() {
+        return ugroupsSet;
     }
 
-    public void setUgroupsCollection(Collection<Ugroups> ugroupsCollection) {
-        this.ugroupsCollection = ugroupsCollection;
+    public void setUgroupsSet(Set<Ugroups> ugroupsSet) {
+        this.ugroupsSet = ugroupsSet;
     }
 
-    public Collection<InvitationPosts> getInvitationPostsCollection() {
-        return invitationPostsCollection;
+    public Set<InvitationPosts> getInvitationPostsSet() {
+        return invitationPostsSet;
     }
 
-    public void setInvitationPostsCollection(Collection<InvitationPosts> invitationPostsCollection) {
-        this.invitationPostsCollection = invitationPostsCollection;
+    public void setInvitationPostsSet(Set<InvitationPosts> invitationPostsSet) {
+        this.invitationPostsSet = invitationPostsSet;
     }
 
-    public Collection<Comments> getCommentsCollection() {
-        return commentsCollection;
+    public Set<Comments> getCommentsSet() {
+        return commentsSet;
     }
 
-    public void setCommentsCollection(Collection<Comments> commentsCollection) {
-        this.commentsCollection = commentsCollection;
+    public void setCommentsSet(Set<Comments> commentsSet) {
+        this.commentsSet = commentsSet;
     }
 
-    public Collection<SurveyDrafts> getSurveyDraftsCollection() {
-        return surveyDraftsCollection;
+    public Set<SurveyDrafts> getSurveyDraftsSet() {
+        return surveyDraftsSet;
     }
 
-    public void setSurveyDraftsCollection(Collection<SurveyDrafts> surveyDraftsCollection) {
-        this.surveyDraftsCollection = surveyDraftsCollection;
+    public void setSurveyDraftsSet(Set<SurveyDrafts> surveyDraftsSet) {
+        this.surveyDraftsSet = surveyDraftsSet;
     }
 
-    public Collection<Posts> getPostsCollection() {
-        return postsCollection;
+    public Set<Posts> getPostsSet() {
+        return postsSet;
     }
 
-    public void setPostsCollection(Collection<Posts> postsCollection) {
-        this.postsCollection = postsCollection;
+    public void setPostsSet(Set<Posts> postsSet) {
+        this.postsSet = postsSet;
     }
 
     public Alumni getAlumni() {
@@ -260,12 +260,12 @@ public class Users implements Serializable {
         this.alumni = alumni;
     }
 
-    public Collection<UserSurveyOptions> getUserSurveyOptionsCollection() {
-        return userSurveyOptionsCollection;
+    public Set<UserSurveyOptions> getUserSurveyOptionsSet() {
+        return userSurveyOptionsSet;
     }
 
-    public void setUserSurveyOptionsCollection(Collection<UserSurveyOptions> userSurveyOptionsCollection) {
-        this.userSurveyOptionsCollection = userSurveyOptionsCollection;
+    public void setUserSurveyOptionsSet(Set<UserSurveyOptions> userSurveyOptionsSet) {
+        this.userSurveyOptionsSet = userSurveyOptionsSet;
     }
 
     public Teachers getTeachers() {
@@ -276,12 +276,12 @@ public class Users implements Serializable {
         this.teachers = teachers;
     }
 
-    public Collection<Reactions> getReactionsCollection() {
-        return reactionsCollection;
+    public Set<Reactions> getReactionsSet() {
+        return reactionsSet;
     }
 
-    public void setReactionsCollection(Collection<Reactions> reactionsCollection) {
-        this.reactionsCollection = reactionsCollection;
+    public void setReactionsSet(Set<Reactions> reactionsSet) {
+        this.reactionsSet = reactionsSet;
     }
 
     @Override

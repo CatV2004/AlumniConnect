@@ -21,8 +21,8 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -66,9 +66,9 @@ public class Ugroups implements Serializable {
         @JoinColumn(name = "group_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")})
     @ManyToMany
-    private Collection<Users> usersCollection;
-    @ManyToMany(mappedBy = "ugroupsCollection")
-    private Collection<InvitationPosts> invitationPostsCollection;
+    private Set<Users> usersSet;
+    @ManyToMany(mappedBy = "ugroupsSet")
+    private Set<InvitationPosts> invitationPostsSet;
 
     public Ugroups() {
     }
@@ -130,20 +130,20 @@ public class Ugroups implements Serializable {
         this.active = active;
     }
 
-    public Collection<Users> getUsersCollection() {
-        return usersCollection;
+    public Set<Users> getUsersSet() {
+        return usersSet;
     }
 
-    public void setUsersCollection(Collection<Users> usersCollection) {
-        this.usersCollection = usersCollection;
+    public void setUsersSet(Set<Users> usersSet) {
+        this.usersSet = usersSet;
     }
 
-    public Collection<InvitationPosts> getInvitationPostsCollection() {
-        return invitationPostsCollection;
+    public Set<InvitationPosts> getInvitationPostsSet() {
+        return invitationPostsSet;
     }
 
-    public void setInvitationPostsCollection(Collection<InvitationPosts> invitationPostsCollection) {
-        this.invitationPostsCollection = invitationPostsCollection;
+    public void setInvitationPostsSet(Set<InvitationPosts> invitationPostsSet) {
+        this.invitationPostsSet = invitationPostsSet;
     }
 
     @Override

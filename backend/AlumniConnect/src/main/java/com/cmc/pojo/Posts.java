@@ -24,8 +24,8 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  *
@@ -69,9 +69,9 @@ public class Posts implements Serializable {
     @Column(name = "active")
     private Boolean active;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
-    private Collection<PostImages> postImagesCollection;
+    private Set<PostImages> postImagesSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
-    private Collection<Comments> commentsCollection;
+    private Set<Comments> commentsSet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Users userId;
@@ -80,7 +80,7 @@ public class Posts implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "posts")
     private SurveyPosts surveyPosts;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
-    private Collection<Reactions> reactionsCollection;
+    private Set<Reactions> reactionsSet;
 
     public Posts() {
     }
@@ -150,20 +150,20 @@ public class Posts implements Serializable {
         this.active = active;
     }
 
-    public Collection<PostImages> getPostImagesCollection() {
-        return postImagesCollection;
+    public Set<PostImages> getPostImagesSet() {
+        return postImagesSet;
     }
 
-    public void setPostImagesCollection(Collection<PostImages> postImagesCollection) {
-        this.postImagesCollection = postImagesCollection;
+    public void setPostImagesSet(Set<PostImages> postImagesSet) {
+        this.postImagesSet = postImagesSet;
     }
 
-    public Collection<Comments> getCommentsCollection() {
-        return commentsCollection;
+    public Set<Comments> getCommentsSet() {
+        return commentsSet;
     }
 
-    public void setCommentsCollection(Collection<Comments> commentsCollection) {
-        this.commentsCollection = commentsCollection;
+    public void setCommentsSet(Set<Comments> commentsSet) {
+        this.commentsSet = commentsSet;
     }
 
     public Users getUserId() {
@@ -190,12 +190,12 @@ public class Posts implements Serializable {
         this.surveyPosts = surveyPosts;
     }
 
-    public Collection<Reactions> getReactionsCollection() {
-        return reactionsCollection;
+    public Set<Reactions> getReactionsSet() {
+        return reactionsSet;
     }
 
-    public void setReactionsCollection(Collection<Reactions> reactionsCollection) {
-        this.reactionsCollection = reactionsCollection;
+    public void setReactionsSet(Set<Reactions> reactionsSet) {
+        this.reactionsSet = reactionsSet;
     }
 
     @Override
