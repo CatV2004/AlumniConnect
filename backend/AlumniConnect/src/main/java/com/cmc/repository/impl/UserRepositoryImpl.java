@@ -39,7 +39,6 @@ public class UserRepositoryImpl implements UserRepository {
         return factory.getObject().getCurrentSession();
     }
 
-
     @Override
     public UserDTO getUserByUsername(String username) {
         Session s = this.factory.getObject().getCurrentSession();
@@ -64,23 +63,22 @@ public class UserRepositoryImpl implements UserRepository {
 
         if (user != null) {
             user.setPassword(passEncoder.encode(dto.getNewPassword()));
-            getCurrentSession().merge(user);
+            getCurrentSession().flush();
         }
     }
 
     @Override
     public boolean authUser(String username, String password) {
-        UserDTO user = this.getUserByUsername(username);
-        return user != null && this.passEncoder.matches(password, user.getPassword());
+        UserDTO uDTO = this.getUserByUsername(username);
+        User user = modelMapper.map(uDTO, User.class);
+        return this.passEncoder.matches(password, user.getPassword());
     }
-    
+
     @Override
     public boolean existsByUsername(String username) {
-        Long count = getCurrentSession()
-            .createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class)
-            .setParameter("username", username)
-            .uniqueResult();
-        return count != null && count > 0;
+        return getCurrentSession()
+                .createQuery("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username",  Boolean.class)
+                .uniqueResultOptional()
+                .orElse(false);
     }
-    
 }

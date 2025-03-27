@@ -14,7 +14,6 @@ public class UserDTO {
 
     private Long id;
     private String username;
-    private String password;
     private String avatar;
     private String cover;
     private String firstName;
@@ -23,15 +22,11 @@ public class UserDTO {
     private String phone;
     private String role;
     private Boolean active;
-    
-    private MultipartFile avatarFile;  
-    private MultipartFile coverFile;
 
-    public UserDTO(Long id, String username, String password, String avatar, String cover,
+    public UserDTO(Long id, String username, String avatar, String cover,
             String firstName, String lastName, String email, String phone, String role, Boolean active) {
         this.id = id;
         this.username = username;
-        this.password = password;
         this.avatar = avatar;
         this.cover = cover;
         this.firstName = firstName;
@@ -60,14 +55,6 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getAvatar() {
@@ -132,22 +119,6 @@ public class UserDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public MultipartFile getAvatarFile() {
-        return avatarFile;
-    }
-
-    public void setAvatarFile(MultipartFile avatarFile) {
-        this.avatarFile = avatarFile;
-    }
-
-    public MultipartFile getCoverFile() {
-        return coverFile;
-    }
-
-    public void setCoverFile(MultipartFile coverFile) {
-        this.coverFile = coverFile;
     }
     
     

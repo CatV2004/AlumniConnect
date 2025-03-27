@@ -24,6 +24,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -122,6 +123,12 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Set<Comment> commentSet;
 
+    
+    private MultipartFile avatarFile;  
+    private MultipartFile coverFile;
+    
+    
+    
     public User() {
     }
 
@@ -321,6 +328,24 @@ public class User implements Serializable {
         this.commentSet = commentSet;
     }
 
+    public MultipartFile getAvatarFile() {
+        return avatarFile;
+    }
+
+    public void setAvatarFile(MultipartFile avatarFile) {
+        this.avatarFile = avatarFile;
+    }
+
+    public MultipartFile getCoverFile() {
+        return coverFile;
+    }
+
+    public void setCoverFile(MultipartFile coverFile) {
+        this.coverFile = coverFile;
+    }
+    
+    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -345,5 +370,7 @@ public class User implements Serializable {
     public String toString() {
         return "com.cmc.pojo.User[ id=" + id + " ]";
     }
+    
+    
     
 }

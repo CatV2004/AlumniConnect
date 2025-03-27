@@ -4,24 +4,25 @@
  */
 package com.cmc.dtos;
 
+import com.cmc.pojo.User;
+
 /**
  *
  * @author FPTSHOP
  */
 public class AlumniDTO {
+
     private Long id;
     private String studentCode;
     private Boolean isVerified;
-    private UserDTO user;
 
     public AlumniDTO() {
     }
 
-    public AlumniDTO(Long id, String studentCode, Boolean isVerified, UserDTO user) {
+    public AlumniDTO(Long id, String studentCode, Boolean isVerified) {
         this.id = id;
         this.studentCode = studentCode;
         this.isVerified = isVerified;
-        this.user = user;
     }
 
     public Long getId() {
@@ -48,11 +49,4 @@ public class AlumniDTO {
         this.isVerified = isVerified;
     }
 
-    public UserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserDTO user) {
-        this.user = user;
-    }
 }

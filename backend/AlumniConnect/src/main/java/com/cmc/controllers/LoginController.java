@@ -27,30 +27,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class LoginController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private WebAppValidator userValidator;
-
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.setValidator((Validator) userValidator);
-    }
-
-    @GetMapping(value = "/register")
-    public String registerView(Model model) {
-        model.addAttribute("user", new User());
-        return "register";
-    }
-
-    @PostMapping(value = "/register")
-    public String registerProcess(
-            @ModelAttribute(name = "user") @Valid UserDTO user,
-            BindingResult result) {
-        if (result.hasErrors()) {
-            return "register";
-        }
-        userService.addUser(user);
-        return "redirect:/login";
-    }
+//    @Autowired
+//    private UserService userService;
+//    @Autowired
+//    private WebAppValidator userValidator;
+//
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.setValidator((Validator) userValidator);
+//    }
+//
+//    @GetMapping(value = "/register")
+//    public String registerView(Model model) {
+//        model.addAttribute("user", new User());
+//        return "register";
+//    }
+//
+//    @PostMapping(value = "/register")
+//    public String registerProcess(
+//            @ModelAttribute(name = "user") @Valid UserDTO user,
+//            BindingResult result) {
+//        if (result.hasErrors()) {
+//            return "register";
+//        }
+//        userService.addUser(user);
+//        return "redirect:/login";
+//    }
 }

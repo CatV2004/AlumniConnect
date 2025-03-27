@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private BCryptPasswordEncoder passEncoder;
     
-    private CloudinaryService cloudinaryService = new CloudinaryService();
+    private final CloudinaryService cloudinaryService = new CloudinaryService();
 
     @Override
     public UserDTO getUserByUsername(String username) {
@@ -59,33 +59,33 @@ public class UserServiceImpl implements UserService {
         if (userDTO == null) {
             throw new UsernameNotFoundException("Không tồn tại!");
         }
+        
+        User user = modelMapper.map(userDTO, User.class);
 
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(userDTO.getRole().toString()));
+        Set<GrantedAuthority> authorities = new HashSet<>(); 
+        authorities.add(new SimpleGrantedAuthority(userDTO.getRole()));
 
         return new org.springframework.security.core.userdetails.User(
-                userDTO.getUsername(), userDTO.getPassword(), authorities);
+                user.getUsername(), user.getPassword(), authorities);
     }
 
     @Override
-    public void addUser(UserDTO userDTO) {
-        if (userRepo.existsByUsername(userDTO.getUsername())) {
+    public void addUser(User user) {
+        if (userRepo.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username đã tồn tại!");
         }
 
-        User user = modelMapper.map(userDTO, User.class);
-
-        if (userDTO.getAvatarFile() != null && !userDTO.getAvatarFile().isEmpty()) {
-            String avatarUrl = cloudinaryService.uploadFile(userDTO.getAvatarFile());
+        if (user.getAvatarFile() != null && !user.getAvatarFile().isEmpty()) {
+            String avatarUrl = cloudinaryService.uploadFile(user.getAvatarFile());
             user.setAvatar(avatarUrl);
         }
 
-        if (userDTO.getCoverFile() != null && !userDTO.getCoverFile().isEmpty()) {
-            String coverUrl = cloudinaryService.uploadFile(userDTO.getCoverFile());
+        if (user.getCoverFile() != null && !user.getCoverFile().isEmpty()) {
+            String coverUrl = cloudinaryService.uploadFile(user.getCoverFile());
             user.setCover(coverUrl);
         }
 
-        user.setPassword(passEncoder.encode(userDTO.getPassword()));
+        user.setPassword(passEncoder.encode(user.getPassword()));
 
         userRepo.addUser(user);
     }
