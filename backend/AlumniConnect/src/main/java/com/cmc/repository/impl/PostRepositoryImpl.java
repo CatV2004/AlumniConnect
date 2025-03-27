@@ -4,10 +4,12 @@
  */
 package com.cmc.repository.impl;
 
+import com.cmc.repository.PostRepository;
+
 /**
  *
  * @author FPTSHOP
  */
-public class PostRepositoryImpl {
+public class PostRepositoryImpl implements PostRepository{
     
 }

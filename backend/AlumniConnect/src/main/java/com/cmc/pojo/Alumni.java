@@ -45,7 +45,7 @@ public class Alumni implements Serializable {
     private Boolean isVerified;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    private Users users;
+    private User user;
 
     public Alumni() {
     }
@@ -83,12 +83,12 @@ public class Alumni implements Serializable {
         this.isVerified = isVerified;
     }
 
-    public Users getUsers() {
-        return users;
+    public User getUser() {
+        return user;
     }
 
-    public void setUsers(Users users) {
-        this.users = users;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

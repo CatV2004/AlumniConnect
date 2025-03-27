@@ -24,13 +24,13 @@ import java.util.Date;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "teachers")
+@Table(name = "teacher")
 @NamedQueries({
-    @NamedQuery(name = "Teachers.findAll", query = "SELECT t FROM Teachers t"),
-    @NamedQuery(name = "Teachers.findById", query = "SELECT t FROM Teachers t WHERE t.id = :id"),
-    @NamedQuery(name = "Teachers.findByMustChangePassword", query = "SELECT t FROM Teachers t WHERE t.mustChangePassword = :mustChangePassword"),
-    @NamedQuery(name = "Teachers.findByPasswordResetTime", query = "SELECT t FROM Teachers t WHERE t.passwordResetTime = :passwordResetTime")})
-public class Teachers implements Serializable {
+    @NamedQuery(name = "Teacher.findAll", query = "SELECT t FROM Teacher t"),
+    @NamedQuery(name = "Teacher.findById", query = "SELECT t FROM Teacher t WHERE t.id = :id"),
+    @NamedQuery(name = "Teacher.findByMustChangePassword", query = "SELECT t FROM Teacher t WHERE t.mustChangePassword = :mustChangePassword"),
+    @NamedQuery(name = "Teacher.findByPasswordResetTime", query = "SELECT t FROM Teacher t WHERE t.passwordResetTime = :passwordResetTime")})
+public class Teacher implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -45,12 +45,12 @@ public class Teachers implements Serializable {
     private Date passwordResetTime;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    private Users users;
+    private User user;
 
-    public Teachers() {
+    public Teacher() {
     }
 
-    public Teachers(Long id) {
+    public Teacher(Long id) {
         this.id = id;
     }
 
@@ -78,12 +78,12 @@ public class Teachers implements Serializable {
         this.passwordResetTime = passwordResetTime;
     }
 
-    public Users getUsers() {
-        return users;
+    public User getUser() {
+        return user;
     }
 
-    public void setUsers(Users users) {
-        this.users = users;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -96,10 +96,10 @@ public class Teachers implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Teachers)) {
+        if (!(object instanceof Teacher)) {
             return false;
         }
-        Teachers other = (Teachers) object;
+        Teacher other = (Teacher) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -108,7 +108,7 @@ public class Teachers implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Teachers[ id=" + id + " ]";
+        return "com.cmc.pojo.Teacher[ id=" + id + " ]";
     }
     
 }

@@ -22,11 +22,11 @@ import java.io.Serializable;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "survey_draft_answers")
+@Table(name = "survey_draft_answer")
 @NamedQueries({
-    @NamedQuery(name = "SurveyDraftAnswers.findAll", query = "SELECT s FROM SurveyDraftAnswers s"),
-    @NamedQuery(name = "SurveyDraftAnswers.findById", query = "SELECT s FROM SurveyDraftAnswers s WHERE s.id = :id")})
-public class SurveyDraftAnswers implements Serializable {
+    @NamedQuery(name = "SurveyDraftAnswer.findAll", query = "SELECT s FROM SurveyDraftAnswer s"),
+    @NamedQuery(name = "SurveyDraftAnswer.findById", query = "SELECT s FROM SurveyDraftAnswer s WHERE s.id = :id")})
+public class SurveyDraftAnswer implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -36,18 +36,18 @@ public class SurveyDraftAnswers implements Serializable {
     private Long id;
     @JoinColumn(name = "draft_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyDrafts draftId;
+    private SurveyDraft draftId;
     @JoinColumn(name = "selected_option_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyOptions selectedOptionId;
+    private SurveyOption selectedOptionId;
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyQuestions questionId;
+    private SurveyQuestion questionId;
 
-    public SurveyDraftAnswers() {
+    public SurveyDraftAnswer() {
     }
 
-    public SurveyDraftAnswers(Long id) {
+    public SurveyDraftAnswer(Long id) {
         this.id = id;
     }
 
@@ -59,27 +59,27 @@ public class SurveyDraftAnswers implements Serializable {
         this.id = id;
     }
 
-    public SurveyDrafts getDraftId() {
+    public SurveyDraft getDraftId() {
         return draftId;
     }
 
-    public void setDraftId(SurveyDrafts draftId) {
+    public void setDraftId(SurveyDraft draftId) {
         this.draftId = draftId;
     }
 
-    public SurveyOptions getSelectedOptionId() {
+    public SurveyOption getSelectedOptionId() {
         return selectedOptionId;
     }
 
-    public void setSelectedOptionId(SurveyOptions selectedOptionId) {
+    public void setSelectedOptionId(SurveyOption selectedOptionId) {
         this.selectedOptionId = selectedOptionId;
     }
 
-    public SurveyQuestions getQuestionId() {
+    public SurveyQuestion getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(SurveyQuestions questionId) {
+    public void setQuestionId(SurveyQuestion questionId) {
         this.questionId = questionId;
     }
 
@@ -93,10 +93,10 @@ public class SurveyDraftAnswers implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SurveyDraftAnswers)) {
+        if (!(object instanceof SurveyDraftAnswer)) {
             return false;
         }
-        SurveyDraftAnswers other = (SurveyDraftAnswers) object;
+        SurveyDraftAnswer other = (SurveyDraftAnswer) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -105,7 +105,7 @@ public class SurveyDraftAnswers implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyDraftAnswers[ id=" + id + " ]";
+        return "com.cmc.pojo.SurveyDraftAnswer[ id=" + id + " ]";
     }
     
 }

@@ -28,11 +28,11 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "survey_options")
+@Table(name = "survey_option")
 @NamedQueries({
-    @NamedQuery(name = "SurveyOptions.findAll", query = "SELECT s FROM SurveyOptions s"),
-    @NamedQuery(name = "SurveyOptions.findById", query = "SELECT s FROM SurveyOptions s WHERE s.id = :id")})
-public class SurveyOptions implements Serializable {
+    @NamedQuery(name = "SurveyOption.findAll", query = "SELECT s FROM SurveyOption s"),
+    @NamedQuery(name = "SurveyOption.findById", query = "SELECT s FROM SurveyOption s WHERE s.id = :id")})
+public class SurveyOption implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,22 +46,22 @@ public class SurveyOptions implements Serializable {
     @Size(min = 1, max = 65535)
     @Column(name = "option_text")
     private String optionText;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "selectedOptionId")
+    private Set<SurveyDraftAnswer> surveyDraftAnswerSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyOptionId")
+    private Set<UserSurveyOption> userSurveyOptionSet;
     @JoinColumn(name = "survey_question_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyQuestions surveyQuestionId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyOptionId")
-    private Set<UserSurveyOptions> userSurveyOptionsSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "selectedOptionId")
-    private Set<SurveyDraftAnswers> surveyDraftAnswersSet;
+    private SurveyQuestion surveyQuestionId;
 
-    public SurveyOptions() {
+    public SurveyOption() {
     }
 
-    public SurveyOptions(Long id) {
+    public SurveyOption(Long id) {
         this.id = id;
     }
 
-    public SurveyOptions(Long id, String optionText) {
+    public SurveyOption(Long id, String optionText) {
         this.id = id;
         this.optionText = optionText;
     }
@@ -82,28 +82,28 @@ public class SurveyOptions implements Serializable {
         this.optionText = optionText;
     }
 
-    public SurveyQuestions getSurveyQuestionId() {
+    public Set<SurveyDraftAnswer> getSurveyDraftAnswerSet() {
+        return surveyDraftAnswerSet;
+    }
+
+    public void setSurveyDraftAnswerSet(Set<SurveyDraftAnswer> surveyDraftAnswerSet) {
+        this.surveyDraftAnswerSet = surveyDraftAnswerSet;
+    }
+
+    public Set<UserSurveyOption> getUserSurveyOptionSet() {
+        return userSurveyOptionSet;
+    }
+
+    public void setUserSurveyOptionSet(Set<UserSurveyOption> userSurveyOptionSet) {
+        this.userSurveyOptionSet = userSurveyOptionSet;
+    }
+
+    public SurveyQuestion getSurveyQuestionId() {
         return surveyQuestionId;
     }
 
-    public void setSurveyQuestionId(SurveyQuestions surveyQuestionId) {
+    public void setSurveyQuestionId(SurveyQuestion surveyQuestionId) {
         this.surveyQuestionId = surveyQuestionId;
-    }
-
-    public Set<UserSurveyOptions> getUserSurveyOptionsSet() {
-        return userSurveyOptionsSet;
-    }
-
-    public void setUserSurveyOptionsSet(Set<UserSurveyOptions> userSurveyOptionsSet) {
-        this.userSurveyOptionsSet = userSurveyOptionsSet;
-    }
-
-    public Set<SurveyDraftAnswers> getSurveyDraftAnswersSet() {
-        return surveyDraftAnswersSet;
-    }
-
-    public void setSurveyDraftAnswersSet(Set<SurveyDraftAnswers> surveyDraftAnswersSet) {
-        this.surveyDraftAnswersSet = surveyDraftAnswersSet;
     }
 
     @Override
@@ -116,10 +116,10 @@ public class SurveyOptions implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SurveyOptions)) {
+        if (!(object instanceof SurveyOption)) {
             return false;
         }
-        SurveyOptions other = (SurveyOptions) object;
+        SurveyOption other = (SurveyOption) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -128,7 +128,7 @@ public class SurveyOptions implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyOptions[ id=" + id + " ]";
+        return "com.cmc.pojo.SurveyOption[ id=" + id + " ]";
     }
     
 }

@@ -28,12 +28,12 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "survey_drafts")
+@Table(name = "survey_draft")
 @NamedQueries({
-    @NamedQuery(name = "SurveyDrafts.findAll", query = "SELECT s FROM SurveyDrafts s"),
-    @NamedQuery(name = "SurveyDrafts.findById", query = "SELECT s FROM SurveyDrafts s WHERE s.id = :id"),
-    @NamedQuery(name = "SurveyDrafts.findByDraftedAt", query = "SELECT s FROM SurveyDrafts s WHERE s.draftedAt = :draftedAt")})
-public class SurveyDrafts implements Serializable {
+    @NamedQuery(name = "SurveyDraft.findAll", query = "SELECT s FROM SurveyDraft s"),
+    @NamedQuery(name = "SurveyDraft.findById", query = "SELECT s FROM SurveyDraft s WHERE s.id = :id"),
+    @NamedQuery(name = "SurveyDraft.findByDraftedAt", query = "SELECT s FROM SurveyDraft s WHERE s.draftedAt = :draftedAt")})
+public class SurveyDraft implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,17 +46,17 @@ public class SurveyDrafts implements Serializable {
     private Date draftedAt;
     @JoinColumn(name = "survey_post_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyPosts surveyPostId;
+    private SurveyPost surveyPostId;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Users userId;
+    private User userId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "draftId")
-    private Set<SurveyDraftAnswers> surveyDraftAnswersSet;
+    private Set<SurveyDraftAnswer> surveyDraftAnswerSet;
 
-    public SurveyDrafts() {
+    public SurveyDraft() {
     }
 
-    public SurveyDrafts(Long id) {
+    public SurveyDraft(Long id) {
         this.id = id;
     }
 
@@ -76,28 +76,28 @@ public class SurveyDrafts implements Serializable {
         this.draftedAt = draftedAt;
     }
 
-    public SurveyPosts getSurveyPostId() {
+    public SurveyPost getSurveyPostId() {
         return surveyPostId;
     }
 
-    public void setSurveyPostId(SurveyPosts surveyPostId) {
+    public void setSurveyPostId(SurveyPost surveyPostId) {
         this.surveyPostId = surveyPostId;
     }
 
-    public Users getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(Users userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
-    public Set<SurveyDraftAnswers> getSurveyDraftAnswersSet() {
-        return surveyDraftAnswersSet;
+    public Set<SurveyDraftAnswer> getSurveyDraftAnswerSet() {
+        return surveyDraftAnswerSet;
     }
 
-    public void setSurveyDraftAnswersSet(Set<SurveyDraftAnswers> surveyDraftAnswersSet) {
-        this.surveyDraftAnswersSet = surveyDraftAnswersSet;
+    public void setSurveyDraftAnswerSet(Set<SurveyDraftAnswer> surveyDraftAnswerSet) {
+        this.surveyDraftAnswerSet = surveyDraftAnswerSet;
     }
 
     @Override
@@ -110,10 +110,10 @@ public class SurveyDrafts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SurveyDrafts)) {
+        if (!(object instanceof SurveyDraft)) {
             return false;
         }
-        SurveyDrafts other = (SurveyDrafts) object;
+        SurveyDraft other = (SurveyDraft) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -122,7 +122,7 @@ public class SurveyDrafts implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyDrafts[ id=" + id + " ]";
+        return "com.cmc.pojo.SurveyDraft[ id=" + id + " ]";
     }
     
 }

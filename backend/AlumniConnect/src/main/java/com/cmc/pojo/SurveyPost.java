@@ -28,13 +28,13 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "survey_posts")
+@Table(name = "survey_post")
 @NamedQueries({
-    @NamedQuery(name = "SurveyPosts.findAll", query = "SELECT s FROM SurveyPosts s"),
-    @NamedQuery(name = "SurveyPosts.findById", query = "SELECT s FROM SurveyPosts s WHERE s.id = :id"),
-    @NamedQuery(name = "SurveyPosts.findByEndTime", query = "SELECT s FROM SurveyPosts s WHERE s.endTime = :endTime"),
-    @NamedQuery(name = "SurveyPosts.findBySurveyType", query = "SELECT s FROM SurveyPosts s WHERE s.surveyType = :surveyType")})
-public class SurveyPosts implements Serializable {
+    @NamedQuery(name = "SurveyPost.findAll", query = "SELECT s FROM SurveyPost s"),
+    @NamedQuery(name = "SurveyPost.findById", query = "SELECT s FROM SurveyPost s WHERE s.id = :id"),
+    @NamedQuery(name = "SurveyPost.findByEndTime", query = "SELECT s FROM SurveyPost s WHERE s.endTime = :endTime"),
+    @NamedQuery(name = "SurveyPost.findBySurveyType", query = "SELECT s FROM SurveyPost s WHERE s.surveyType = :surveyType")})
+public class SurveyPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,21 +53,21 @@ public class SurveyPosts implements Serializable {
     @Column(name = "survey_type")
     private String surveyType;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
-    private Set<SurveyDrafts> surveyDraftsSet;
+    private Set<SurveyQuestion> surveyQuestionSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
-    private Set<SurveyQuestions> surveyQuestionsSet;
+    private Set<SurveyDraft> surveyDraftSet;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    private Posts posts;
+    private Post post;
 
-    public SurveyPosts() {
+    public SurveyPost() {
     }
 
-    public SurveyPosts(Long id) {
+    public SurveyPost(Long id) {
         this.id = id;
     }
 
-    public SurveyPosts(Long id, Date endTime, String surveyType) {
+    public SurveyPost(Long id, Date endTime, String surveyType) {
         this.id = id;
         this.endTime = endTime;
         this.surveyType = surveyType;
@@ -97,28 +97,28 @@ public class SurveyPosts implements Serializable {
         this.surveyType = surveyType;
     }
 
-    public Set<SurveyDrafts> getSurveyDraftsSet() {
-        return surveyDraftsSet;
+    public Set<SurveyQuestion> getSurveyQuestionSet() {
+        return surveyQuestionSet;
     }
 
-    public void setSurveyDraftsSet(Set<SurveyDrafts> surveyDraftsSet) {
-        this.surveyDraftsSet = surveyDraftsSet;
+    public void setSurveyQuestionSet(Set<SurveyQuestion> surveyQuestionSet) {
+        this.surveyQuestionSet = surveyQuestionSet;
     }
 
-    public Set<SurveyQuestions> getSurveyQuestionsSet() {
-        return surveyQuestionsSet;
+    public Set<SurveyDraft> getSurveyDraftSet() {
+        return surveyDraftSet;
     }
 
-    public void setSurveyQuestionsSet(Set<SurveyQuestions> surveyQuestionsSet) {
-        this.surveyQuestionsSet = surveyQuestionsSet;
+    public void setSurveyDraftSet(Set<SurveyDraft> surveyDraftSet) {
+        this.surveyDraftSet = surveyDraftSet;
     }
 
-    public Posts getPosts() {
-        return posts;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPosts(Posts posts) {
-        this.posts = posts;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     @Override
@@ -131,10 +131,10 @@ public class SurveyPosts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SurveyPosts)) {
+        if (!(object instanceof SurveyPost)) {
             return false;
         }
-        SurveyPosts other = (SurveyPosts) object;
+        SurveyPost other = (SurveyPost) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -143,7 +143,7 @@ public class SurveyPosts implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyPosts[ id=" + id + " ]";
+        return "com.cmc.pojo.SurveyPost[ id=" + id + " ]";
     }
     
 }

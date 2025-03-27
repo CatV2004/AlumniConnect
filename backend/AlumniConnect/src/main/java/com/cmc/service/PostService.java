@@ -8,6 +8,6 @@ package com.cmc.service;
  *
  * @author FPTSHOP
  */
-public class PostService {
+public interface PostService {
     
 }

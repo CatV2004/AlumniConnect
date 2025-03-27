@@ -28,5 +28,14 @@
     <class>com.cmc.pojo.UserSurveyOptions</class>
     <class>com.cmc.pojo.SurveyDrafts</class>
     <class>com.cmc.pojo.Reactions</class>
+    <class>com.cmc.pojo.SurveyPost</class>
+    <class>com.cmc.pojo.InvitationPost</class>
+    <class>com.cmc.pojo.UserSurveyOption</class>
+    <class>com.cmc.pojo.SurveyQuestion</class>
+    <class>com.cmc.pojo.PostImage</class>
+    <class>com.cmc.pojo.SurveyDraftAnswer</class>
+    <class>com.cmc.pojo.SurveyDraft</class>
+    <class>com.cmc.pojo.SurveyOption</class>
+    <class>com.cmc.pojo.Ugroup</class>
   </persistence-unit>
 </persistence>

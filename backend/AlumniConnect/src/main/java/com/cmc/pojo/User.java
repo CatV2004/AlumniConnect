@@ -30,21 +30,24 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @NamedQueries({
-    @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u"),
-    @NamedQuery(name = "Users.findById", query = "SELECT u FROM Users u WHERE u.id = :id"),
-    @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username"),
-    @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password"),
-    @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email"),
-    @NamedQuery(name = "Users.findByAvatar", query = "SELECT u FROM Users u WHERE u.avatar = :avatar"),
-    @NamedQuery(name = "Users.findByCover", query = "SELECT u FROM Users u WHERE u.cover = :cover"),
-    @NamedQuery(name = "Users.findByRole", query = "SELECT u FROM Users u WHERE u.role = :role"),
-    @NamedQuery(name = "Users.findByCreatedDate", query = "SELECT u FROM Users u WHERE u.createdDate = :createdDate"),
-    @NamedQuery(name = "Users.findByUpdatedDate", query = "SELECT u FROM Users u WHERE u.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Users.findByDeletedDate", query = "SELECT u FROM Users u WHERE u.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Users.findByActive", query = "SELECT u FROM Users u WHERE u.active = :active")})
-public class Users implements Serializable {
+    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
+    @NamedQuery(name = "User.findById", query = "SELECT u FROM User u WHERE u.id = :id"),
+    @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username"),
+    @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
+    @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName"),
+    @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName"),
+    @NamedQuery(name = "User.findByPhone", query = "SELECT u FROM User u WHERE u.phone = :phone"),
+    @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email"),
+    @NamedQuery(name = "User.findByAvatar", query = "SELECT u FROM User u WHERE u.avatar = :avatar"),
+    @NamedQuery(name = "User.findByCover", query = "SELECT u FROM User u WHERE u.cover = :cover"),
+    @NamedQuery(name = "User.findByRole", query = "SELECT u FROM User u WHERE u.role = :role"),
+    @NamedQuery(name = "User.findByCreatedDate", query = "SELECT u FROM User u WHERE u.createdDate = :createdDate"),
+    @NamedQuery(name = "User.findByUpdatedDate", query = "SELECT u FROM User u WHERE u.updatedDate = :updatedDate"),
+    @NamedQuery(name = "User.findByDeletedDate", query = "SELECT u FROM User u WHERE u.deletedDate = :deletedDate"),
+    @NamedQuery(name = "User.findByActive", query = "SELECT u FROM User u WHERE u.active = :active")})
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -62,6 +65,16 @@ public class Users implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "password")
     private String password;
+    @Size(max = 45)
+    @Column(name = "last_name")
+    private String lastName;
+    @Size(max = 45)
+    @Column(name = "first_name")
+    private String firstName;
+    // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
+    @Size(max = 45)
+    @Column(name = "phone")
+    private String phone;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -90,33 +103,33 @@ public class Users implements Serializable {
     private Date deletedDate;
     @Column(name = "active")
     private Boolean active;
-    @ManyToMany(mappedBy = "usersSet")
-    private Set<Ugroups> ugroupsSet;
-    @ManyToMany(mappedBy = "usersSet")
-    private Set<InvitationPosts> invitationPostsSet;
+    @ManyToMany(mappedBy = "userSet")
+    private Set<InvitationPost> invitationPostSet;
+    @ManyToMany(mappedBy = "userSet")
+    private Set<Ugroup> ugroupSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Set<Comments> commentsSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Set<SurveyDrafts> surveyDraftsSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Set<Posts> postsSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "users")
+    private Set<Reaction> reactionSet;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     private Alumni alumni;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Set<UserSurveyOptions> userSurveyOptionsSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "users")
-    private Teachers teachers;
+    private Set<SurveyDraft> surveyDraftSet;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private Teacher teacher;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
-    private Set<Reactions> reactionsSet;
+    private Set<Post> postSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Set<UserSurveyOption> userSurveyOptionSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Set<Comment> commentSet;
 
-    public Users() {
+    public User() {
     }
 
-    public Users(Long id) {
+    public User(Long id) {
         this.id = id;
     }
 
-    public Users(Long id, String username, String password, String email, String role) {
+    public User(Long id, String username, String password, String email, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -146,6 +159,30 @@ public class Users implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getEmail() {
@@ -212,44 +249,28 @@ public class Users implements Serializable {
         this.active = active;
     }
 
-    public Set<Ugroups> getUgroupsSet() {
-        return ugroupsSet;
+    public Set<InvitationPost> getInvitationPostSet() {
+        return invitationPostSet;
     }
 
-    public void setUgroupsSet(Set<Ugroups> ugroupsSet) {
-        this.ugroupsSet = ugroupsSet;
+    public void setInvitationPostSet(Set<InvitationPost> invitationPostSet) {
+        this.invitationPostSet = invitationPostSet;
     }
 
-    public Set<InvitationPosts> getInvitationPostsSet() {
-        return invitationPostsSet;
+    public Set<Ugroup> getUgroupSet() {
+        return ugroupSet;
     }
 
-    public void setInvitationPostsSet(Set<InvitationPosts> invitationPostsSet) {
-        this.invitationPostsSet = invitationPostsSet;
+    public void setUgroupSet(Set<Ugroup> ugroupSet) {
+        this.ugroupSet = ugroupSet;
     }
 
-    public Set<Comments> getCommentsSet() {
-        return commentsSet;
+    public Set<Reaction> getReactionSet() {
+        return reactionSet;
     }
 
-    public void setCommentsSet(Set<Comments> commentsSet) {
-        this.commentsSet = commentsSet;
-    }
-
-    public Set<SurveyDrafts> getSurveyDraftsSet() {
-        return surveyDraftsSet;
-    }
-
-    public void setSurveyDraftsSet(Set<SurveyDrafts> surveyDraftsSet) {
-        this.surveyDraftsSet = surveyDraftsSet;
-    }
-
-    public Set<Posts> getPostsSet() {
-        return postsSet;
-    }
-
-    public void setPostsSet(Set<Posts> postsSet) {
-        this.postsSet = postsSet;
+    public void setReactionSet(Set<Reaction> reactionSet) {
+        this.reactionSet = reactionSet;
     }
 
     public Alumni getAlumni() {
@@ -260,28 +281,44 @@ public class Users implements Serializable {
         this.alumni = alumni;
     }
 
-    public Set<UserSurveyOptions> getUserSurveyOptionsSet() {
-        return userSurveyOptionsSet;
+    public Set<SurveyDraft> getSurveyDraftSet() {
+        return surveyDraftSet;
     }
 
-    public void setUserSurveyOptionsSet(Set<UserSurveyOptions> userSurveyOptionsSet) {
-        this.userSurveyOptionsSet = userSurveyOptionsSet;
+    public void setSurveyDraftSet(Set<SurveyDraft> surveyDraftSet) {
+        this.surveyDraftSet = surveyDraftSet;
     }
 
-    public Teachers getTeachers() {
-        return teachers;
+    public Teacher getTeacher() {
+        return teacher;
     }
 
-    public void setTeachers(Teachers teachers) {
-        this.teachers = teachers;
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
-    public Set<Reactions> getReactionsSet() {
-        return reactionsSet;
+    public Set<Post> getPostSet() {
+        return postSet;
     }
 
-    public void setReactionsSet(Set<Reactions> reactionsSet) {
-        this.reactionsSet = reactionsSet;
+    public void setPostSet(Set<Post> postSet) {
+        this.postSet = postSet;
+    }
+
+    public Set<UserSurveyOption> getUserSurveyOptionSet() {
+        return userSurveyOptionSet;
+    }
+
+    public void setUserSurveyOptionSet(Set<UserSurveyOption> userSurveyOptionSet) {
+        this.userSurveyOptionSet = userSurveyOptionSet;
+    }
+
+    public Set<Comment> getCommentSet() {
+        return commentSet;
+    }
+
+    public void setCommentSet(Set<Comment> commentSet) {
+        this.commentSet = commentSet;
     }
 
     @Override
@@ -294,10 +331,10 @@ public class Users implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Users)) {
+        if (!(object instanceof User)) {
             return false;
         }
-        Users other = (Users) object;
+        User other = (User) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -306,7 +343,7 @@ public class Users implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Users[ id=" + id + " ]";
+        return "com.cmc.pojo.User[ id=" + id + " ]";
     }
     
 }

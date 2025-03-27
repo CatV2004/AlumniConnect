@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -22,11 +23,12 @@ import java.io.Serializable;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "user_survey_options")
+@Table(name = "post_image")
 @NamedQueries({
-    @NamedQuery(name = "UserSurveyOptions.findAll", query = "SELECT u FROM UserSurveyOptions u"),
-    @NamedQuery(name = "UserSurveyOptions.findById", query = "SELECT u FROM UserSurveyOptions u WHERE u.id = :id")})
-public class UserSurveyOptions implements Serializable {
+    @NamedQuery(name = "PostImage.findAll", query = "SELECT p FROM PostImage p"),
+    @NamedQuery(name = "PostImage.findById", query = "SELECT p FROM PostImage p WHERE p.id = :id"),
+    @NamedQuery(name = "PostImage.findByImage", query = "SELECT p FROM PostImage p WHERE p.image = :image")})
+public class PostImage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -34,17 +36,17 @@ public class UserSurveyOptions implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @JoinColumn(name = "survey_option_id", referencedColumnName = "id")
+    @Size(max = 500)
+    @Column(name = "image")
+    private String image;
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private SurveyOptions surveyOptionId;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Users userId;
+    private Post postId;
 
-    public UserSurveyOptions() {
+    public PostImage() {
     }
 
-    public UserSurveyOptions(Long id) {
+    public PostImage(Long id) {
         this.id = id;
     }
 
@@ -56,20 +58,20 @@ public class UserSurveyOptions implements Serializable {
         this.id = id;
     }
 
-    public SurveyOptions getSurveyOptionId() {
-        return surveyOptionId;
+    public String getImage() {
+        return image;
     }
 
-    public void setSurveyOptionId(SurveyOptions surveyOptionId) {
-        this.surveyOptionId = surveyOptionId;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public Users getUserId() {
-        return userId;
+    public Post getPostId() {
+        return postId;
     }
 
-    public void setUserId(Users userId) {
-        this.userId = userId;
+    public void setPostId(Post postId) {
+        this.postId = postId;
     }
 
     @Override
@@ -82,10 +84,10 @@ public class UserSurveyOptions implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof UserSurveyOptions)) {
+        if (!(object instanceof PostImage)) {
             return false;
         }
-        UserSurveyOptions other = (UserSurveyOptions) object;
+        PostImage other = (PostImage) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -94,7 +96,7 @@ public class UserSurveyOptions implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.UserSurveyOptions[ id=" + id + " ]";
+        return "com.cmc.pojo.PostImage[ id=" + id + " ]";
     }
     
 }

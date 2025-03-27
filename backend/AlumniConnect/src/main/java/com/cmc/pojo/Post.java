@@ -5,6 +5,7 @@
 package com.cmc.pojo;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -30,16 +32,16 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "comments")
+@Table(name = "post")
 @NamedQueries({
-    @NamedQuery(name = "Comments.findAll", query = "SELECT c FROM Comments c"),
-    @NamedQuery(name = "Comments.findById", query = "SELECT c FROM Comments c WHERE c.id = :id"),
-    @NamedQuery(name = "Comments.findByImage", query = "SELECT c FROM Comments c WHERE c.image = :image"),
-    @NamedQuery(name = "Comments.findByCreatedDate", query = "SELECT c FROM Comments c WHERE c.createdDate = :createdDate"),
-    @NamedQuery(name = "Comments.findByUpdatedDate", query = "SELECT c FROM Comments c WHERE c.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Comments.findByDeletedDate", query = "SELECT c FROM Comments c WHERE c.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Comments.findByActive", query = "SELECT c FROM Comments c WHERE c.active = :active")})
-public class Comments implements Serializable {
+    @NamedQuery(name = "Post.findAll", query = "SELECT p FROM Post p"),
+    @NamedQuery(name = "Post.findById", query = "SELECT p FROM Post p WHERE p.id = :id"),
+    @NamedQuery(name = "Post.findByLockComment", query = "SELECT p FROM Post p WHERE p.lockComment = :lockComment"),
+    @NamedQuery(name = "Post.findByCreatedDate", query = "SELECT p FROM Post p WHERE p.createdDate = :createdDate"),
+    @NamedQuery(name = "Post.findByUpdatedDate", query = "SELECT p FROM Post p WHERE p.updatedDate = :updatedDate"),
+    @NamedQuery(name = "Post.findByDeletedDate", query = "SELECT p FROM Post p WHERE p.deletedDate = :deletedDate"),
+    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")})
+public class Post implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,9 +55,8 @@ public class Comments implements Serializable {
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
-    @Size(max = 500)
-    @Column(name = "image")
-    private String image;
+    @Column(name = "lock_comment")
+    private Boolean lockComment;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -67,26 +68,28 @@ public class Comments implements Serializable {
     private Date deletedDate;
     @Column(name = "active")
     private Boolean active;
-    @OneToMany(mappedBy = "parentId")
-    private Set<Comments> commentsSet;
-    @JoinColumn(name = "parent_id", referencedColumnName = "id")
-    @ManyToOne
-    private Comments parentId;
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
-    private Posts postId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    private Set<PostImage> postImageSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    private Set<Reaction> reactionSet;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
+    private InvitationPost invitationPost;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Users userId;
+    private User userId;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
+    private SurveyPost surveyPost;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    private Set<Comment> commentSet;
 
-    public Comments() {
+    public Post() {
     }
 
-    public Comments(Long id) {
+    public Post(Long id) {
         this.id = id;
     }
 
-    public Comments(Long id, String content) {
+    public Post(Long id, String content) {
         this.id = id;
         this.content = content;
     }
@@ -107,12 +110,12 @@ public class Comments implements Serializable {
         this.content = content;
     }
 
-    public String getImage() {
-        return image;
+    public Boolean getLockComment() {
+        return lockComment;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setLockComment(Boolean lockComment) {
+        this.lockComment = lockComment;
     }
 
     public Date getCreatedDate() {
@@ -147,36 +150,52 @@ public class Comments implements Serializable {
         this.active = active;
     }
 
-    public Set<Comments> getCommentsSet() {
-        return commentsSet;
+    public Set<PostImage> getPostImageSet() {
+        return postImageSet;
     }
 
-    public void setCommentsSet(Set<Comments> commentsSet) {
-        this.commentsSet = commentsSet;
+    public void setPostImageSet(Set<PostImage> postImageSet) {
+        this.postImageSet = postImageSet;
     }
 
-    public Comments getParentId() {
-        return parentId;
+    public Set<Reaction> getReactionSet() {
+        return reactionSet;
     }
 
-    public void setParentId(Comments parentId) {
-        this.parentId = parentId;
+    public void setReactionSet(Set<Reaction> reactionSet) {
+        this.reactionSet = reactionSet;
     }
 
-    public Posts getPostId() {
-        return postId;
+    public InvitationPost getInvitationPost() {
+        return invitationPost;
     }
 
-    public void setPostId(Posts postId) {
-        this.postId = postId;
+    public void setInvitationPost(InvitationPost invitationPost) {
+        this.invitationPost = invitationPost;
     }
 
-    public Users getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(Users userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public SurveyPost getSurveyPost() {
+        return surveyPost;
+    }
+
+    public void setSurveyPost(SurveyPost surveyPost) {
+        this.surveyPost = surveyPost;
+    }
+
+    public Set<Comment> getCommentSet() {
+        return commentSet;
+    }
+
+    public void setCommentSet(Set<Comment> commentSet) {
+        this.commentSet = commentSet;
     }
 
     @Override
@@ -189,10 +208,10 @@ public class Comments implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Comments)) {
+        if (!(object instanceof Post)) {
             return false;
         }
-        Comments other = (Comments) object;
+        Post other = (Post) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -201,7 +220,7 @@ public class Comments implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Comments[ id=" + id + " ]";
+        return "com.cmc.pojo.Post[ id=" + id + " ]";
     }
     
 }

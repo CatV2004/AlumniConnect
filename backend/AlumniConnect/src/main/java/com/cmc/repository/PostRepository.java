@@ -8,6 +8,6 @@ package com.cmc.repository;
  *
  * @author FPTSHOP
  */
-public class PostRepository {
+public interface PostRepository {
     
 }

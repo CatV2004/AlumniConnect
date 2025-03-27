@@ -11,8 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
@@ -22,23 +21,22 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 /**
  *
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "ugroups")
+@Table(name = "reaction")
 @NamedQueries({
-    @NamedQuery(name = "Ugroups.findAll", query = "SELECT u FROM Ugroups u"),
-    @NamedQuery(name = "Ugroups.findById", query = "SELECT u FROM Ugroups u WHERE u.id = :id"),
-    @NamedQuery(name = "Ugroups.findByGroupName", query = "SELECT u FROM Ugroups u WHERE u.groupName = :groupName"),
-    @NamedQuery(name = "Ugroups.findByCreatedDate", query = "SELECT u FROM Ugroups u WHERE u.createdDate = :createdDate"),
-    @NamedQuery(name = "Ugroups.findByUpdatedDate", query = "SELECT u FROM Ugroups u WHERE u.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Ugroups.findByDeletedDate", query = "SELECT u FROM Ugroups u WHERE u.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Ugroups.findByActive", query = "SELECT u FROM Ugroups u WHERE u.active = :active")})
-public class Ugroups implements Serializable {
+    @NamedQuery(name = "Reaction.findAll", query = "SELECT r FROM Reaction r"),
+    @NamedQuery(name = "Reaction.findById", query = "SELECT r FROM Reaction r WHERE r.id = :id"),
+    @NamedQuery(name = "Reaction.findByReaction", query = "SELECT r FROM Reaction r WHERE r.reaction = :reaction"),
+    @NamedQuery(name = "Reaction.findByCreatedDate", query = "SELECT r FROM Reaction r WHERE r.createdDate = :createdDate"),
+    @NamedQuery(name = "Reaction.findByUpdatedDate", query = "SELECT r FROM Reaction r WHERE r.updatedDate = :updatedDate"),
+    @NamedQuery(name = "Reaction.findByDeletedDate", query = "SELECT r FROM Reaction r WHERE r.deletedDate = :deletedDate"),
+    @NamedQuery(name = "Reaction.findByActive", query = "SELECT r FROM Reaction r WHERE r.active = :active")})
+public class Reaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,9 +46,9 @@ public class Ugroups implements Serializable {
     private Long id;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 255)
-    @Column(name = "group_name")
-    private String groupName;
+    @Size(min = 1, max = 4)
+    @Column(name = "reaction")
+    private String reaction;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -62,24 +60,23 @@ public class Ugroups implements Serializable {
     private Date deletedDate;
     @Column(name = "active")
     private Boolean active;
-    @JoinTable(name = "group_users", joinColumns = {
-        @JoinColumn(name = "group_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "user_id", referencedColumnName = "id")})
-    @ManyToMany
-    private Set<Users> usersSet;
-    @ManyToMany(mappedBy = "ugroupsSet")
-    private Set<InvitationPosts> invitationPostsSet;
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private Post postId;
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private User userId;
 
-    public Ugroups() {
+    public Reaction() {
     }
 
-    public Ugroups(Long id) {
+    public Reaction(Long id) {
         this.id = id;
     }
 
-    public Ugroups(Long id, String groupName) {
+    public Reaction(Long id, String reaction) {
         this.id = id;
-        this.groupName = groupName;
+        this.reaction = reaction;
     }
 
     public Long getId() {
@@ -90,12 +87,12 @@ public class Ugroups implements Serializable {
         this.id = id;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getReaction() {
+        return reaction;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setReaction(String reaction) {
+        this.reaction = reaction;
     }
 
     public Date getCreatedDate() {
@@ -130,20 +127,20 @@ public class Ugroups implements Serializable {
         this.active = active;
     }
 
-    public Set<Users> getUsersSet() {
-        return usersSet;
+    public Post getPostId() {
+        return postId;
     }
 
-    public void setUsersSet(Set<Users> usersSet) {
-        this.usersSet = usersSet;
+    public void setPostId(Post postId) {
+        this.postId = postId;
     }
 
-    public Set<InvitationPosts> getInvitationPostsSet() {
-        return invitationPostsSet;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setInvitationPostsSet(Set<InvitationPosts> invitationPostsSet) {
-        this.invitationPostsSet = invitationPostsSet;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -156,10 +153,10 @@ public class Ugroups implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Ugroups)) {
+        if (!(object instanceof Reaction)) {
             return false;
         }
-        Ugroups other = (Ugroups) object;
+        Reaction other = (Reaction) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -168,7 +165,7 @@ public class Ugroups implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Ugroups[ id=" + id + " ]";
+        return "com.cmc.pojo.Reaction[ id=" + id + " ]";
     }
     
 }

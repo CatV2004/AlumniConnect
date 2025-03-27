@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
@@ -20,6 +21,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -27,16 +29,17 @@ import java.util.Date;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "reactions")
+@Table(name = "comment")
 @NamedQueries({
-    @NamedQuery(name = "Reactions.findAll", query = "SELECT r FROM Reactions r"),
-    @NamedQuery(name = "Reactions.findById", query = "SELECT r FROM Reactions r WHERE r.id = :id"),
-    @NamedQuery(name = "Reactions.findByReaction", query = "SELECT r FROM Reactions r WHERE r.reaction = :reaction"),
-    @NamedQuery(name = "Reactions.findByCreatedDate", query = "SELECT r FROM Reactions r WHERE r.createdDate = :createdDate"),
-    @NamedQuery(name = "Reactions.findByUpdatedDate", query = "SELECT r FROM Reactions r WHERE r.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Reactions.findByDeletedDate", query = "SELECT r FROM Reactions r WHERE r.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Reactions.findByActive", query = "SELECT r FROM Reactions r WHERE r.active = :active")})
-public class Reactions implements Serializable {
+    @NamedQuery(name = "Comment.findAll", query = "SELECT c FROM Comment c"),
+    @NamedQuery(name = "Comment.findById", query = "SELECT c FROM Comment c WHERE c.id = :id"),
+    @NamedQuery(name = "Comment.findByImage", query = "SELECT c FROM Comment c WHERE c.image = :image"),
+    @NamedQuery(name = "Comment.findByParentId", query = "SELECT c FROM Comment c WHERE c.parentId = :parentId"),
+    @NamedQuery(name = "Comment.findByCreatedDate", query = "SELECT c FROM Comment c WHERE c.createdDate = :createdDate"),
+    @NamedQuery(name = "Comment.findByUpdatedDate", query = "SELECT c FROM Comment c WHERE c.updatedDate = :updatedDate"),
+    @NamedQuery(name = "Comment.findByDeletedDate", query = "SELECT c FROM Comment c WHERE c.deletedDate = :deletedDate"),
+    @NamedQuery(name = "Comment.findByActive", query = "SELECT c FROM Comment c WHERE c.active = :active")})
+public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,9 +49,15 @@ public class Reactions implements Serializable {
     private Long id;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 4)
-    @Column(name = "reaction")
-    private String reaction;
+    @Lob
+    @Size(min = 1, max = 65535)
+    @Column(name = "content")
+    private String content;
+    @Size(max = 500)
+    @Column(name = "image")
+    private String image;
+    @Column(name = "parent_id")
+    private BigInteger parentId;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -62,21 +71,21 @@ public class Reactions implements Serializable {
     private Boolean active;
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Posts postId;
+    private Post postId;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Users userId;
+    private User userId;
 
-    public Reactions() {
+    public Comment() {
     }
 
-    public Reactions(Long id) {
+    public Comment(Long id) {
         this.id = id;
     }
 
-    public Reactions(Long id, String reaction) {
+    public Comment(Long id, String content) {
         this.id = id;
-        this.reaction = reaction;
+        this.content = content;
     }
 
     public Long getId() {
@@ -87,12 +96,28 @@ public class Reactions implements Serializable {
         this.id = id;
     }
 
-    public String getReaction() {
-        return reaction;
+    public String getContent() {
+        return content;
     }
 
-    public void setReaction(String reaction) {
-        this.reaction = reaction;
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public BigInteger getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(BigInteger parentId) {
+        this.parentId = parentId;
     }
 
     public Date getCreatedDate() {
@@ -127,19 +152,19 @@ public class Reactions implements Serializable {
         this.active = active;
     }
 
-    public Posts getPostId() {
+    public Post getPostId() {
         return postId;
     }
 
-    public void setPostId(Posts postId) {
+    public void setPostId(Post postId) {
         this.postId = postId;
     }
 
-    public Users getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(Users userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
@@ -153,10 +178,10 @@ public class Reactions implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Reactions)) {
+        if (!(object instanceof Comment)) {
             return false;
         }
-        Reactions other = (Reactions) object;
+        Comment other = (Comment) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -165,7 +190,7 @@ public class Reactions implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Reactions[ id=" + id + " ]";
+        return "com.cmc.pojo.Comment[ id=" + id + " ]";
     }
     
 }

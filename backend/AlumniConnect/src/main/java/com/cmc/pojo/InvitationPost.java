@@ -25,12 +25,12 @@ import java.util.Set;
  * @author FPTSHOP
  */
 @Entity
-@Table(name = "invitation_posts")
+@Table(name = "invitation_post")
 @NamedQueries({
-    @NamedQuery(name = "InvitationPosts.findAll", query = "SELECT i FROM InvitationPosts i"),
-    @NamedQuery(name = "InvitationPosts.findById", query = "SELECT i FROM InvitationPosts i WHERE i.id = :id"),
-    @NamedQuery(name = "InvitationPosts.findByEventName", query = "SELECT i FROM InvitationPosts i WHERE i.eventName = :eventName")})
-public class InvitationPosts implements Serializable {
+    @NamedQuery(name = "InvitationPost.findAll", query = "SELECT i FROM InvitationPost i"),
+    @NamedQuery(name = "InvitationPost.findById", query = "SELECT i FROM InvitationPost i WHERE i.id = :id"),
+    @NamedQuery(name = "InvitationPost.findByEventName", query = "SELECT i FROM InvitationPost i WHERE i.eventName = :eventName")})
+public class InvitationPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,28 +43,28 @@ public class InvitationPosts implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "event_name")
     private String eventName;
-    @JoinTable(name = "invitation_post_groups", joinColumns = {
+    @JoinTable(name = "invitation_post_group", joinColumns = {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
-    private Set<Ugroups> ugroupsSet;
-    @JoinTable(name = "invitation_post_users", joinColumns = {
+    private Set<Ugroup> ugroupSet;
+    @JoinTable(name = "invitation_post_user", joinColumns = {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")})
     @ManyToMany
-    private Set<Users> usersSet;
+    private Set<User> userSet;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
-    private Posts posts;
+    private Post post;
 
-    public InvitationPosts() {
+    public InvitationPost() {
     }
 
-    public InvitationPosts(Long id) {
+    public InvitationPost(Long id) {
         this.id = id;
     }
 
-    public InvitationPosts(Long id, String eventName) {
+    public InvitationPost(Long id, String eventName) {
         this.id = id;
         this.eventName = eventName;
     }
@@ -85,28 +85,28 @@ public class InvitationPosts implements Serializable {
         this.eventName = eventName;
     }
 
-    public Set<Ugroups> getUgroupsSet() {
-        return ugroupsSet;
+    public Set<Ugroup> getUgroupSet() {
+        return ugroupSet;
     }
 
-    public void setUgroupsSet(Set<Ugroups> ugroupsSet) {
-        this.ugroupsSet = ugroupsSet;
+    public void setUgroupSet(Set<Ugroup> ugroupSet) {
+        this.ugroupSet = ugroupSet;
     }
 
-    public Set<Users> getUsersSet() {
-        return usersSet;
+    public Set<User> getUserSet() {
+        return userSet;
     }
 
-    public void setUsersSet(Set<Users> usersSet) {
-        this.usersSet = usersSet;
+    public void setUserSet(Set<User> userSet) {
+        this.userSet = userSet;
     }
 
-    public Posts getPosts() {
-        return posts;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPosts(Posts posts) {
-        this.posts = posts;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     @Override
@@ -119,10 +119,10 @@ public class InvitationPosts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof InvitationPosts)) {
+        if (!(object instanceof InvitationPost)) {
             return false;
         }
-        InvitationPosts other = (InvitationPosts) object;
+        InvitationPost other = (InvitationPost) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -131,7 +131,7 @@ public class InvitationPosts implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.InvitationPosts[ id=" + id + " ]";
+        return "com.cmc.pojo.InvitationPost[ id=" + id + " ]";
     }
     
 }

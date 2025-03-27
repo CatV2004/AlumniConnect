@@ -2,14 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.cmc.service.impl;
+package com.cmc.controllers;
 
-import com.cmc.service.PostService;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
  *
  * @author FPTSHOP
  */
-public class PostServiceImpl implements PostService{
+@Controller
+@ControllerAdvice
+public class HomeController {
     
 }
