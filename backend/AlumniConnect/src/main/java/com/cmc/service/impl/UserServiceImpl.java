@@ -4,21 +4,14 @@
  */
 package com.cmc.service.impl;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.cmc.components.CloudinaryService;
-import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
+import com.cmc.repository.impl.UserRepositoryImpl;
 import com.cmc.service.UserService;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

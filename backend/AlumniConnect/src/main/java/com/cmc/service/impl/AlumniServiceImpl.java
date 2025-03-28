@@ -4,17 +4,11 @@
  */
 package com.cmc.service.impl;
 
-import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.AlumniDTO;
-import com.cmc.pojo.User;
 import com.cmc.repository.AlumniRepository;
-import com.cmc.repository.UserRepository;
 import com.cmc.service.AlumniService;
 import java.util.List;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**

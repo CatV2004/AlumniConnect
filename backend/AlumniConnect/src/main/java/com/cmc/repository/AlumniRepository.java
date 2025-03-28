@@ -17,5 +17,4 @@ public interface AlumniRepository {
     boolean existsByStudentId(String studentId);
     List<AlumniDTO> getPendingAlumniRegistrations();
     void approveAlumni(String username);
-    UserDTO getUserById(long id);
 }

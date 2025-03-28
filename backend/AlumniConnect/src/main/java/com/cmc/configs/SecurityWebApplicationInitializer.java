@@ -14,8 +14,5 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
  */
 public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer{
 
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    } 
+
 }

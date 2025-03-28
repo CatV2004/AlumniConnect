@@ -24,10 +24,10 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 @EnableWebMvc
 @EnableTransactionManagement
 @ComponentScan(basePackages = {
-    "com.nmc.controllers",
-    "com.nmc.repository",
-    "com.nmc.service",
-    "com.nmc.configs"
+    "com.cmc.controllers",
+    "com.cmc.repository",
+    "com.cmc.service",
+    "com.cmc.configs"
 })
 public class WebAppContextConfigs implements WebMvcConfigurer{
     @Override

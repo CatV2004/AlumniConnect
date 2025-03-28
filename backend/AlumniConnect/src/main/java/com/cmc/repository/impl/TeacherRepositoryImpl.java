@@ -6,8 +6,10 @@ package com.cmc.repository.impl;
 
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
+import com.cmc.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Date;
 import org.hibernate.Session;
@@ -30,6 +32,9 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
     @Autowired
     private ModelMapper modelMapper;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     private Session getCurrentSession() {
         return factory.getObject().getCurrentSession();
@@ -37,15 +42,20 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
     @Override
     public void createTeacherAccount(TeacherDTO teacherDTO) {
-        User user = modelMapper.map(teacherDTO.getUser(), User.class);
-        user.setRole("TEACHER");
+        UserDTO userDTO = userRepository.getUserById(teacherDTO.getId());
+        User user = modelMapper.map(userDTO, User.class);
+        if (user != null) {
 
-        TeacherDTO newTeacherDTO = new TeacherDTO();
-        newTeacherDTO.setUser(modelMapper.map(user, UserDTO.class));
-        newTeacherDTO.setMustChangePassword(true);
-        newTeacherDTO.setPasswordResetTime(new Date());
+            user.setRole("TEACHER");
+            getCurrentSession().merge(user);
 
-        getCurrentSession().persist(modelMapper.map(newTeacherDTO, User.class));
+            Teacher teacher = new Teacher();
+            teacher.setId(user.getId());
+            teacher.setMustChangePassword(teacherDTO.getMustChangePassword());
+            teacher.setPasswordResetTime(new Date());
+
+            getCurrentSession().persist(teacher);
+        }
     }
 
     @Override

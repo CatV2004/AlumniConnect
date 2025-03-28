@@ -9,6 +9,7 @@ import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.AlumniRepository;
+import com.cmc.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
@@ -31,23 +32,17 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
     @Autowired
     private ModelMapper modelMapper;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     private Session getCurrentSession() {
         return factory.getObject().getCurrentSession();
     }
 
-    public UserDTO getUserById(long id) {
-        User user = getCurrentSession()
-                .createQuery("FROM User WHERE id = :id", User.class)
-                .setParameter("id", id)
-                .uniqueResult();
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        return userDTO;
-    }
-
     @Override
     public void registerAlumni(AlumniDTO alumniDTO) {
-        UserDTO userDTO = this.getUserById(alumniDTO.getId());
+        UserDTO userDTO = userRepository.getUserById(alumniDTO.getId());
 
         User user = modelMapper.map(userDTO, User.class);
         if (user != null) {

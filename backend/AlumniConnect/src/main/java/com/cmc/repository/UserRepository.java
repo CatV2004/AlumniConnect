@@ -16,6 +16,8 @@ import java.util.List;
 public interface UserRepository {
 
     UserDTO  getUserByUsername(String username);
+    
+    UserDTO getUserById(long id);
 
     void addUser(User User);
 

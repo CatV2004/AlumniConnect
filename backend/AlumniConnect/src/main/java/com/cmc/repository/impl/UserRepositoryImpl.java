@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
- * @author FPTSHOP
+ * @author FPTSHOP  
  */
 @Repository
 @Transactional
@@ -80,5 +80,15 @@ public class UserRepositoryImpl implements UserRepository {
                 .createQuery("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username",  Boolean.class)
                 .uniqueResultOptional()
                 .orElse(false);
+    }
+    
+    @Override
+    public UserDTO getUserById(long id) {
+        User user = getCurrentSession()
+                .createQuery("FROM User WHERE id = :id", User.class)
+                .setParameter("id", id)
+                .uniqueResult();
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        return userDTO;
     }
 }
