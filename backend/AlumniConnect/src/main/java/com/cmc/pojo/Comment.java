@@ -22,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -38,42 +39,49 @@ import java.util.Date;
     @NamedQuery(name = "Comment.findByCreatedDate", query = "SELECT c FROM Comment c WHERE c.createdDate = :createdDate"),
     @NamedQuery(name = "Comment.findByUpdatedDate", query = "SELECT c FROM Comment c WHERE c.updatedDate = :updatedDate"),
     @NamedQuery(name = "Comment.findByDeletedDate", query = "SELECT c FROM Comment c WHERE c.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Comment.findByActive", query = "SELECT c FROM Comment c WHERE c.active = :active")})
+    @NamedQuery(name = "Comment.findByActive", query = "SELECT c FROM Comment c WHERE c.active = :active")
+})
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-    @Basic(optional = false)
+
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
+
     @Size(max = 500)
     @Column(name = "image")
     private String image;
+
     @Column(name = "parent_id")
     private BigInteger parentId;
+
+    // Chuyển sang LocalDateTime
     @Column(name = "created_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    private LocalDateTime createdDate;
+
     @Column(name = "updated_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
+    private LocalDateTime updatedDate;
+
     @Column(name = "deleted_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedDate;
+    private LocalDateTime deletedDate;
+
     @Column(name = "active")
     private Boolean active;
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "post_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
     private Post postId;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+
     @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User userId;
 
     public Comment() {
@@ -120,27 +128,27 @@ public class Comment implements Serializable {
         this.parentId = parentId;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getUpdatedDate() {
+    public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
+    public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
     }
 
-    public Date getDeletedDate() {
+    public LocalDateTime getDeletedDate() {
         return deletedDate;
     }
 
-    public void setDeletedDate(Date deletedDate) {
+    public void setDeletedDate(LocalDateTime deletedDate) {
         this.deletedDate = deletedDate;
     }
 
@@ -192,5 +200,5 @@ public class Comment implements Serializable {
     public String toString() {
         return "com.cmc.pojo.Comment[ id=" + id + " ]";
     }
-    
+
 }

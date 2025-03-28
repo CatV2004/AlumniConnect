@@ -5,7 +5,7 @@
 package com.cmc.dtos;
 
 import com.cmc.pojo.User;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -14,13 +14,13 @@ import java.util.Date;
 public class TeacherDTO {
     private Long id;
     private Boolean mustChangePassword;
-    private Date passwordResetTime;
+    private LocalDateTime passwordResetTime;
     private UserDTO user;
 
     public TeacherDTO() {
     }
 
-    public TeacherDTO(Long id, Boolean mustChangePassword, Date passwordResetTime, UserDTO user) {
+    public TeacherDTO(Long id, Boolean mustChangePassword, LocalDateTime passwordResetTime, UserDTO user) {
         this.id = id;
         this.mustChangePassword = mustChangePassword;
         this.passwordResetTime = passwordResetTime;
@@ -43,11 +43,11 @@ public class TeacherDTO {
         this.mustChangePassword = mustChangePassword;
     }
 
-    public Date getPasswordResetTime() {
+    public LocalDateTime getPasswordResetTime() {
         return passwordResetTime;
     }
 
-    public void setPasswordResetTime(Date passwordResetTime) {
+    public void setPasswordResetTime(LocalDateTime passwordResetTime) {
         this.passwordResetTime = passwordResetTime;
     }
 

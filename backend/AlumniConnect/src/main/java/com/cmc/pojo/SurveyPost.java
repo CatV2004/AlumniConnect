@@ -20,6 +20,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -45,8 +46,7 @@ public class SurveyPost implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "end_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endTime;
+    private LocalDateTime endTime;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 23)
@@ -67,7 +67,7 @@ public class SurveyPost implements Serializable {
         this.id = id;
     }
 
-    public SurveyPost(Long id, Date endTime, String surveyType) {
+    public SurveyPost(Long id, LocalDateTime endTime, String surveyType) {
         this.id = id;
         this.endTime = endTime;
         this.surveyType = surveyType;
@@ -81,11 +81,11 @@ public class SurveyPost implements Serializable {
         this.id = id;
     }
 
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

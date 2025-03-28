@@ -52,7 +52,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
             Teacher teacher = new Teacher();
             teacher.setId(user.getId());
             teacher.setMustChangePassword(teacherDTO.getMustChangePassword());
-            teacher.setPasswordResetTime(new Date());
+            teacher.setPasswordResetTime(LocalDateTime.now().plusHours(24));
 
             getCurrentSession().persist(teacher);
         }
@@ -69,7 +69,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
         TeacherDTO teacherDTO = modelMapper.map(user, TeacherDTO.class);
         return teacherDTO.getPasswordResetTime() != null &&
-                teacherDTO.getPasswordResetTime().before(new Date());
+                teacherDTO.getPasswordResetTime().isBefore(LocalDateTime.now());
     }
 
     @Override
@@ -81,7 +81,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
         if (user != null) {
             TeacherDTO teacherDTO = modelMapper.map(user, TeacherDTO.class);
-            teacherDTO.setPasswordResetTime(new Date());
+            teacherDTO.setPasswordResetTime(LocalDateTime.now());
             teacherDTO.setMustChangePassword(true);
             getCurrentSession().merge(modelMapper.map(teacherDTO, User.class));
         }

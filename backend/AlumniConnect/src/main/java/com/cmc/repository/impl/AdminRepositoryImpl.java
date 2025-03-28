@@ -9,7 +9,6 @@ import com.cmc.dtos.TeacherDTO;
 import com.cmc.pojo.User;
 import com.cmc.repository.AdminRepository;
 import java.time.LocalDateTime;
-import java.util.Date;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class AdminRepositoryImpl implements AdminRepository {
         if (user != null && "TEACHER".equalsIgnoreCase(user.getRole())) {
             TeacherDTO teacherDTO = modelMapper.map(user, TeacherDTO.class);
             teacherDTO.setMustChangePassword(true);
-            teacherDTO.setPasswordResetTime(new Date());
+            teacherDTO.setPasswordResetTime(LocalDateTime.now().plusHours(24));
             getCurrentSession().merge(modelMapper.map(teacherDTO, User.class));
         }
     }

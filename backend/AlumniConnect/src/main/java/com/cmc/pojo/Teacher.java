@@ -17,6 +17,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -41,8 +42,7 @@ public class Teacher implements Serializable {
     @Column(name = "must_change_password")
     private Boolean mustChangePassword;
     @Column(name = "password_reset_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date passwordResetTime;
+    private LocalDateTime passwordResetTime;
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private User user;
@@ -70,11 +70,11 @@ public class Teacher implements Serializable {
         this.mustChangePassword = mustChangePassword;
     }
 
-    public Date getPasswordResetTime() {
+    public LocalDateTime getPasswordResetTime() {
         return passwordResetTime;
     }
 
-    public void setPasswordResetTime(Date passwordResetTime) {
+    public void setPasswordResetTime(LocalDateTime passwordResetTime) {
         this.passwordResetTime = passwordResetTime;
     }
 
