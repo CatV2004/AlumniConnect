@@ -6,6 +6,7 @@ package com.cmc.repository;
 
 import com.cmc.dtos.AlumniDTO;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Alumni;
 import java.util.List;
 
 /**
@@ -13,8 +14,10 @@ import java.util.List;
  * @author FPTSHOP
  */
 public interface AlumniRepository {
-    void registerAlumni(AlumniDTO alumniDTO);
-    boolean existsByStudentId(String studentId);
+    void registerAlumni(Alumni alumni);
     List<AlumniDTO> getPendingAlumniRegistrations();
-    void approveAlumni(String username);
+    void approveAlumni(Long id);
+    Alumni findByStudentCode(String studentCode);
+    boolean checkStudentCode(String studentId);
+    List<Alumni> getAlumnis();
 }

@@ -75,5 +75,6 @@ public class HibernateConfigs {
         transactionManager.setSessionFactory(getSessionFactory().getObject());
         return transactionManager;
     }
+    
 
 }

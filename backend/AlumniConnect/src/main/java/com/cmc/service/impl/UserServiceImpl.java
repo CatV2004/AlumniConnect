@@ -91,7 +91,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean authUser(String username, String password) {
-        return this.userRepo.authUser(username, password);
+        User u = this.getUserByUsername(username);
+        return u.getActive() && this.userRepo.authUser(username, password);
     }
 
     @Override
@@ -107,4 +108,10 @@ public class UserServiceImpl implements UserService {
         userRepo.addUser(admin);
         return true;
     }
+
+    @Override
+    public User getUserById(Long id) {
+        return this.userRepo.getUserById(id);
+    }
+
 }

@@ -7,8 +7,10 @@ package com.cmc.repository.impl;
 import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
@@ -54,7 +56,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         getCurrentSession().persist(user);
         getCurrentSession().flush();
-        
+
     }
 
     @Override
@@ -90,4 +92,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .uniqueResult();
         return user;
     }
+
+
 }

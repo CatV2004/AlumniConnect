@@ -48,10 +48,10 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtService jwtService;
+//    @Autowired
+//    private AuthenticationManager authenticationManager;
+//    @Autowired
+//    private JwtService jwtService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Principal principal, HttpSession session) {

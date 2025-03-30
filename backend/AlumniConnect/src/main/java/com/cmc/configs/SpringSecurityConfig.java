@@ -76,6 +76,7 @@ public class SpringSecurityConfig {
                     .clearAuthentication(true)
                     .permitAll()
                 )
+//                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception
                     .accessDeniedPage("/403")
                 );

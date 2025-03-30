@@ -6,9 +6,11 @@ package com.cmc.repository.impl;
 
 import com.cmc.dtos.AlumniDTO;
 import com.cmc.dtos.TeacherDTO;
+import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.AdminRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +39,13 @@ public class AdminRepositoryImpl implements AdminRepository {
     @Override
     public void confirmAlumniRegistration(String username) {
         User user = getCurrentSession()
-            .createQuery("FROM User WHERE username = :username", User.class)
-            .setParameter("username", username)
-            .uniqueResult();
+                .createQuery("FROM User WHERE username = :username", User.class)
+                .setParameter("username", username)
+                .uniqueResult();
 
         if (user != null && "ALUMNI".equalsIgnoreCase(user.getRole())) {
             AlumniDTO alumniDTO = modelMapper.map(user, AlumniDTO.class);
-            alumniDTO.setIsVerified(true); 
+            alumniDTO.setIsVerified(true);
             getCurrentSession().merge(modelMapper.map(alumniDTO, User.class));
         }
     }
@@ -51,9 +53,9 @@ public class AdminRepositoryImpl implements AdminRepository {
     @Override
     public void resetTeacherPasswordDeadline(String username) {
         User user = getCurrentSession()
-            .createQuery("FROM User WHERE username = :username", User.class)
-            .setParameter("username", username)
-            .uniqueResult();
+                .createQuery("FROM User WHERE username = :username", User.class)
+                .setParameter("username", username)
+                .uniqueResult();
 
         if (user != null && "TEACHER".equalsIgnoreCase(user.getRole())) {
             TeacherDTO teacherDTO = modelMapper.map(user, TeacherDTO.class);
@@ -62,6 +64,6 @@ public class AdminRepositoryImpl implements AdminRepository {
             getCurrentSession().merge(modelMapper.map(teacherDTO, User.class));
         }
     }
+
+
 }
-
-

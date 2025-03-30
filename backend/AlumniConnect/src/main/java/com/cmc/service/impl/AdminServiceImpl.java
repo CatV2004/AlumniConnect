@@ -13,12 +13,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author FPTSHOP
  */
 @Service
+@Transactional
 public class AdminServiceImpl implements AdminService {
 
     @Autowired
@@ -37,7 +39,6 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Tài khoản đã tồn tại!");
         }
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-        System.out.printf("function registerAdmin --passwordEncoder: %s", admin.getPassword());
         admin.setRole("ADMIN");
         User u = modelMapper.map(admin, User.class);
         userRepository.addUser(u);

@@ -23,4 +23,7 @@ public interface UserService extends UserDetailsService {
     boolean authUser(String username, String password);
     
     boolean registerAdmin(String username, String password);
+    
+    User getUserById(Long id);
+    
 }

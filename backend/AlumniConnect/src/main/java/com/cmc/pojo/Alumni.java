@@ -49,6 +49,12 @@ public class Alumni implements Serializable {
 
     public Alumni() {
     }
+    public Alumni(String studentCode, Boolean isVerified, User user) {
+        this.id = user.getId();
+        this.studentCode = studentCode;
+        this.isVerified = isVerified;
+        this.user = user;
+    }
 
     public Alumni(Long id) {
         this.id = id;
