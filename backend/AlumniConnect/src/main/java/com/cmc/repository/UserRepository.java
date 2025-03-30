@@ -15,15 +15,15 @@ import java.util.List;
  */
 public interface UserRepository {
 
-    UserDTO  getUserByUsername(String username);
+    User  getUserByUsername(String username);
     
-    UserDTO getUserById(long id);
+    User getUserById(long id);
 
     void addUser(User User);
 
     void changePassword(String username, ChangePasswordDTO dto);
     
-    boolean authUser(String username, String password);
+    boolean authUser(String username, String password );
     
     boolean existsByUsername(String username);
 

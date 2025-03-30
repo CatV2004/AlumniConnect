@@ -8,9 +8,10 @@ import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
-import com.cmc.repository.impl.UserRepositoryImpl;
 import com.cmc.service.UserService;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -38,53 +40,71 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passEncoder;
-    
+
     private final CloudinaryService cloudinaryService = new CloudinaryService();
 
     @Override
-    public UserDTO getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return this.userRepo.getUserByUsername(username);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDTO userDTO = this.userRepo.getUserByUsername(username);
-        if (userDTO == null) {
+        User user = this.userRepo.getUserByUsername(username);
+        if (user == null) {
             throw new UsernameNotFoundException("Không tồn tại!");
         }
-        
-        User user = modelMapper.map(userDTO, User.class);
 
-        Set<GrantedAuthority> authorities = new HashSet<>(); 
-        authorities.add(new SimpleGrantedAuthority(userDTO.getRole()));
+        if (user.getUsername() == null || user.getPassword() == null) {
+            throw new UsernameNotFoundException("Lỗi ánh xạ dữ liệu từ UserDTO sang User!");
+        }
+
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(), user.getPassword(), authorities);
     }
 
     @Override
-    public void addUser(User user) {
-        if (userRepo.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username đã tồn tại!");
-        }
+    public User addUser(Map<String, String> params, MultipartFile avatar, MultipartFile cover) {
+        User u = new User();
+        u.setFirstName(params.get("firstName"));
+        u.setLastName(params.get("lastName"));
+        u.setPhone(params.getOrDefault("phone", "113"));
+        u.setEmail(params.getOrDefault("email", "admin@gmail.com"));
+        u.setUsername(params.get("username"));
+        u.setPassword(this.passEncoder.encode(params.get("password")));
+        u.setRole(params.get("role"));
 
-        if (user.getAvatarFile() != null && !user.getAvatarFile().isEmpty()) {
-            String avatarUrl = cloudinaryService.uploadFile(user.getAvatarFile());
-            user.setAvatar(avatarUrl);
-        }
+        u.setAvatar(cloudinaryService.uploadFile(avatar));
+        u.setCover(cloudinaryService.uploadFile(cover));
+        u.setCreatedDate(LocalDateTime.now());
+        u.setUpdatedDate(LocalDateTime.now());
+        u.setActive(true);
 
-        if (user.getCoverFile() != null && !user.getCoverFile().isEmpty()) {
-            String coverUrl = cloudinaryService.uploadFile(user.getCoverFile());
-            user.setCover(coverUrl);
-        }
 
-        user.setPassword(passEncoder.encode(user.getPassword()));
+        userRepo.addUser(u);
 
-        userRepo.addUser(user);
+        return u;
     }
 
     @Override
     public boolean authUser(String username, String password) {
         return this.userRepo.authUser(username, password);
+    }
+
+    @Override
+    public boolean registerAdmin(String username, String password) {
+        if (userRepo.getUserByUsername(username) != null) {
+            return false;
+        }
+
+        User admin = new User();
+        admin.setUsername(username);
+        admin.setPassword(passEncoder.encode(password));
+        admin.setRole("ADMIN");
+        userRepo.addUser(admin);
+        return true;
     }
 }

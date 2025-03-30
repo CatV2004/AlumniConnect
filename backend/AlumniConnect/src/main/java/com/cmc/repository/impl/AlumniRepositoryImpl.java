@@ -42,9 +42,8 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
     @Override
     public void registerAlumni(AlumniDTO alumniDTO) {
-        UserDTO userDTO = userRepository.getUserById(alumniDTO.getId());
+        User user = userRepository.getUserById(alumniDTO.getId());
 
-        User user = modelMapper.map(userDTO, User.class);
         if (user != null) {
 
             user.setRole("ALUMNI");
@@ -61,11 +60,11 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
     @Override
     public boolean existsByStudentId(String studentCode) {
-        return getCurrentSession()
-                .createQuery("SELECT COUNT(a) > 0 FROM Alumni a WHERE a.studentCode = :studentCode", Boolean.class)
+        long count = getCurrentSession()
+                .createQuery("SELECT COUNT(a) FROM Alumni a WHERE a.studentCode = :studentCode", Long.class)
                 .setParameter("studentCode", studentCode)
-                .uniqueResultOptional()
-                .orElse(false);
+                .uniqueResult();
+        return count > 0;
     }
 
     @Override

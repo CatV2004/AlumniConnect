@@ -11,7 +11,6 @@ import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
 import com.cmc.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.Date;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +41,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
     @Override
     public void createTeacherAccount(TeacherDTO teacherDTO) {
-        UserDTO userDTO = userRepository.getUserById(teacherDTO.getId());
-        User user = modelMapper.map(userDTO, User.class);
+        User user = userRepository.getUserById(teacherDTO.getId());
         if (user != null) {
 
             user.setRole("TEACHER");

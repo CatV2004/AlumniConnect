@@ -16,14 +16,18 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -121,12 +125,6 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Set<Comment> commentSet;
 
-    
-    private MultipartFile avatarFile;  
-    private MultipartFile coverFile;
-    
-    
-    
     public User() {
     }
 
@@ -326,24 +324,6 @@ public class User implements Serializable {
         this.commentSet = commentSet;
     }
 
-    public MultipartFile getAvatarFile() {
-        return avatarFile;
-    }
-
-    public void setAvatarFile(MultipartFile avatarFile) {
-        this.avatarFile = avatarFile;
-    }
-
-    public MultipartFile getCoverFile() {
-        return coverFile;
-    }
-
-    public void setCoverFile(MultipartFile coverFile) {
-        this.coverFile = coverFile;
-    }
-    
-    
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -364,11 +344,21 @@ public class User implements Serializable {
         return true;
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+        this.updatedDate = LocalDateTime.now();
+        this.active = true;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedDate = LocalDateTime.now();
+    }
+
     @Override
     public String toString() {
-        return "com.cmc.pojo.User[ id=" + id + " ]";
+        return String.format("%s %s", Objects.toString(firstName, ""), Objects.toString(lastName, ""));
     }
-    
-    
-    
+
 }
