@@ -1,1 +1,28 @@
     
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Trang Chủ</title>
+    <th:block th:replace="base :: styleBase"></th:block>
+    <th:block th:replace="base :: scriptBase"></th:block>
+</head>
+
+<body>
+    <div th:replace="base :: header"></div>
+    <div th:replace="base :: content">
+        <h1>Xin Chao</h1>
+        <ul>
+            <li th:each="post : ${posts}">
+                <p th:text="${post.content}"></p>
+            </li>
+        </ul>
+
+        <div th:if="${totalPages > 1}">
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+               th:href="@{/search(keyword=${keyword}, page=${i}, size=10)}"
+               th:text="${i + 1}"></a>
+        </div>
+    </div>
+    <div th:replace="base :: footer"></div>
+</body>
+</html>

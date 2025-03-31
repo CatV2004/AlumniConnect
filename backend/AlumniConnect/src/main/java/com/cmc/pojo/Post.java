@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
-
+import lombok.Data; 
 /**
  *
  * @author FPTSHOP
@@ -43,6 +43,7 @@ import java.util.Set;
     @NamedQuery(name = "Post.findByDeletedDate", query = "SELECT p FROM Post p WHERE p.deletedDate = :deletedDate"),
     @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")
 })
+@Data
 public class Post implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -98,6 +99,19 @@ public class Post implements Serializable {
 
     public Post(Long id) {
         this.id = id;
+    }
+
+    public Post(Long id, String content, Boolean lockComment, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime deletedDate, Boolean active,  User userId, Set<PostImage> postImageSet) {
+        this.id = id;
+        this.content = content;
+        this.lockComment = lockComment;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+        this.deletedDate = deletedDate;
+        this.active = active;
+        this.userId = userId;
+        this.postImageSet = postImageSet;
+  
     }
 
     public Post(Long id, String content) {

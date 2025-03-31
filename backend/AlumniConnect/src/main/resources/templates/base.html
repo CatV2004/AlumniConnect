@@ -32,8 +32,8 @@
                         <li class="nav-item"><a class="nav-link" href="/admin/notifications">Thông báo & Sự kiện</a></li>
                         <li class="nav-item"><a class="nav-link" href="/admin/statistics">Thống kê</a></li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <form class="d-flex" action="/posts/search" method="get">
+                        <input class="form-control me-2" name="keyword" type="search" placeholder="Tìm kiếm ..." aria-label="Tìm">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
                     <ul class="navbar-nav ms-auto">

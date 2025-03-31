@@ -4,6 +4,7 @@
  */
 package com.cmc.configs;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
     "com.cmc.controllers",
     "com.cmc.repository",
     "com.cmc.service",
-    "com.cmc.configs"
+    "com.cmc.configs",
 })
 public class WebAppContextConfigs implements WebMvcConfigurer{
     @Override
