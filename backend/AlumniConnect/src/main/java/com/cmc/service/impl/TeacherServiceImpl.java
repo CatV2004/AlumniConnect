@@ -9,12 +9,14 @@ import com.cmc.repository.TeacherRepository;
 import com.cmc.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author FPTSHOP
  */
 @Service
+@Transactional
 public class TeacherServiceImpl implements TeacherService {
 
     @Autowired

@@ -7,8 +7,10 @@ package com.cmc.repository.impl;
 import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
@@ -20,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
- * @author FPTSHOP  
+ * @author FPTSHOP
  */
 @Repository
 @Transactional
@@ -40,26 +42,26 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public UserDTO getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createQuery("FROM User WHERE username = :username", User.class);
         q.setParameter("username", username);
 
         User user = (User) q.uniqueResult();
-        return user != null ? modelMapper.map(user, UserDTO.class) : null;
+        return user != null ? user : null;
     }
 
     @Override
     public void addUser(User user) {
+
         getCurrentSession().persist(user);
+        getCurrentSession().flush();
+
     }
 
     @Override
     public void changePassword(String username, ChangePasswordDTO dto) {
-        User user = getCurrentSession()
-                .createQuery("FROM User WHERE username = :username", User.class)
-                .setParameter("username", username)
-                .uniqueResult();
+        User user = this.getUserByUsername(username);
 
         if (user != null) {
             user.setPassword(passEncoder.encode(dto.getNewPassword()));
@@ -69,26 +71,27 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean authUser(String username, String password) {
-        UserDTO uDTO = this.getUserByUsername(username);
-        User user = modelMapper.map(uDTO, User.class);
-        return this.passEncoder.matches(password, user.getPassword());
+        User user = this.getUserByUsername(username);
+        return user != null && this.passEncoder.matches(password, user.getPassword());
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return getCurrentSession()
-                .createQuery("SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username",  Boolean.class)
-                .uniqueResultOptional()
-                .orElse(false);
+        Long count = getCurrentSession()
+                .createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class)
+                .setParameter("username", username)
+                .uniqueResult();
+        return count != null && count > 0;
     }
-    
+
     @Override
-    public UserDTO getUserById(long id) {
+    public User getUserById(long id) {
         User user = getCurrentSession()
                 .createQuery("FROM User WHERE id = :id", User.class)
                 .setParameter("id", id)
                 .uniqueResult();
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        return userDTO;
+        return user;
     }
+
+
 }

@@ -3,13 +3,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>Trang Chủ</title>
-    <th:block th:replace="base :: styleBase"></th:block>
-    <th:block th:replace="base :: scriptBase"></th:block>
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
 </head>
 
 <body>
-    <div th:replace="base :: header"></div>
-    <div th:replace="base :: content">
+    <header th:replace="~{layout/base :: header}"></header>
+    <main class="container mt-4" th:fragment="~{layout/base :: main}">
         <h1>Xin Chao</h1>
         <ul>
             <li th:each="post : ${posts}">
@@ -22,7 +22,7 @@
                th:href="@{/search(keyword=${keyword}, page=${i}, size=10)}"
                th:text="${i + 1}"></a>
         </div>
-    </div>
-    <div th:replace="base :: footer"></div>
+    </main>
+    <footer th:replace="~{layout/base :: footer}"></footer>
 </body>
 </html>

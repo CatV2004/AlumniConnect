@@ -6,6 +6,10 @@ package com.cmc.repository.impl;
 
 import com.cmc.pojo.Post;
 import com.cmc.repository.PostRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,38 +27,37 @@ import org.springframework.stereotype.Repository;
  * @author FPTSHOP
  */
 @Repository
-public class PostRepositoryImpl implements PostRepository{
+@Transactional
+public class PostRepositoryImpl implements PostRepository {
 
     private static final int SIZE = 10;
-    
+
     @Autowired
     private LocalSessionFactoryBean Factory;
-    
-    private Session getSession(){
+
+    private Session getSession() {
         return Factory.getObject().getCurrentSession();
     }
-    
+
     @Override
-    @Transactional
     public List<Post> getPostByUserId(Long id) {
         List<Post> p = new ArrayList<>();
-        String sql = "SELECT * FROM Post p" +
-            "JOIN Users u ON p.userId = u.id" +
-            "LEFT JOIN PostImages pi ON p.id = pi.postId" +
-            "WHERE p.userId = :userId"
+        String sql = "SELECT * FROM Post p"
+                + "JOIN Users u ON p.userId = u.id"
+                + "LEFT JOIN PostImages pi ON p.id = pi.postId"
+                + "WHERE p.userId = :userId"
                 + "ORDER BY p.id DESC";
-        Query<Post> q = getSession().createQuery(sql, Post.class);
+        Query q = getSession().createQuery(sql, Post.class);
         q.setParameter("userId", id);
         p = q.getResultList();
         return p;
     }
 
     @Override
-    @Transactional
-    public List<Post> getPosts(String kw, Pageable pageable) {
-        String hql = "FROM Post p WHERE p.content LIKE :kw ORDER BY p.id DESC";
-        Query<Post> query = getSession().createQuery(hql, Post.class);
-        query.setParameter("kw", "%" + kw + "%");
+    public List<Post> getPostByKeywords(String kw, Pageable pageable) {
+        String hql = "FROM Post p WHERE p.content LIKE CONCAT('%', :kw, '%') ORDER BY p.id DESC";
+        Query query = getSession().createQuery(hql, Post.class);
+        query.setParameter("kw", kw);
 
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
@@ -63,11 +66,10 @@ public class PostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    @Transactional
     public int addPost(Post post) {
-        try{
-            getSession().persist(post); 
-        }catch(Exception ex){
+        try {
+            getSession().persist(post);
+        } catch (Exception ex) {
             return -1;
         }
         return 1;
@@ -82,7 +84,6 @@ public class PostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    @Transactional
     public int updateContent(Long id, String content) {
         Query q = getSession().createNamedQuery("UPDATE Post p SET p.content = :content WHERE p.id = :id", Post.class);
         q.setParameter("id", id);
@@ -101,22 +102,59 @@ public class PostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    @Transactional
     public List<Post> getPostId(Long id) {
         List<Post> ps = new ArrayList<>();
         String sql = "SELECT p FROM Post p WHERE p.active = true, p.id = :id";
-        Query<Post> q = getSession().createQuery(sql, Post.class);
+        Query q = getSession().createQuery(sql, Post.class);
         q.setParameter("id", id);
         ps = q.getResultList();
         return ps;
     }
-    
+
     @Override
     public long countTotalPosts(String kw) {
         String hql = "SELECT COUNT(p) FROM Post p WHERE p.content LIKE :kw";
-        Query<Long> query = getSession().createQuery(hql, Long.class);
+        Query query = getSession().createQuery(hql, Long.class);
         query.setParameter("kw", "%" + kw + "%");
-        return query.getSingleResult();
+        return (long) query.getSingleResult();
     }
-    
+
+    @Override
+    public List<Post> getPosts(Pageable pageable) {
+        String hql = "FROM Post p ORDER BY p.id DESC";
+        Query query = getSession().createQuery(hql, Post.class);
+
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        return query.getResultList();
+    }
+
+    @Override
+    public int lockComment(Long id) {
+        CriteriaBuilder builder = getSession().getCriteriaBuilder();
+        CriteriaUpdate<Post> update = builder.createCriteriaUpdate(Post.class);
+        Root<Post> root = update.from(Post.class);
+
+        CriteriaQuery<Boolean> selectQuery = builder.createQuery(Boolean.class);
+        Root<Post> selectRoot = selectQuery.from(Post.class);
+        selectQuery.select(selectRoot.get("lockComment")).where(builder.equal(selectRoot.get("id"), id));
+
+        Boolean currentStatus = getSession().createQuery(selectQuery).uniqueResult();
+        boolean newStatus = (currentStatus != null) ? !currentStatus : true;
+
+        update.set(root.get("lockComment"), newStatus);
+        update.where(builder.equal(root.get("id"), id));
+
+        return getSession().createQuery(update).executeUpdate();
+    }
+
+
+    @Override
+    public long countTotalPosts() {
+        String hql = "SELECT COUNT(*) FROM Post";
+        Query query = getSession().createQuery(hql, Long.class);
+        return (long) query.getSingleResult();
+    }
+
 }

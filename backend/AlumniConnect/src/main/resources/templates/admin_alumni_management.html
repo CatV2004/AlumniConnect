@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quản lý Cựu Sinh Viên</title>
+
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+</head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="container mt-4" th:fragment="~{layout/base :: main}">
+        <div class="container mt-4" >
+            <h2 class="mb-4">Danh sách Cựu Sinh Viên</h2>
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Mã Sinh Viên</th>
+                        <th>Họ Tên</th>
+                        <th>Email</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="alumni, iterStat : ${alumnis}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td th:text="${alumni.studentCode}"></td>
+                        <td th:text="${alumni.user.firstName + ' ' + alumni.user.lastName}"></td>
+                        <td th:text="${alumni.user.email}"></td>
+                        <td>
+                            <span th:class="${alumni.isVerified} ? 'badge bg-success' : 'badge bg-warning'"
+                                  th:text="${alumni.isVerified} ? 'Đã xác nhận' : 'Chờ xác nhận'"></span>
+                        </td>
+                        <td>
+                            <button th:if="${!alumni.isVerified}" 
+                                    class="btn btn-success btn-sm" 
+                                    th:attr="onclick='approveAlumni(' + ${alumni.id} + ')'"
+                                    >Duyệt</button>
+                            <button th:if="${alumni.isVerified}" 
+                                    class="btn btn-secondary btn-sm" 
+                                    disabled>Đã duyệt</button>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <script>
+            function approveAlumni(id) {
+                if (confirm('Bạn có chắc chắn muốn duyệt tài khoản này?')) {
+                    fetch(window.location.origin + '/AlumniConnect/admin/alumnis/approve/' + id, {
+                        method: 'POST'
+                    })
+                            .then(response => {
+                                if (response.ok) {
+                                    alert('Tài khoản đã được duyệt!');
+                                    location.reload(); // Cập nhật lại trang
+                                } else {
+                                    alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                }
+                            });
+                }
+            }
+        </script>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+
+</body>
+</html>

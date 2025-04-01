@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Trang quản trị</title>
+
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+</head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="container mt-4" th:fragment="~{layout/base :: main}">
+        <h2 class="mb-3">Chào mừng, <span th:text="${username}"></span>!</h2>
+
+        <div class="row">
+            <!-- Card Dashboard -->
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-header">Thống kê</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Báo cáo tổng quan</h5>
+                        <p class="card-text">Xem tổng quan về hệ thống và số lượng thành viên.</p>
+                        <a href="/admin/statistics" class="btn btn-light">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-header">Quản lý bài viết</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Bài viết & Thông báo</h5>
+                        <p class="card-text">Duyệt và quản lý bài viết của cựu sinh viên.</p>
+                        <a href="/admin/posts" class="btn btn-light">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-header">Quản lý khảo sát</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Khảo sát & Bình chọn</h5>
+                        <p class="card-text">Theo dõi và tạo khảo sát cho cựu sinh viên.</p>
+                        <a href="/admin/surveys" class="btn btn-dark">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+
+</body>
+</html>

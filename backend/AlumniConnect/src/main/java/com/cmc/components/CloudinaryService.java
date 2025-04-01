@@ -24,6 +24,9 @@ public class CloudinaryService {
     private Cloudinary cloudinary;
 
     public String uploadFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
         try {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             return uploadResult.get("url").toString(); // Lấy URL ảnh từ Cloudinary
@@ -32,4 +35,3 @@ public class CloudinaryService {
         }
     }
 }
-

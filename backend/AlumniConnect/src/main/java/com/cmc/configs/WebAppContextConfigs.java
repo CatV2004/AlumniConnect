@@ -4,7 +4,6 @@
  */
 package com.cmc.configs;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
     "com.cmc.repository",
     "com.cmc.service",
     "com.cmc.configs",
+    "com.cmc.components",
 })
 public class WebAppContextConfigs implements WebMvcConfigurer{
     @Override
@@ -60,4 +60,5 @@ public class WebAppContextConfigs implements WebMvcConfigurer{
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
     }
+    
 }

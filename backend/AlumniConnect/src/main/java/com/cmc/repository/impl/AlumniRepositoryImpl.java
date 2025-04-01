@@ -10,9 +10,13 @@ import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.AlumniRepository;
 import com.cmc.repository.UserRepository;
+import com.cmc.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -32,40 +36,21 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
     @Autowired
     private ModelMapper modelMapper;
-    
+
     @Autowired
     private UserRepository userRepository;
 
-    private Session getCurrentSession() {
-        return factory.getObject().getCurrentSession();
-    }
-
-    @Override
-    public void registerAlumni(AlumniDTO alumniDTO) {
-        UserDTO userDTO = userRepository.getUserById(alumniDTO.getId());
-
-        User user = modelMapper.map(userDTO, User.class);
-        if (user != null) {
-
-            user.setRole("ALUMNI");
-            getCurrentSession().merge(user);
-
-            Alumni alumni = new Alumni();
-            alumni.setId(user.getId());
-            alumni.setStudentCode(alumniDTO.getStudentCode());
-            alumni.setIsVerified(false);
-
-            getCurrentSession().persist(alumni);
+    private final Session getCurrentSession() {
+        Session session = factory.getObject().getCurrentSession();
+        if (session == null || !session.isOpen()) {
+            session = factory.getObject().openSession();
         }
+        return session;
     }
 
     @Override
-    public boolean existsByStudentId(String studentCode) {
-        return getCurrentSession()
-                .createQuery("SELECT COUNT(a) > 0 FROM Alumni a WHERE a.studentCode = :studentCode", Boolean.class)
-                .setParameter("studentCode", studentCode)
-                .uniqueResultOptional()
-                .orElse(false);
+    public void registerAlumni(Alumni alumni) {
+        getCurrentSession().persist(alumni);
     }
 
     @Override
@@ -79,24 +64,61 @@ public class AlumniRepositoryImpl implements AlumniRepository {
     }
 
     @Override
-    public void approveAlumni(String username) {
-        Session session = getCurrentSession();
-        User user = session
-                .createQuery("FROM User WHERE username = :username", User.class)
-                .setParameter("username", username)
-                .uniqueResult();
-
-        if (user != null) {
-            Alumni alumni = session
-                    .createQuery("FROM Alumni WHERE user.id = :userId", Alumni.class)
-                    .setParameter("userId", user.getId())
-                    .uniqueResult();
-
-            if (alumni != null) {
-                alumni.setIsVerified(true);
-                getCurrentSession().merge(alumni); 
+    public void approveAlumni(Long id) {
+        Session session = getCurrentSession();  
+        Transaction tx = session.beginTransaction(); 
+        try {
+            User user = this.userRepository.getUserById(id);
+            System.out.println("user confirm: " + user);
+            if (user == null) {
+                throw new EntityNotFoundException("User not found with id: " + id);
             }
+
+            Alumni alumni = session.get(Alumni.class, id);
+            if (alumni == null) {
+                throw new EntityNotFoundException("Alumni not found with id: " + id);
+            }
+
+            alumni.setIsVerified(true);
+            user.setActive(true);
+
+            session.merge(alumni);
+            session.merge(user);
+            session.flush();
+
+            tx.commit(); 
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw e;
         }
+    }
+
+    @Override
+    public Alumni findByStudentCode(String studentCode) {
+        Session s = this.getCurrentSession();
+        Query q = s.createQuery("FROM Alumni WHERE studentCode = :studentCode", User.class);
+        q.setParameter("studentCode", studentCode);
+
+        Alumni alumni = (Alumni) q.uniqueResult();
+        return alumni != null ? alumni : null;
+    }
+
+    @Override
+    public boolean checkStudentCode(String studentId) {
+        Long count = getCurrentSession()
+                .createQuery("SELECT COUNT(a) FROM Alumni a WHERE a.studentCode = :studentId", Long.class)
+                .setParameter("studentId", studentId)
+                .uniqueResult();
+        return count != null && count > 0;
+    }
+
+    @Override
+    public List<Alumni> getAlumnis() {
+        String hql = "FROM Alumni";
+        return getCurrentSession().createQuery(hql, Alumni.class).getResultList();
+
     }
 
 }

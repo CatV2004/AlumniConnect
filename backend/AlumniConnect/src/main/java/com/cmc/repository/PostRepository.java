@@ -16,10 +16,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface PostRepository extends PagingAndSortingRepository<Post, Integer> {
     List<Post> getPostByUserId(Long id);
-    List<Post> getPosts(String kw, Pageable pageable);
+    List<Post> getPostByKeywords(String kw, Pageable pageable);
+    List<Post> getPosts(Pageable pageable);
     List<Post> getPostId(Long id);
     int addPost(Post post);
     int deletePost(Long id);
     int updateContent(Long id,String content);
     long countTotalPosts(String kw);
+    long countTotalPosts();
+    int lockComment(Long id);
 }

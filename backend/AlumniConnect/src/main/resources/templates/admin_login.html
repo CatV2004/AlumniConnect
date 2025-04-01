@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow p-4" style="width: 400px;">
+            <h2 class="text-center">Đăng nhập Admin</h2>
+
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <div th:if="${error}" class="alert alert-danger">
+                <p th:text="${error}"></p>
+            </div>
+
+            <!-- Hiển thị thông báo khi đăng xuất -->
+            <div th:if="${logoutMessage}" class="alert alert-success">
+                <p th:text="${logoutMessage}"></p>
+            </div>
+
+            <form th:action="@{/admin/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/admin/register}">Chưa có tài khoản? Đăng ký</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

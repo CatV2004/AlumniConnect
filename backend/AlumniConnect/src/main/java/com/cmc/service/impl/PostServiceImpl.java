@@ -32,8 +32,11 @@ public class PostServiceImpl implements PostService {
     private ModelMapper modelMapper;
 
     @Override
-    public Iterable<Post> getPosts(Integer pageSize, Integer offset) {
-        return postRepository.getPosts("", PageRequest.of(offset, pageSize));
+    public Page<Post> getPosts(Integer pageSize, Integer offset) {
+        Pageable pageable = PageRequest.of(pageSize, offset);
+        List<Post> posts = postRepository.getPosts(pageable);
+        long total = postRepository.countTotalPosts();
+        return new PageImpl<>(posts, pageable, total);
     }
 
     @Override
@@ -62,11 +65,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> searchPosts(String kw, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Post> posts = postRepository.getPosts(kw, pageable);
+        List<Post> posts = postRepository.getPostByKeywords(kw, pageable);
 
         long total = postRepository.countTotalPosts(kw);
 
         return new PageImpl<>(posts, pageable, total);
     }
+
+    @Override
+    public int lockComment(Long id) {
+        return this.postRepository.lockComment(id);
+    }
+    
+    
 
 }

@@ -4,11 +4,11 @@
  */
 package com.cmc.service;
 
-import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.User;
-import java.util.List;
+import java.util.Map;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -16,9 +16,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  */
 public interface UserService extends UserDetailsService {
 
-    UserDTO getUserByUsername(String username);
+    User getUserByUsername(String username);
 
-    void addUser(User user);
+    User addUser(Map<String, String> params, MultipartFile avatar, MultipartFile cover);
 
     boolean authUser(String username, String password);
+    
+    boolean registerAdmin(String username, String password);
+    
+    User getUserById(Long id);
+    
 }

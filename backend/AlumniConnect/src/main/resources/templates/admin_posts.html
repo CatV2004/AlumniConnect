@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Trang Chủ</title>
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+</head>
+
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+    <main class="container mt-4" th:fragment="~{layout/base :: main}">
+        <div class='d-flex justify-content-between' >
+            <div>
+                <h1>Quản lý bài đăng</h1>
+            </div>
+            <div>
+                <nav aria-label="Page navigation example" th:if="${totalPages > 1}">
+                    <ul th:each="i : ${#numbers.sequence(0, totalPages - 1)}" >
+                        <li class="page-item">
+                            <a th:href="@{/search(keyword=${keyword}, page=${i}, size=10)}"
+                               th:text="${i + 1}"
+                               class="page-link"></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Mã Bài Đăng</th>
+                    <th>Nội Dung</th>
+                    <th>Người Đăng Bài</th>
+                    <th>Thời Gian Tạo</th>
+                    <th>Khóa Bình luận</th>
+                    <th>Xóa bài Đăng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="post, iterStat: ${posts}">
+                    <td th:text="${iterStat.count}"></td>
+                    <td th:text="${post.id}"></td>
+                    <td th:text="${post.content}"></td>
+                    <td th:text="${post.userId.username}"></td>
+                    <td th:text="${post.createdDate}"></td>
+                    <td th:switch="${post.lockComment}">
+                        <button th:id="'status-' + ${post.id}"
+                                th:class="${!post.lockComment} ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm'"
+                                th:text="${!post.lockComment} ? 'Khóa bình luận' : 'Mở khóa bình luận'"
+                            th:attr="onclick='toggleCommentStatus(' + ${post.id} + ', ' + ${!post.lockComment} + ')'">
+                        </button>
+                    </td>
+                    <td>
+                        <button th:if="${post.active}" 
+                                class="btn btn-danger btn-sm" 
+                                th:attr="onclick=''"
+                                >Xóa</button>
+                        <button th:if="${!post.active}" 
+                                class="btn btn-secondary btn-sm" 
+                                th:attr="onclick=''">Khôi phục</button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+        <script>
+            function toggleCommentStatus(postId, isLocked) {
+                if (confirm('Bạn có chắc chắn muốn khóa bình luận bài viết này!!!')) {
+                    console.log(`/AlumniConnect/admin/posts/${postId}/toggle-comment`);
+                    fetch(`/AlumniConnect/admin/posts/${postId}/toggle-comment`, {
+                        method: 'PATCH'
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        alert(data);
+                        let statusElement = document.getElementById("status-" + postId);
+                        if (isLocked) {
+                            statusElement.textContent = "Mở khóa bình luận";
+                            statusElement.classList.remove("btn-danger");
+                            statusElement.classList.add("btn-success");
+                            statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, false)`);
+                        } else {
+                            statusElement.textContent = "Khóa bình luận";
+                            statusElement.classList.remove("btn-success");
+                            statusElement.classList.add("btn-danger");
+                            statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, true)`);
+                        }
+                    }).catch(error => console.error("Lỗi:", error));
+                }
+            }
+        </script>
+    </main>
+</main>
+<footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

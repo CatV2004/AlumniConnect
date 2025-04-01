@@ -24,16 +24,16 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    @RequestMapping("/posts/search")
+    @RequestMapping("/admin/posts")
     public String getPosts(
-            @RequestParam(required=false) String keyword,
+            @RequestParam(required=false, defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0", value = "page", name = "page") int page,
             @RequestParam(defaultValue = "10",value = "size", name = "size") int size,
             Model model) {
-        Page<Post> pages = postService.searchPosts(keyword, page, size);
+        Page<Post> pages = postService.getPosts(page, size);
         model.addAttribute("posts", pages.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", pages.getTotalPages());
-        return "home";
+        return "admin_posts";
     }
 }

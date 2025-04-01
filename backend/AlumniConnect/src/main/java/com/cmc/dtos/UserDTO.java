@@ -4,6 +4,8 @@
  */
 package com.cmc.dtos;
 
+import jakarta.persistence.Transient;
+import java.time.LocalDateTime;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -14,6 +16,7 @@ public class UserDTO {
 
     private Long id;
     private String username;
+    private String password;
     private String avatar;
     private String cover;
     private String firstName;
@@ -21,12 +24,17 @@ public class UserDTO {
     private String email;
     private String phone;
     private String role;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
+    private LocalDateTime deletedDate;
     private Boolean active;
+    
 
-    public UserDTO(Long id, String username, String avatar, String cover,
+    public UserDTO(Long id, String username, String password, String avatar, String cover,
             String firstName, String lastName, String email, String phone, String role, Boolean active) {
         this.id = id;
         this.username = username;
+        this.password = password;
         this.avatar = avatar;
         this.cover = cover;
         this.firstName = firstName;
@@ -36,7 +44,7 @@ public class UserDTO {
         this.role = role;
         this.active = active;
     }
-
+    
     public UserDTO() {
     }
     
@@ -120,6 +128,40 @@ public class UserDTO {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public LocalDateTime getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(LocalDateTime deletedDate) {
+        this.deletedDate = deletedDate;
+    }
+    
+    
     
     
 

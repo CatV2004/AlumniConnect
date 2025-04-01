@@ -4,6 +4,11 @@
  */
 package com.cmc.configs;
 
+import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
+import jakarta.annotation.PreDestroy;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.util.Enumeration;
 import java.util.Properties;
 import javax.sql.DataSource;
 import static org.hibernate.cfg.JdbcSettings.DIALECT;
@@ -24,17 +29,17 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
  */
 @Configuration
 @PropertySource("classpath:databases.properties")
-@EntityScan("com.cmc.pojo")
 public class HibernateConfigs {
 
     @Autowired
     public Environment env;
+    private LocalSessionFactoryBean sessionFactory;
 
     @Bean
     public LocalSessionFactoryBean getSessionFactory() {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setPackagesToScan(new String[]{
-            "com.nmc.pojo"
+            "com.cmc.pojo"
         });
 
         sessionFactory.setDataSource(dataSource());
@@ -47,7 +52,7 @@ public class HibernateConfigs {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(
-                env.getProperty("hibernate.connection.driverClass"));
+                env.getProperty("hibernate.connection.driver_class"));
         dataSource.setUrl(
                 env.getProperty("hibernate.connection.url"));
         dataSource.setUsername(
@@ -56,21 +61,21 @@ public class HibernateConfigs {
                 env.getProperty("hibernate.connection.password"));
         return dataSource;
     }
-    
+
     private Properties hibernateProperties() {
         Properties props = new Properties();
-        
+
         props.put(DIALECT, env.getProperty("hibernate.dialect"));
         props.put(SHOW_SQL, env.getProperty("hibernate.showSql"));
-        
         return props;
     }
-    
+
     @Bean
     public HibernateTransactionManager transactionManager() {
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(getSessionFactory().getObject());
         return transactionManager;
     }
+    
 
 }

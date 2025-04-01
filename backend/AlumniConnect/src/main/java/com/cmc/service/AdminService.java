@@ -4,11 +4,15 @@
  */
 package com.cmc.service;
 
+import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.User;
+
 /**
  *
  * @author FPTSHOP
  */
 public interface AdminService {
+    void registerAdmin(UserDTO admin);
     void confirmAlumniRegistration(String username);
     void resetTeacherPasswordDeadline(String username);
 }
