@@ -6,7 +6,6 @@ package com.cmc.dtos;
 
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *

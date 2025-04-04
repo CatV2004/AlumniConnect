@@ -8,6 +8,6 @@ package com.cmc.controllers;
  *
  * @author FPTSHOP
  */
-public class AlumniController {
+public class ApiAlumniController {
     
 }

@@ -63,7 +63,7 @@ public class AlumniServiceImpl implements AlumniService {
         User user = modelMapper.map(u, User.class);
         userRepository.addUser(user);
 
-        alumniRepository.registerAlumni(new Alumni(alumniDTO.getStudentCode(), Boolean.FALSE, user));
+        alumniRepository.registerAlumni(new Alumni(alumniDTO.getStudentCode(), user));
     }
 
     @Override
@@ -73,8 +73,7 @@ public class AlumniServiceImpl implements AlumniService {
 
     @Override
     public void approveAlumni(Long id) {
-        System.out.println("nguyenmanhcuong");
-
+        System.out.println("ssssssssssssssssssssssssssssssssssss");
         try {
             this.alumniRepository.approveAlumni(id);
         } catch (EntityNotFoundException e) {

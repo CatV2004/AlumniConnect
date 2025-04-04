@@ -25,7 +25,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -41,55 +40,45 @@ import java.util.Set;
     @NamedQuery(name = "Post.findByCreatedDate", query = "SELECT p FROM Post p WHERE p.createdDate = :createdDate"),
     @NamedQuery(name = "Post.findByUpdatedDate", query = "SELECT p FROM Post p WHERE p.updatedDate = :updatedDate"),
     @NamedQuery(name = "Post.findByDeletedDate", query = "SELECT p FROM Post p WHERE p.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")
-})
+    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")})
 public class Post implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
     @Column(name = "id")
     private Long id;
-
+    @Basic(optional = false)
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
-
     @Column(name = "lock_comment")
     private Boolean lockComment;
-
-    // Chuyển sang LocalDateTime
     @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdDate;
-
     @Column(name = "updated_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedDate;
-
     @Column(name = "deleted_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedDate;
-
     @Column(name = "active")
     private Boolean active;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     private Set<PostImage> postImageSet;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     private Set<Reaction> reactionSet;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
     private InvitationPost invitationPost;
-
-    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
     private User userId;
-
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
     private SurveyPost surveyPost;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     private Set<Comment> commentSet;
 
@@ -233,5 +222,5 @@ public class Post implements Serializable {
     public String toString() {
         return "com.cmc.pojo.Post[ id=" + id + " ]";
     }
-
+    
 }

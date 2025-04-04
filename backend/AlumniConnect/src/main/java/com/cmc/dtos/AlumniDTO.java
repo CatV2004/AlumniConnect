@@ -20,10 +20,9 @@ public class AlumniDTO {
     public AlumniDTO() {
     }
 
-    public AlumniDTO(String studentCode, Boolean isVerified, UserDTO user) {
-        this.id = user.getId();
+    public AlumniDTO(String studentCode, UserDTO user) {
         this.studentCode = studentCode;
-        this.isVerified = isVerified;
+        this.isVerified = false;
         this.user = user;
     }
 

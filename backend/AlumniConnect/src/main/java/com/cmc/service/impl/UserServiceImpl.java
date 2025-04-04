@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author FPTSHOP
  */
-@Service
+@Service("UserDetailsService")
 @Transactional
 public class UserServiceImpl implements UserService {
 
@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService {
         u.setCover(cloudinaryService.uploadFile(cover));
         u.setCreatedDate(LocalDateTime.now());
         u.setUpdatedDate(LocalDateTime.now());
+
         u.setActive(true);
 
 

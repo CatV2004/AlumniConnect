@@ -55,6 +55,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void addUser(User user) {
 
         getCurrentSession().persist(user);
+        getCurrentSession().refresh(user);
         getCurrentSession().flush();
 
     }
@@ -92,6 +93,5 @@ public class UserRepositoryImpl implements UserRepository {
                 .uniqueResult();
         return user;
     }
-
 
 }

@@ -7,6 +7,8 @@ package com.cmc.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.NamedQueries;
@@ -32,8 +34,8 @@ public class Alumni implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "id")
     private Long id;
     @Basic(optional = false)
@@ -43,17 +45,11 @@ public class Alumni implements Serializable {
     private String studentCode;
     @Column(name = "is_verified")
     private Boolean isVerified;
-    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
-    private User user;
+    private User userId;
 
     public Alumni() {
-    }
-    public Alumni(String studentCode, Boolean isVerified, User user) {
-        this.id = user.getId();
-        this.studentCode = studentCode;
-        this.isVerified = isVerified;
-        this.user = user;
     }
 
     public Alumni(Long id) {
@@ -63,6 +59,12 @@ public class Alumni implements Serializable {
     public Alumni(Long id, String studentCode) {
         this.id = id;
         this.studentCode = studentCode;
+    }
+    
+    public Alumni(String studentCode, User user){
+        this.studentCode = studentCode;
+        this.isVerified = false;
+        this.userId = user;
     }
 
     public Long getId() {
@@ -89,12 +91,12 @@ public class Alumni implements Serializable {
         this.isVerified = isVerified;
     }
 
-    public User getUser() {
-        return user;
+    public User getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 
     @Override
