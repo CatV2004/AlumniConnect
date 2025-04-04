@@ -24,3 +24,10 @@ hs_err_pid*
 replay_pid*
 /backend/AlumniConnect/target/
 /backend/mavenproject1/target/
+
+
+# Env and config files
+**/.env
+**/application.properties
+**/databases.properties
+**/application.yml

@@ -4,6 +4,7 @@
  */
 package com.cmc.service.impl;
 
+import com.cmc.components.MailUtils;
 import com.cmc.dtos.AlumniDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
@@ -14,6 +15,7 @@ import com.cmc.service.AlumniService;
 import com.cmc.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +38,8 @@ public class AlumniServiceImpl implements AlumniService {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private MailUtils mailUtils;
 
     @Override
     public boolean existsByStudentId(String studentCode) {
@@ -67,18 +71,42 @@ public class AlumniServiceImpl implements AlumniService {
     }
 
     @Override
-    public List<Alumni> getAlumnis() {
-        return this.alumniRepository.getAlumnis();
+    public List<Alumni> getAlumnis(Map<String, String> params) {
+        return this.alumniRepository.getAlumnis(params);
     }
 
     @Override
+    public long countAlumnis() {
+        return alumniRepository.countAlumnis();
+    }
+    
+    @Override
     public void approveAlumni(Long id) {
-        System.out.println("ssssssssssssssssssssssssssssssssssss");
         try {
-            this.alumniRepository.approveAlumni(id);
+            boolean isApproved = alumniRepository.approveAlumni(id);
+            
+            Alumni a = alumniRepository.getAlumniById(id);
+
+            if (isApproved) {
+                String alumniEmail = a.getUserId().getEmail();  
+                String alumniName = a.getUserId().toString();    
+                notifyAlumniOnApproval(alumniEmail, alumniName);
+            }
         } catch (EntityNotFoundException e) {
             throw new RuntimeException("Approval failed: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void notifyAlumniOnApproval(String alumniEmail, String alumniName) {
+        String subject = "Thông Báo: Bạn đã được duyệt";
+        String body = "Chào " + alumniName + ",\n\n"
+                + "Chúng tôi rất vui thông báo rằng bạn đã được duyệt bởi admin. Bạn có thể truy cập hệ thống và sử dụng các tính năng mới.\n\n"
+                + "Cảm ơn bạn đã tham gia với chúng tôi.\n\n"
+                + "Trân trọng,\n"
+                + "Team AlumniConnect";
+
+        mailUtils.sendEmail(alumniEmail, subject, body);
     }
 
 }

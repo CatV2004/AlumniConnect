@@ -55,7 +55,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Principal principal, HttpSession session) {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         if (principal != null) {
             User user = userService.getUserByUsername(principal.getName());

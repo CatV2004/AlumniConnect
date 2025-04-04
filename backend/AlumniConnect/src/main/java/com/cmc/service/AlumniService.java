@@ -8,6 +8,7 @@ import com.cmc.dtos.AlumniDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,8 +22,11 @@ public interface AlumniService {
 
     List<AlumniDTO> getPendingAlumniRegistrations();
 
-    List<Alumni> getAlumnis();
+    List<Alumni> getAlumnis(Map<String, String> params);
 
     void approveAlumni(Long id);
 
+    long countAlumnis();
+    
+    void notifyAlumniOnApproval(String alumniEmail, String alumniName);
 }

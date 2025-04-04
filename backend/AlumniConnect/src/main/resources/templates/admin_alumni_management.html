@@ -12,8 +12,18 @@
     <header th:replace="~{layout/base :: header}"></header>
 
     <main class="container mt-4" th:fragment="~{layout/base :: main}">
-        <div class="container mt-4" >
+        <div class="container mt-4">
             <h2 class="mb-4">Danh sách Cựu Sinh Viên</h2>
+
+            <!-- Form tìm kiếm cho studentCode -->
+            <form th:action="@{/admin/alumnis}" method="get" class="mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="studentCode" 
+                           th:value="${studentCode}" placeholder="Tìm theo Mã Sinh Viên">
+                    <button class="btn btn-primary" type="submit">Tìm</button>
+                </div>
+            </form>
+
             <table class="table table-bordered">
                 <thead class="table-dark">
                     <tr>
@@ -29,8 +39,8 @@
                     <tr th:each="alumni, iterStat : ${alumnis}">
                         <td th:text="${iterStat.count}"></td>
                         <td th:text="${alumni.studentCode}"></td>
-                        <td th:text="${alumni.user.firstName + ' ' + alumni.user.lastName}"></td>
-                        <td th:text="${alumni.user.email}"></td>
+                        <td th:text="${alumni.userId.firstName + ' ' + alumni.userId.lastName}"></td>
+                        <td th:text="${alumni.userId.email}"></td>
                         <td>
                             <span th:class="${alumni.isVerified} ? 'badge bg-success' : 'badge bg-warning'"
                                   th:text="${alumni.isVerified} ? 'Đã xác nhận' : 'Chờ xác nhận'"></span>
@@ -38,20 +48,39 @@
                         <td>
                             <button th:if="${!alumni.isVerified}" 
                                     class="btn btn-success btn-sm" 
-                                    th:onclick="'approveAlumni(\'' + @{/admin/alumnis/approve/{id}(id=${alumni.id})} + '\')'"
-                                    >Duyệt</button>
+                                    th:onclick="'approveAlumni(\'' + @{/admin/alumnis/approve/{id}(id=${alumni.id})} + '\')'">
+                                Duyệt
+                            </button>
                             <button th:if="${alumni.isVerified}" 
                                     class="btn btn-secondary btn-sm" 
                                     disabled>Đã duyệt</button>
                         </td>
                     </tr>
                 </tbody>
-
             </table>
-        </div>        
 
+            <!-- Phân trang -->
+            <div class="pagination mt-4">
+                <ul class="pagination">
+                    <!-- Previous page -->
+                    <li th:class="${currentPage > 1} ? 'page-item' : 'page-item disabled'">
+                        <a class="page-link" th:href="@{/admin/alumnis(page=${currentPage - 1}, size=${size}, studentCode=${studentCode})}">Trước</a>
+                    </li>
 
+                    <!-- Current page -->
+                    <li class="page-item disabled">
+                        <span class="page-link" th:text="${currentPage}"></span>
+                    </li>
+
+                    <!-- Next page -->
+                    <li th:class="${currentPage < totalPages} ? 'page-item' : 'page-item disabled'">
+                        <a class="page-link" th:href="@{/admin/alumnis(page=${currentPage + 1}, size=${size}, studentCode=${studentCode})}">Tiếp theo</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </main>
+
     <script th:src="@{/js/main.js}"></script>
     <footer th:replace="~{layout/base :: footer}"></footer>
 
