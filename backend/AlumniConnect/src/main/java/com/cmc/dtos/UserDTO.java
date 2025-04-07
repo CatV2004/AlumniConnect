@@ -46,7 +46,6 @@ public class UserDTO {
     
     public UserDTO() {
     }
-    
 
     public Long getId() {
         return id;
@@ -159,6 +158,12 @@ public class UserDTO {
     public void setDeletedDate(LocalDateTime deletedDate) {
         this.deletedDate = deletedDate;
     }
+
+    @Override
+    public String toString() {
+        return this.firstName + this.lastName;
+    }
+    
     
     
     

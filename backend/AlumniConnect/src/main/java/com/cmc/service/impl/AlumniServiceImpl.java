@@ -11,9 +11,9 @@ import com.cmc.pojo.User;
 import com.cmc.repository.AlumniRepository;
 import com.cmc.repository.UserRepository;
 import com.cmc.service.AlumniService;
-import com.cmc.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +36,8 @@ public class AlumniServiceImpl implements AlumniService {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private MailServicesImpl mailServices;
 
     @Override
     public boolean existsByStudentId(String studentCode) {
@@ -61,21 +63,33 @@ public class AlumniServiceImpl implements AlumniService {
         u.setRole("ALUMNI");
         u.setActive(Boolean.FALSE);
         User user = modelMapper.map(u, User.class);
-        userRepository.addUser(user);
+        userRepository.saveOrUpdate(user);
 
         alumniRepository.registerAlumni(new Alumni(alumniDTO.getStudentCode(), user));
     }
 
     @Override
-    public List<Alumni> getAlumnis() {
-        return this.alumniRepository.getAlumnis();
+    public List<Alumni> getAlumnis(Map<String, String> params) {
+        return this.alumniRepository.getAlumnis(params);
     }
 
     @Override
+    public long countAlumnis() {
+        return alumniRepository.countAlumnis();
+    }
+    
+    @Override
     public void approveAlumni(Long id) {
-        System.out.println("ssssssssssssssssssssssssssssssssssss");
         try {
-            this.alumniRepository.approveAlumni(id);
+            boolean isApproved = alumniRepository.approveAlumni(id);
+            
+            Alumni a = alumniRepository.getAlumniById(id);
+
+            if (isApproved) {
+                String alumniEmail = a.getUserId().getEmail();  
+                String alumniName = a.getUserId().toString();    
+                mailServices.notifyAlumniOnApproval(alumniEmail, alumniName);
+            }
         } catch (EntityNotFoundException e) {
             throw new RuntimeException("Approval failed: " + e.getMessage());
         }

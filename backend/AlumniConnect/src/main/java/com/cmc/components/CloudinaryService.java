@@ -29,7 +29,7 @@ public class CloudinaryService {
         }
         try {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
-            return uploadResult.get("url").toString(); // Lấy URL ảnh từ Cloudinary
+            return uploadResult.get("url").toString();
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi upload file!", e);
         }

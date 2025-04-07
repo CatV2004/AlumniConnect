@@ -55,7 +55,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Principal principal, HttpSession session) {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         if (principal != null) {
             User user = userService.getUserByUsername(principal.getName());
@@ -102,7 +102,9 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("success", "Đăng ký thành công! Hãy đăng nhập.");
             return "redirect:/admin/login";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Tên đăng nhập đã tồn tại!");
+            e.printStackTrace(); 
+
+            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/register";
         }
     }

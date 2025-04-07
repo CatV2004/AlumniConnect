@@ -5,9 +5,17 @@
 package com.cmc.service.impl;
 
 import com.cmc.dtos.TeacherDTO;
+import com.cmc.pojo.Teacher;
+import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
 import com.cmc.service.TeacherService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +29,25 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
+    @Autowired
+    private MailServicesImpl mailServices;
 
     @Override
-    public void createTeacherAccount(TeacherDTO teacherDTO) {
-        teacherRepository.createTeacherAccount(teacherDTO);
+    public boolean createTeacherAccount(TeacherDTO teacherDTO) {
+
+        boolean isCreated = teacherRepository.createTeacherAccount(teacherDTO);
+
+        if (isCreated) {
+            mailServices.notifyTeacherAccountCreation(
+                    teacherDTO.getUser().getEmail(),
+                    teacherDTO.getUser().getFirstName() + " " + teacherDTO.getUser().getLastName(),
+                    teacherDTO.getUser().getUsername(),
+                    "ou@123"
+            );
+            return true;
+        }
+        return false;
+
     }
 
     @Override
@@ -33,8 +56,17 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public void resetPasswordChangeDeadline(String username) {
-        teacherRepository.resetPasswordChangeDeadline(username);
+    public void resetPasswordChangeDeadline(Long id) {
+        teacherRepository.resetPasswordChangeDeadline(id);
+    }
+
+    @Override
+    public List<Teacher> getTeachers(Map<String, String> params) {
+        return this.teacherRepository.getTeachers(params);
+    }
+
+    @Override
+    public Long countTeachers() {
+        return this.teacherRepository.countTeachers();
     }
 }
-

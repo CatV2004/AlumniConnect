@@ -6,13 +6,29 @@ package com.cmc.repository;
 
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Teacher;
+import com.cmc.pojo.User;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author FPTSHOP
  */
 public interface TeacherRepository {
-    void createTeacherAccount(TeacherDTO teacherDTO);
+
+    boolean createTeacherAccount(TeacherDTO teacherDTO);
+
     boolean isPasswordChangeDeadlineExceeded(String username);
-    void resetPasswordChangeDeadline(String username);
+
+    void resetPasswordChangeDeadline(Long id);
+
+    List<Teacher> getTeachers(Map<String, String> params);
+
+    Long countTeachers();
+    
+    void saveOrUpdate(Teacher teacher);
+    
+    Teacher getTeacherById(Long id);
+    
 }

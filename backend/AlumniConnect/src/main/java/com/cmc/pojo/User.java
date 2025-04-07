@@ -343,7 +343,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.User[ id=" + id + " ]";
+        return this.role.equals("ADMIN") ? "Admin" : this.firstName + " " + this.lastName;
     }
-    
+
 }

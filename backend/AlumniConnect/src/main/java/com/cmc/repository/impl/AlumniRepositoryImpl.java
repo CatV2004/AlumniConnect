@@ -12,7 +12,13 @@ import com.cmc.repository.AlumniRepository;
 import com.cmc.repository.UserRepository;
 import com.cmc.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -49,6 +55,16 @@ public class AlumniRepositoryImpl implements AlumniRepository {
     }
 
     @Override
+    public Alumni getAlumniById(Long id) {
+        Session s = this.getCurrentSession();
+        Query q = s.createQuery("FROM Alumni WHERE id = :id", Alumni.class); 
+        q.setParameter("id", id);
+
+        Alumni alumni = (Alumni) q.uniqueResult();
+        return alumni != null ? alumni : null;  
+    }
+
+    @Override
     public void registerAlumni(Alumni alumni) {
         getCurrentSession().persist(alumni);
     }
@@ -64,35 +80,25 @@ public class AlumniRepositoryImpl implements AlumniRepository {
     }
 
     @Override
-    public void approveAlumni(Long id) {
-        Session session = getCurrentSession();  
-        Transaction tx = session.beginTransaction(); 
-        try {
-            User user = this.userRepository.getUserById(id);
-            System.out.println("user confirm: " + user);
-            if (user == null) {
-                throw new EntityNotFoundException("User not found with id: " + id);
-            }
+    public boolean approveAlumni(Long id) {
+        Session session = factory.getObject().getCurrentSession();
+        Alumni alumni = this.getAlumniById(id);
+        User user = this.userRepository.getUserById(alumni.getUserId().getId());
 
-            Alumni alumni = session.get(Alumni.class, id);
-            if (alumni == null) {
-                throw new EntityNotFoundException("Alumni not found with id: " + id);
-            }
-
-            alumni.setIsVerified(true);
-            user.setActive(true);
-
-            session.merge(alumni);
-            session.merge(user);
-            session.flush();
-
-            tx.commit(); 
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            throw e;
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with id: " + id);
         }
+
+        if (alumni == null) {
+            throw new EntityNotFoundException("Alumni not found with id: " + id);
+        }
+        alumni.setIsVerified(true);
+        user.setActive(true);
+
+        session.merge(alumni);
+        session.merge(user);
+        
+        return true;
     }
 
     @Override
@@ -115,10 +121,46 @@ public class AlumniRepositoryImpl implements AlumniRepository {
     }
 
     @Override
-    public List<Alumni> getAlumnis() {
-        String hql = "FROM Alumni";
-        return getCurrentSession().createQuery(hql, Alumni.class).getResultList();
+    public List<Alumni> getAlumnis(Map<String, String> params) {
+        Session session = this.getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Alumni> q = builder.createQuery(Alumni.class);
+        Root<Alumni> root = q.from(Alumni.class);
+        q.select(root);
 
+        if (params != null) {
+            List<Predicate> predicates = new ArrayList<>();
+
+            String studentCode = params.get("studentCode");
+            if (studentCode != null && !studentCode.isEmpty()) {
+                predicates.add(builder.like(root.get("studentCode"), "%" + studentCode + "%"));
+            }
+
+            if (!predicates.isEmpty()) {
+                q.where(predicates.toArray(new Predicate[0]));
+            }
+
+            Query<Alumni> query = session.createQuery(q);
+
+            if (params.containsKey("page")) {
+                int page = Integer.parseInt(params.get("page"));
+                int size = Integer.parseInt(params.getOrDefault("size", "10"));
+                int start = (page - 1) * size;
+                query.setFirstResult(start);
+                query.setMaxResults(size);
+            }
+
+            return query.getResultList();
+        }
+
+        return session.createQuery(q).getResultList();
+    }
+
+    @Override
+    public long countAlumnis() {
+        Session session = this.getCurrentSession();
+        Query<Long> query = session.createQuery("SELECT count(*) FROM Alumni", Long.class);
+        return query.uniqueResult();
     }
 
 }

@@ -19,7 +19,7 @@ public interface UserRepository {
     
     User getUserById(long id);
 
-    void addUser(User User);
+    void saveOrUpdate(User User);
 
     void changePassword(String username, ChangePasswordDTO dto);
     

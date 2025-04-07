@@ -4,11 +4,6 @@
  */
 package com.cmc.configs;
 
-import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
-import jakarta.annotation.PreDestroy;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.util.Enumeration;
 import java.util.Properties;
 import javax.sql.DataSource;
 import static org.hibernate.cfg.JdbcSettings.DIALECT;
@@ -76,6 +71,5 @@ public class HibernateConfigs {
         transactionManager.setSessionFactory(getSessionFactory().getObject());
         return transactionManager;
     }
-    
 
 }

@@ -4,13 +4,16 @@
  */
 package com.cmc.configs;
 
+import java.util.TimeZone;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,13 +23,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 @EnableWebMvc
+@EnableScheduling
 @EnableTransactionManagement
 @ComponentScan(basePackages = {
     "com.cmc.controllers",
     "com.cmc.repository",
     "com.cmc.service",
     "com.cmc.configs",
-    "com.cmc.components",})
+    "com.cmc.components",
+})
 public class WebAppContextConfigs implements WebMvcConfigurer {
 
     @Override
@@ -43,4 +48,10 @@ public class WebAppContextConfigs implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
     }
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+    }
+    
 }

@@ -52,12 +52,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addUser(User user) {
-
-        getCurrentSession().persist(user);
-        getCurrentSession().refresh(user);
+    public void saveOrUpdate(User user) {
+        if (user.getId() != null) {
+            getCurrentSession().merge(user);
+        } else {
+            getCurrentSession().persist(user);
+        }
         getCurrentSession().flush();
-
     }
 
     @Override
@@ -78,11 +79,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
-        Long count = getCurrentSession()
-                .createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class)
+        Boolean exists = getCurrentSession()
+                .createQuery("SELECT EXISTS(SELECT 1 FROM User u WHERE u.username = :username)", Boolean.class)
                 .setParameter("username", username)
                 .uniqueResult();
-        return count != null && count > 0;
+        return exists != null && exists;
     }
 
     @Override

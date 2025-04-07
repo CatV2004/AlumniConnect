@@ -41,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin.setRole("ADMIN");
         User u = modelMapper.map(admin, User.class);
-        userRepository.addUser(u);
+        userRepository.saveOrUpdate(u);
     }
 
     @Override

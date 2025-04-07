@@ -6,6 +6,7 @@ package com.cmc.service.impl;
 
 import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
 import com.cmc.service.UserService;
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
         u.setActive(true);
 
 
-        userRepo.addUser(u);
+        userRepo.saveOrUpdate(u);
 
         return u;
     }
@@ -107,7 +108,7 @@ public class UserServiceImpl implements UserService {
         admin.setUsername(username);
         admin.setPassword(passEncoder.encode(password));
         admin.setRole("ADMIN");
-        userRepo.addUser(admin);
+        userRepo.saveOrUpdate(admin);
         return true;
     }
 
