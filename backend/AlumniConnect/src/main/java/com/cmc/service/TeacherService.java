@@ -5,13 +5,23 @@
 package com.cmc.service;
 
 import com.cmc.dtos.TeacherDTO;
+import com.cmc.pojo.Teacher;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author FPTSHOP
  */
 public interface TeacherService {
-    void createTeacherAccount(TeacherDTO teacherDTO);
+
+    boolean createTeacherAccount(TeacherDTO teacherDTO);
+
     boolean isPasswordChangeDeadlineExceeded(String username);
-    void resetPasswordChangeDeadline(String username);
+
+    void resetPasswordChangeDeadline(Long id);
+
+    List<Teacher> getTeachers(Map<String, String> params);
+
+    Long countTeachers();
 }

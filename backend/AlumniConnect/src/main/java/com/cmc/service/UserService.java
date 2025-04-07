@@ -5,14 +5,14 @@
 package com.cmc.service;
 
 import com.cmc.dtos.UserDTO;
+import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- *
- * @author FPTSHOP
  */
 public interface UserService extends UserDetailsService {
 

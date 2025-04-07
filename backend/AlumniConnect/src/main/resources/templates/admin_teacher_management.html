@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quản lý Giảng viên</title>
+
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+</head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="container mt-4">
+        <div class="card shadow-sm rounded-4 border-0">
+            <div class="card-body">
+                <h2 class="mb-4"><i class="bi bi-person-fill me-2"></i>Danh sách Giảng viên</h2>
+
+                <!-- Form tìm kiếm -->
+                <form th:action="@{/admin/teachers}" method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="username"
+                               th:value="${username}" placeholder="🔍 Tìm theo mã giảng viên">
+                        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+                </form>
+
+                <!-- Nút tạo tài khoản giảng viên -->
+                <div class="mb-3">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTeacherModal">
+                        <i class="bi bi-person-plus-fill me-2"></i> Tạo tài khoản giảng viên
+                    </button>
+                </div>
+
+                <!-- Bảng danh sách giảng viên -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Mã giảng viên</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="teacher, iterStat : ${teachers}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${teacher.userId.username}"></td>
+                                <td th:text="${teacher.userId.firstName + ' ' + teacher.userId.lastName}"></td>
+                                <td th:text="${teacher.userId.email}"></td>
+                                <td>
+                                    <span th:if="${teacher.mustChangePassword == false and teacher.userId.active == true}" 
+                                          class="badge bg-success">Đang hoạt động</span>
+                                    <span th:if="${teacher.mustChangePassword == true and teacher.userId.active == true}" 
+                                          class="badge bg-warning">Chờ xác nhận</span>
+                                    <span th:if="${teacher.mustChangePassword == false and teacher.userId.active == false}" 
+                                          class="badge bg-secondary">Đã hủy</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/admin/teachers/edit/{id}(id=${teacher.id})}" 
+                                       class="btn btn-warning btn-sm rounded-pill">
+                                        <i class="bi bi-pencil-square me-1"></i> 
+                                    </a>
+                                    <a th:href="@{/admin/teachers/delete/{id}(id=${teacher.id})}" 
+                                       class="btn btn-danger btn-sm rounded-pill"
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa giảng viên này không?');">
+                                        <i class="bi bi-trash-fill me-1"></i> 
+                                    </a>
+                                    <button type="button" class="btn btn-info btn-sm rounded-pill"
+                                            th:onclick="'updateResetPasswordTime(\'' + @{/admin/teachers/resetPassword/{id}(id=${teacher.id})} + '\')'">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                    </button>
+
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Phân trang -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li th:class="${currentPage > 1} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/teachers(page=${currentPage - 1}, size=${size}, username=${username})}">
+                                <i class="bi bi-chevron-left"></i> Trước
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}"></span>
+                        </li>
+                        <li th:class="${currentPage < totalPages} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/teachers(page=${currentPage + 1}, size=${size}, username=${username})}">
+                                Tiếp <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- MODAL tạo tài khoản giảng viên -->
+        <div class="modal fade" id="createTeacherModal" tabindex="-1" aria-labelledby="createTeacherModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow-lg rounded-4" style="background: #f8f9fa;">
+                    <form id="createTeacherForm">
+                        <!-- Header Modal -->
+                        <div class="modal-header" style="background-color: #429279e6; color: white;">
+                            <h5 class="modal-title" id="createTeacherModalLabel">Tạo tài khoản giảng viên mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+
+                        <!-- Body Modal -->
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <!-- Mã Giảng viên -->
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">Mã giảng viên</label>
+                                    <input type="text" class="form-control" id="username" name="username" required placeholder="Nhập mã giảng viên">
+                                </div>
+                                <!-- Họ -->
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">Họ</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Nhập họ của giảng viên">
+                                </div>
+                                <!-- Tên -->
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Tên</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Nhập tên của giảng viên">
+                                </div>
+                                <!-- Email -->
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required placeholder="Nhập email của giảng viên">
+                                </div>
+                                <!-- Số điện thoại -->
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Số điện thoại</label>
+                                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Nhập số điện thoại">
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Footer Modal -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <!-- Nút Tạo tài khoản -->
+                            <button type="button" class="btn btn-primary" style="background-color: #329b5beb;" 
+                                    th:onclick="'addTeacher(\'' + @{/admin/teachers/create} + '\')'">Tạo tài khoản</button>
+
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+        <th:block th:insert="~{modal_noti}"></th:block>
+    </main>
+
+    <script th:src="@{/js/teacher.js}"></script>
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

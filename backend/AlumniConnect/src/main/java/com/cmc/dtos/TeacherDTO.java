@@ -15,7 +15,7 @@ public class TeacherDTO {
     private Long id;
     private Boolean mustChangePassword;
     private LocalDateTime passwordResetTime;
-    private UserDTO user;
+    private UserDTO userId;
 
     public TeacherDTO() {
     }
@@ -23,7 +23,7 @@ public class TeacherDTO {
     public TeacherDTO(Boolean mustChangePassword, LocalDateTime passwordResetTime, UserDTO user) {
         this.mustChangePassword = mustChangePassword;
         this.passwordResetTime = passwordResetTime;
-        this.user = user;
+        this.userId = user;
     }
 
     public Long getId() {
@@ -51,10 +51,10 @@ public class TeacherDTO {
     }
 
     public UserDTO getUser() {
-        return user;
+        return userId;
     }
 
     public void setUser(UserDTO user) {
-        this.user = user;
+        this.userId = user;
     }
 }

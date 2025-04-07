@@ -102,7 +102,9 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("success", "Đăng ký thành công! Hãy đăng nhập.");
             return "redirect:/admin/login";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Tên đăng nhập đã tồn tại!");
+            e.printStackTrace(); 
+
+            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
             return "redirect:/admin/register";
         }
     }

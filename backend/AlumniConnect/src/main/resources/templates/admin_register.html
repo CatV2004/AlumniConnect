@@ -14,6 +14,13 @@
                         <h3>Đăng ký Quản trị viên</h3>
                     </div>
                     <div class="card-body">
+
+                        <!-- Thông báo lỗi -->
+                        <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+
+                        <!-- Thông báo thành công -->
+                        <div th:if="${success}" class="alert alert-success text-center" th:text="${success}"></div>
+
                         <form th:action="@{/admin/register}" method="post" th:object="${admin}">
                             <div class="mb-3">
                                 <label class="form-label">Tên đăng nhập</label>
@@ -35,22 +42,28 @@
                         </form>
                     </div>
                     <div class="card-footer text-center">
-                        <a href="@{/admin/login}">Đã có tài khoản? Đăng nhập</a>
+                        <a th:href="@{/admin/login}">Đã có tài khoản? Đăng nhập</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
-<script>
-    document.querySelector("form").addEventListener("submit", function(event) {
-        let password = document.querySelector("[name='password']").value;
-        let confirmPassword = document.querySelector("[name='confirmPassword']").value;
-        if (password !== confirmPassword) {
-            alert("Mật khẩu xác nhận không khớp!");
-            event.preventDefault();  // Ngăn submit form
-        }
-    });
-</script>
-</html>
 
+    <!-- JS kiểm tra xác nhận mật khẩu -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            if (form) {
+                form.addEventListener("submit", function (event) {
+                    const password = document.querySelector("[name='password']").value;
+                    const confirmPassword = document.querySelector("[name='confirmPassword']").value;
+                    if (password !== confirmPassword) {
+                        alert("Mật khẩu xác nhận không khớp!");
+                        event.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

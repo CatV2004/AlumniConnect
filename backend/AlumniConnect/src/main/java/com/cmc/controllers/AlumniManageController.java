@@ -38,8 +38,11 @@ public class AlumniManageController {
 
     @GetMapping("/alumnis")
     public String alumisView(@RequestParam Map<String, String> params, Model model) {
-        int page = Integer.parseInt(params.getOrDefault("page", "1"));
-        int size = Integer.parseInt(params.getOrDefault("size", "10"));
+        params.putIfAbsent("page", "1");
+        params.putIfAbsent("size", "5");
+
+        int page = Integer.parseInt(params.get("page"));
+        int size = Integer.parseInt(params.get("size"));
 
         String studentCode = params.get("studentCode");
 

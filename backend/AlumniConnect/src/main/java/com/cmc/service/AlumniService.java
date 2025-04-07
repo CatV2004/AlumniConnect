@@ -28,5 +28,5 @@ public interface AlumniService {
 
     long countAlumnis();
     
-    void notifyAlumniOnApproval(String alumniEmail, String alumniName);
+//    void notifyAlumniOnApproval(String alumniEmail, String alumniName);
 }
