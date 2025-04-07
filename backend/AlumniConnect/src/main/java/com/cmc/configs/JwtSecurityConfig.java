@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,10 +47,11 @@ public class JwtSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login/**").permitAll()
+//                .requestMatchers("/api/login/**").permitAll()
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/users/**").hasAnyRole("ALUMNI", "TEACHER")
-                .anyRequest().authenticated()
+//                .requestMatchers("/api/users/**").hasAnyRole("ALUMNI", "TEACHER")
+                .requestMatchers("/api/**").permitAll()
+//                .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                 .accessDeniedHandler(customAccessDeniedHandler())

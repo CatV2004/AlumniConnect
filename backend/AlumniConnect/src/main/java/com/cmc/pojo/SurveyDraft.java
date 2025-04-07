@@ -21,7 +21,6 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -43,6 +42,7 @@ public class SurveyDraft implements Serializable {
     @Column(name = "id")
     private Long id;
     @Column(name = "drafted_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime draftedAt;
     @JoinColumn(name = "survey_post_id", referencedColumnName = "id")
     @ManyToOne(optional = false)

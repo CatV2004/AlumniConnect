@@ -38,7 +38,7 @@
                         <td>
                             <button th:if="${!alumni.isVerified}" 
                                     class="btn btn-success btn-sm" 
-                                    th:attr="onclick='approveAlumni(' + ${alumni.id} + ')'"
+                                    th:onclick="'approveAlumni(\'' + @{/admin/alumnis/approve/{id}(id=${alumni.id})} + '\')'"
                                     >Duyệt</button>
                             <button th:if="${alumni.isVerified}" 
                                     class="btn btn-secondary btn-sm" 
@@ -48,27 +48,11 @@
                 </tbody>
 
             </table>
-        </div>
+        </div>        
 
-        <script>
-            function approveAlumni(id) {
-                if (confirm('Bạn có chắc chắn muốn duyệt tài khoản này?')) {
-                    fetch(window.location.origin + '/AlumniConnect/admin/alumnis/approve/' + id, {
-                        method: 'POST'
-                    })
-                            .then(response => {
-                                if (response.ok) {
-                                    alert('Tài khoản đã được duyệt!');
-                                    location.reload(); // Cập nhật lại trang
-                                } else {
-                                    alert('Có lỗi xảy ra, vui lòng thử lại!');
-                                }
-                            });
-                }
-            }
-        </script>
+
     </main>
-
+    <script th:src="@{/js/main.js}"></script>
     <footer th:replace="~{layout/base :: footer}"></footer>
 
 </body>

@@ -4,6 +4,7 @@
  */
 package com.cmc.repository;
 
+import com.cmc.dtos.PostDTO;
 import com.cmc.pojo.Post;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +19,12 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     List<Post> getPostByUserId(Long id);
     List<Post> getPostByKeywords(String kw, Pageable pageable);
     List<Post> getPosts(Pageable pageable);
-    List<Post> getPostId(Long id);
-    int addPost(Post post);
+    Post getPostId(Long id);
+    Post addPost(Post post);
     int deletePost(Long id);
     int updateContent(Long id,String content);
     long countTotalPosts(String kw);
     long countTotalPosts();
     int lockComment(Long id);
+    int restorePost(Long id);
 }

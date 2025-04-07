@@ -11,6 +11,7 @@ import com.cmc.repository.UserRepository;
 import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.modelmapper.ModelMapper;
@@ -28,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author FPTSHOP
  */
-@Service
+@Service("UserDetailsService")
 @Transactional
 public class UserServiceImpl implements UserService {
 
@@ -81,6 +82,7 @@ public class UserServiceImpl implements UserService {
         u.setCover(cloudinaryService.uploadFile(cover));
         u.setCreatedDate(LocalDateTime.now());
         u.setUpdatedDate(LocalDateTime.now());
+
         u.setActive(true);
 
 
@@ -112,6 +114,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return this.userRepo.getUserById(id);
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return this.userRepo.getUsers();
     }
 
 }

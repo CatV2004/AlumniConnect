@@ -22,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -53,10 +52,13 @@ public class Ugroup implements Serializable {
     @Column(name = "group_name")
     private String groupName;
     @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdDate;
     @Column(name = "updated_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedDate;
     @Column(name = "deleted_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;

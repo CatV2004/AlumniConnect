@@ -6,6 +6,7 @@ package com.cmc.service;
 
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.User;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,5 +26,8 @@ public interface UserService extends UserDetailsService {
     boolean registerAdmin(String username, String password);
     
     User getUserById(Long id);
+    
+    List<User> getUsers();
+    
     
 }

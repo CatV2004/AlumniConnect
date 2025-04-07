@@ -55,6 +55,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void addUser(User user) {
 
         getCurrentSession().persist(user);
+        getCurrentSession().refresh(user);
         getCurrentSession().flush();
 
     }
@@ -93,5 +94,11 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
+    @Override
+    public List<User> getUsers() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createQuery("FROM User", User.class);
+        return q.getResultList();
+    }
 
 }

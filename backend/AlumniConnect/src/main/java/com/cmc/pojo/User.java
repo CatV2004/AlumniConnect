@@ -16,20 +16,14 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Objects;
 import java.util.Set;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -99,10 +93,13 @@ public class User implements Serializable {
     @Column(name = "role")
     private String role;
     @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdDate;
     @Column(name = "updated_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedDate;
     @Column(name = "deleted_date")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
@@ -112,11 +109,11 @@ public class User implements Serializable {
     private Set<Ugroup> ugroupSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Set<Reaction> reactionSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private Alumni alumni;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Set<SurveyDraft> surveyDraftSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private Teacher teacher;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     private Set<Post> postSet;
@@ -344,21 +341,9 @@ public class User implements Serializable {
         return true;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdDate = LocalDateTime.now();
-        this.updatedDate = LocalDateTime.now();
-        this.active = true;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedDate = LocalDateTime.now();
-    }
-
     @Override
     public String toString() {
-        return String.format("%s %s", Objects.toString(firstName, ""), Objects.toString(lastName, ""));
+        return "com.cmc.pojo.User[ id=" + id + " ]";
     }
-
+    
 }

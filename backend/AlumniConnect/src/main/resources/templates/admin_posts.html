@@ -55,20 +55,62 @@
                     <td>
                         <button th:if="${post.active}" 
                                 class="btn btn-danger btn-sm" 
-                                th:attr="onclick=''"
+                                th:attr="onclick='deletePost(' + ${post.id} + ')'"
                                 >Xóa</button>
                         <button th:if="${!post.active}" 
                                 class="btn btn-secondary btn-sm" 
-                                th:attr="onclick=''">Khôi phục</button>
+                                th:attr="onclick='restorePost(' + ${post.id} + ')'">Khôi phục</button>
+                        
+                        <a th:href="@{'/admin/posts/' + ${post.id}}" class="btn btn-info">&#128393;</a>
                     </td>
                 </tr>
             </tbody>
 
         </table>
+        
+        <div>
+            <a th:href="@{/admin/add-posts}">
+                <button class="btn btn-success">Thêm bài viết</button>
+            </a>
+        </div>
         <script>
+            function deletePost(postId) {
+                if (confirm('Bạn có chắc chắn muốn XÓA bài viết này!!!')) {
+                    fetch(`/AlumniConnect/api/posts/${postId}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if(response.status === 204){
+                            alert("Xóa thành công!!!");
+                            location.reload();
+                        }else {
+                            alert("Hệ Thống Bị lỗi !!!");
+                        }
+                    })
+                    .catch(error => console.error("Lỗi:", error));
+                }
+            }
+            
+            function restorePost(postId) {
+                if (confirm('Bạn có chắc chắn muốn khôi phục bài viết này!!!')) {
+                    fetch(`/AlumniConnect/api/posts/restore-posts/${postId}`, {
+                        method: "PATCH"
+                    })
+                    .then(response => {
+                        if(response.status === 204){
+                            alert("Khôi phục thành công!!!");
+                            location.reload();
+                        }else {
+                            alert("Hệ Thống Bị lỗi !!!");
+                        }
+                    })
+                    .catch(error => console.error("Lỗi:", error));
+                }
+            }
+
             function toggleCommentStatus(postId, isLocked) {
                 if (confirm('Bạn có chắc chắn muốn khóa bình luận bài viết này!!!')) {
-                    console.log(`/AlumniConnect/admin/posts/${postId}/toggle-comment`);
+                    console.log(`/AlumniConnect/api/posts/${postId}/toggle-comment`);
                     fetch(`/AlumniConnect/admin/posts/${postId}/toggle-comment`, {
                         method: 'PATCH'
                     })

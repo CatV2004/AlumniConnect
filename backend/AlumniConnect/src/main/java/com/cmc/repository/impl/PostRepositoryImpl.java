@@ -41,16 +41,15 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public List<Post> getPostByUserId(Long id) {
-        List<Post> p = new ArrayList<>();
-        String sql = "SELECT * FROM Post p"
-                + "JOIN Users u ON p.userId = u.id"
-                + "LEFT JOIN PostImages pi ON p.id = pi.postId"
-                + "WHERE p.userId = :userId"
-                + "ORDER BY p.id DESC";
-        Query q = getSession().createQuery(sql, Post.class);
+        Query q = getSession().createQuery("""
+            SELECT p FROM Post p 
+            JOIN p.userId u  
+            LEFT JOIN p.postImageSet pi  
+            WHERE p.userId = :userId 
+            ORDER BY p.id DESC
+            """);
         q.setParameter("userId", id);
-        p = q.getResultList();
-        return p;
+        return q.getResultList();
     }
 
     @Override
@@ -66,19 +65,31 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public int addPost(Post post) {
+    public Post addPost(Post post) {
+        Session s = this.getSession();
         try {
-            getSession().persist(post);
+            if (post.getId() == null) {
+                s.persist(post);
+            } else {
+                s.merge(post);
+            }
         } catch (Exception ex) {
-            return -1;
+            return null;
         }
-        return 1;
+        s.refresh(post);
+        return post;
     }
 
     @Override
-    @Transactional
     public int deletePost(Long id) {
-        Query q = getSession().createQuery("UPDATE Post p SET p.active = 0 WHERE p.id = :id", Post.class);
+        Query q = getSession().createQuery("UPDATE Post p SET p.active = TRUE WHERE p.id = :id");
+        q.setParameter("id", id);
+        return q.executeUpdate();
+    }
+
+    @Override
+    public int restorePost(Long id) {
+        Query q = getSession().createQuery("UPDATE Post p SET p.active = FALSE WHERE p.id = :id");
         q.setParameter("id", id);
         return q.executeUpdate();
     }
@@ -102,13 +113,16 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> getPostId(Long id) {
-        List<Post> ps = new ArrayList<>();
-        String sql = "SELECT p FROM Post p WHERE p.active = true, p.id = :id";
+    public Post getPostId(Long id) {
+        String sql = "FROM Post p WHERE p.active = true AND p.id = :id";
         Query q = getSession().createQuery(sql, Post.class);
         q.setParameter("id", id);
-        ps = q.getResultList();
-        return ps;
+        List<Post> results = q.getResultList();
+        if (results.isEmpty()) {
+            return null;
+        } else {
+            return results.get(0);
+        }
     }
 
     @Override
@@ -148,7 +162,6 @@ public class PostRepositoryImpl implements PostRepository {
 
         return getSession().createQuery(update).executeUpdate();
     }
-
 
     @Override
     public long countTotalPosts() {

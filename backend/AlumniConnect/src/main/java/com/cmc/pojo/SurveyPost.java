@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -46,6 +45,7 @@ public class SurveyPost implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "end_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
     @Basic(optional = false)
     @NotNull
