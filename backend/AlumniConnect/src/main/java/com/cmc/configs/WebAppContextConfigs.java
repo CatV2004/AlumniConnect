@@ -54,5 +54,4 @@ public class WebAppContextConfigs implements WebMvcConfigurer {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
     }
     
-
 }

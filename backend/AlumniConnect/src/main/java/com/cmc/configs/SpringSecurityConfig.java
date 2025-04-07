@@ -4,6 +4,8 @@
  */
 package com.cmc.configs;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.cmc.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
  *
@@ -40,6 +44,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @Order(2)
 public class SpringSecurityConfig {
 
+    @Autowired
+    private Environment env;
+    
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -48,8 +55,8 @@ public class SpringSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
+    }   
+            
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -84,6 +91,16 @@ public class SpringSecurityConfig {
                 );
 
         return http.build();
+    }
+    
+    @Bean
+    public Cloudinary cloudinary() {
+        return new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", env.getProperty("cloudinary.cloud_name"),
+                "api_key", env.getProperty("cloudinary.api_key"),
+                "api_secret", env.getProperty("cloudinary.api_secret"),
+                "secure", true
+        ));
     }
 
 }

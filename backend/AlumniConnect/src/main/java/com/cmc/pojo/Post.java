@@ -8,6 +8,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,12 +22,14 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
-
+import lombok.Data; 
+import org.springframework.web.multipart.MultipartFile;
 /**
  *
  * @author FPTSHOP
@@ -40,7 +43,10 @@ import java.util.Set;
     @NamedQuery(name = "Post.findByCreatedDate", query = "SELECT p FROM Post p WHERE p.createdDate = :createdDate"),
     @NamedQuery(name = "Post.findByUpdatedDate", query = "SELECT p FROM Post p WHERE p.updatedDate = :updatedDate"),
     @NamedQuery(name = "Post.findByDeletedDate", query = "SELECT p FROM Post p WHERE p.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")})
+
+    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")
+})
+@Data
 public class Post implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -68,7 +74,7 @@ public class Post implements Serializable {
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId",fetch = FetchType.EAGER)
     private Set<PostImage> postImageSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     private Set<Reaction> reactionSet;
@@ -81,12 +87,27 @@ public class Post implements Serializable {
     private SurveyPost surveyPost;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     private Set<Comment> commentSet;
+    
+  
 
     public Post() {
     }
 
     public Post(Long id) {
         this.id = id;
+    }
+
+    public Post(Long id, String content, Boolean lockComment, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime deletedDate, Boolean active,  User userId, Set<PostImage> postImageSet) {
+        this.id = id;
+        this.content = content;
+        this.lockComment = lockComment;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+        this.deletedDate = deletedDate;
+        this.active = active;
+        this.userId = userId;
+        this.postImageSet = postImageSet;
+  
     }
 
     public Post(Long id, String content) {
@@ -222,5 +243,4 @@ public class Post implements Serializable {
     public String toString() {
         return "com.cmc.pojo.Post[ id=" + id + " ]";
     }
-    
 }

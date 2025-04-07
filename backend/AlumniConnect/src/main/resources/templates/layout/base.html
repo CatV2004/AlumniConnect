@@ -10,8 +10,10 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </th:block>
-    <th:block th:fragment="scriptBase">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <th:block th:fragment="scriptBase"> 
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </th:block>
 
 
@@ -38,6 +40,12 @@
                         <li class="nav-item"><a class="nav-link" th:href="@{/admin/statistics}">Thống kê</a></li>
                     </ul>
 
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+
+
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item dropdown" th:if="${session.user != null}">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
@@ -47,7 +55,8 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
                                 <li>
-                                    <a th:href="@{/admin/logout}" class="dropdown-item">Đăng xuất</a>                                </li>
+                                    <a th:href="@{/admin/logout}" class="dropdown-item">Đăng xuất</a>  
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -60,6 +69,7 @@
     <main class="container mt-4" th:replace="main"></main>
 
     <!-- Footer -->
+
     <footer th:fragment="footer" class="bg-dark text-white text-center py-3">
         <p>&copy; 2025 - Hệ thống Cựu sinh viên | Quản trị viên</p>
     </footer>
