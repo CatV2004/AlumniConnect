@@ -46,7 +46,7 @@ public class SpringSecurityConfig {
 
     @Autowired
     private Environment env;
-    
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,44 +55,44 @@ public class SpringSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }   
-            
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/admin/login", "/admin/register").permitAll()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/api/**").permitAll()
-                    .requestMatchers("/js/**").permitAll()
-                    .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/login", "/admin/register").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/js/**").permitAll()
+                .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                    .loginPage("/admin/login")
-                    .loginProcessingUrl("/admin/login")
-                    .usernameParameter("username")
-                    .passwordParameter("password")
-                    .defaultSuccessUrl("/admin/dashboard", true)
-                    .failureUrl("/admin/login?error")
-                    .permitAll()
+                .loginPage("/admin/login")
+                .loginProcessingUrl("/admin/login")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/admin/dashboard", true)
+                .failureUrl("/admin/login?error")
+                .permitAll()
                 )
                 .logout(logout -> logout
-                    .logoutUrl("/admin/logout") 
-                    .logoutSuccessUrl("/admin/login?logout=true")
-                    .deleteCookies("JSESSIONID")
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true)
-                    .permitAll()
+                .logoutUrl("/admin/logout")
+                .logoutSuccessUrl("/admin/login?logout=true")
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .permitAll()
                 )
-//                .csrf(csrf -> csrf.disable())
+                //                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception
-                    .accessDeniedPage("/403")
+                .accessDeniedPage("/403")
                 );
 
         return http.build();
     }
-    
+
     @Bean
     public Cloudinary cloudinary() {
         return new Cloudinary(ObjectUtils.asMap(
@@ -102,5 +102,5 @@ public class SpringSecurityConfig {
                 "secure", true
         ));
     }
-
+    
 }
