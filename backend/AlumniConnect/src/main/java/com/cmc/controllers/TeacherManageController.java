@@ -51,6 +51,9 @@ public class TeacherManageController {
 
         int page = Integer.parseInt(params.get("page"));
         int size = Integer.parseInt(params.get("size"));
+        
+        String username = params.get("username");
+
 
         List<Teacher> teachers = teacherService.getTeachers(params);
 
@@ -61,6 +64,7 @@ public class TeacherManageController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("size", size);
+        model.addAttribute("username", username);
 
         return "admin_teacher_management";
     }

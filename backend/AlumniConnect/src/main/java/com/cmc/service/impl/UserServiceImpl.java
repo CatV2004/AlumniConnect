@@ -43,7 +43,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private BCryptPasswordEncoder passEncoder;
 
-    private final CloudinaryService cloudinaryService = new CloudinaryService();
+    private final CloudinaryService cloudinaryService;
+    
+    @Autowired
+    public UserServiceImpl(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
+    }
 
     @Override
     public User getUserByUsername(String username) {
@@ -69,33 +74,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(Map<String, String> params, MultipartFile avatar, MultipartFile cover) {
-        User u = new User();
-        u.setFirstName(params.get("firstName"));
-        u.setLastName(params.get("lastName"));
-        u.setPhone(params.getOrDefault("phone", "113"));
-        u.setEmail(params.getOrDefault("email", "admin@gmail.com"));
-        u.setUsername(params.get("username"));
-        u.setPassword(this.passEncoder.encode(params.get("password")));
-        u.setRole(params.get("role"));
+    public User saveOrUpdate(UserDTO userDTO, MultipartFile avatar, MultipartFile cover) {
+        User user = new User();
+        user = modelMapper.map(userDTO, User.class);
 
-        u.setAvatar(cloudinaryService.uploadFile(avatar));
-        u.setCover(cloudinaryService.uploadFile(cover));
-        u.setCreatedDate(LocalDateTime.now());
-        u.setUpdatedDate(LocalDateTime.now());
+        user.setPassword(this.passEncoder.encode(user.getPassword()));
+        user.setRole("ALUMNI");
 
-        u.setActive(true);
+        user.setAvatar(cloudinaryService.uploadFile(avatar,"avatar"));
+        user.setCover(cloudinaryService.uploadFile(cover, "cover"));
 
+        user.setActive(true);
 
-        userRepo.saveOrUpdate(u);
+        this.userRepo.saveOrUpdate(user);
 
-        return u;
+        return user;
     }
 
     @Override
-    public boolean authUser(String username, String password) {
+    public boolean authUser(String username, String password, String role) {
         User u = this.getUserByUsername(username);
-        return u.getActive() && this.userRepo.authUser(username, password);
+        return u.getActive() && this.userRepo.authUser(username, password, role);
     }
 
     @Override

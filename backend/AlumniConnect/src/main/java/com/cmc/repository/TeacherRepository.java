@@ -21,7 +21,7 @@ public interface TeacherRepository {
 
     boolean isPasswordChangeDeadlineExceeded(String username);
 
-    void resetPasswordChangeDeadline(Long id);
+    boolean resetPasswordChangeDeadline(Long id);
 
     List<Teacher> getTeachers(Map<String, String> params);
 

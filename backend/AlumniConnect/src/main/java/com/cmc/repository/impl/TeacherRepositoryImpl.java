@@ -14,6 +14,8 @@ import com.cmc.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.LocalDateTime;
@@ -98,7 +100,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     }
 
     @Override
-    public void resetPasswordChangeDeadline(Long id) {
+    public boolean resetPasswordChangeDeadline(Long id) {
         Teacher teacher = this.getTeacherById(id);
 
         if (teacher != null) {
@@ -106,10 +108,13 @@ public class TeacherRepositoryImpl implements TeacherRepository {
             teacher.setMustChangePassword(Boolean.TRUE);
             teacher.setPasswordResetTime(LocalDateTime.now().plusHours(24));
             user.setActive(Boolean.TRUE);
-            
+
             this.userRepository.saveOrUpdate(user);
             this.saveOrUpdate(teacher);
+
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -119,7 +124,21 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         CriteriaQuery<Teacher> query = builder.createQuery(Teacher.class);
         Root<Teacher> root = query.from(Teacher.class);
 
-        query.select(root);
+        Join<Teacher, User> userJoin = root.join("userId", JoinType.INNER);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params != null && params.containsKey("username")) {
+            String username = params.get("username");
+            Predicate usernamePredicate = builder.like(userJoin.get("username"), "%" + username + "%");
+            predicates.add(usernamePredicate);
+        }
+
+        if (!predicates.isEmpty()) {
+            query.where(predicates.toArray(new Predicate[0]));
+        }
+
+        query.select(root).orderBy(builder.desc(root.get("id"))); 
 
         Query<Teacher> q = session.createQuery(query);
 
@@ -136,7 +155,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     }
 
     @Override
-    public Long countTeachers() {
+    public Long countTeachers() {   
         Session session = this.getCurrentSession();
         Query<Long> query = session.createQuery("SELECT count(*) FROM Teacher", Long.class);
         return query.uniqueResult();

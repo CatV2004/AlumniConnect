@@ -123,18 +123,22 @@ public class User implements Serializable {
     private Set<Comment> commentSet;
 
     public User() {
+        this.createdDate = LocalDateTime.now();
     }
 
     public User(Long id) {
         this.id = id;
     }
 
-    public User(Long id, String username, String password, String email, String role) {
-        this.id = id;
+    public User(String username, String password, String email, String phone, String avatar, String cover, String role) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.phone = phone;
+        this.avatar = avatar;
+        this.cover = cover;
         this.role = role;
+        this.createdDate = LocalDateTime.now();
     }
 
     public Long getId() {

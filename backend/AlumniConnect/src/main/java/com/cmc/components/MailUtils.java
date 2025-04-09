@@ -41,7 +41,6 @@ public class MailUtils {
             return;
         }
 
-        // Cấu hình thuộc tính email
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");

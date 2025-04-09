@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface AlumniRepository {
 
-    void registerAlumni(Alumni alumni);
+    void saveOrUpdateAlumni(Alumni alumni);
 
     List<AlumniDTO> getPendingAlumniRegistrations();
 
