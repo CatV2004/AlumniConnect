@@ -6,6 +6,7 @@ function addTeacher(url) {
         email: document.getElementById("email").value,
         phone: document.getElementById("phone").value
     };
+
     fetch(url, {
         method: 'POST',
         headers: {
@@ -13,20 +14,35 @@ function addTeacher(url) {
         },
         body: JSON.stringify(data)
     })
-            .then(response => response.json())
-            .then(result => {
-                if (result.message) {
-                    showSuccessModal(result.message);
-//                    closeAndUpdateTeacherList(modalId);
+    .then(response => {
+        return response.json().then(result => {
+            const teacherModalEl = document.getElementById('createTeacherModal');
+            const teacherModal = bootstrap.Modal.getInstance(teacherModalEl);
+
+            teacherModalEl.addEventListener('hidden.bs.modal', function () {
+                if (response.ok) {
+                    showSuccessModal(result.message || "Tạo tài khoản giảng viên thành công!");
                     reloadPageOnModalClose("successModal");
                 } else {
-                    showErrorModal("Đã có lỗi xảy ra. Vui lòng thử lại.");
+                    showErrorModal(result.message || "Tạo tài khoản thất bại.");
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorModal("Đã có lỗi xảy ra. Vui lòng thử lại.");
-            });
+            }, { once: true });
+
+            teacherModal.hide();
+        });
+    })
+    .catch(error => {
+        console.error('Lỗi gọi API:', error);
+
+        const teacherModalEl = document.getElementById('createTeacherModal');
+        const teacherModal = bootstrap.Modal.getInstance(teacherModalEl);
+
+        teacherModalEl.addEventListener('hidden.bs.modal', function () {
+            showErrorModal("Đã có lỗi xảy ra. Vui lòng thử lại.");
+        }, { once: true });
+
+        teacherModal.hide();
+    });
 }
 
 function showSuccessModal(message) {
@@ -50,27 +66,27 @@ function reloadPageOnModalClose(modalId) {
 
 function updateResetPasswordTime(url) {
     const confirmed = confirm("Bạn có chắc chắn muốn đặt lại mật khẩu không?");
-    
+
     if (confirmed) {
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({})  
+            body: JSON.stringify({})
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Đặt lại mật khẩu thành công!');
-                window.location.reload(); 
-            } else {
-                alert('Đã xảy ra lỗi khi đặt lại mật khẩu');
-            }
-        })
-        .catch(error => {
-            alert('Lỗi kết nối với máy chủ');
-            console.error(error);
-        });
+                .then(response => {
+                    if (response.ok) {
+                        alert('Đặt lại mật khẩu thành công!');
+                        window.location.reload();
+                    } else {
+                        alert('Đã xảy ra lỗi khi đặt lại mật khẩu');
+                    }
+                })
+                .catch(error => {
+                    alert('Lỗi kết nối với máy chủ');
+                    console.error(error);
+                });
     } else {
         alert('Hành động đã bị hủy!');
     }

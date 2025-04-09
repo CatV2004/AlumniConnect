@@ -5,10 +5,12 @@
 package com.cmc.service;
 
 import com.cmc.dtos.AlumniDTO;
+import com.cmc.dtos.AlumniRegisterDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -16,7 +18,7 @@ import java.util.Map;
  */
 public interface AlumniService {
 
-    void registerAlumni(AlumniDTO alumni);
+    Alumni registerAlumni(AlumniRegisterDTO alumni);
 
     boolean existsByStudentId(String studentCode);
 

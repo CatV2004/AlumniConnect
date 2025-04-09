@@ -8,6 +8,7 @@ import com.cmc.dtos.TeacherDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
+import com.cmc.service.MailServices;
 import com.cmc.service.TeacherService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +31,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private TeacherRepository teacherRepository;
     @Autowired
-    private MailServicesImpl mailServices;
+    private MailServices mailServices;
 
     @Override
     public boolean createTeacherAccount(TeacherDTO teacherDTO) {
@@ -57,7 +58,14 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public void resetPasswordChangeDeadline(Long id) {
-        teacherRepository.resetPasswordChangeDeadline(id);
+        boolean isReset = teacherRepository.resetPasswordChangeDeadline(id);
+        if (isReset) {
+            String teacherEmail = teacherRepository.getTeacherById(id).getUserId().getEmail();
+            String teacherName = teacherRepository.getTeacherById(id).getUserId().toString();
+            LocalDateTime passwordChangeDeadline = teacherRepository.getTeacherById(id).getPasswordResetTime();
+
+            mailServices.notifyTeacherPasswordReset(teacherEmail, teacherName, passwordChangeDeadline);
+        }
     }
 
     @Override

@@ -4,6 +4,8 @@
  */
 package com.cmc.service;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author FPTSHOP
@@ -11,6 +13,8 @@ package com.cmc.service;
 public interface MailServices {
 
     void notifyAlumniOnApproval(String alumniEmail, String alumniName);
+
+    void notifyTeacherPasswordReset(String teacherEmail, String teacherName, LocalDateTime passwordChangeDeadline);
 
     void notifyTeacherAccountCreation(String teacherEmail, String teacherName, String username, String defaultPassword);
 }

@@ -23,7 +23,7 @@ public interface UserRepository {
 
     void changePassword(String username, ChangePasswordDTO dto);
     
-    boolean authUser(String username, String password );
+    boolean authUser(String username, String password, String role);
     
     boolean existsByUsername(String username);
     

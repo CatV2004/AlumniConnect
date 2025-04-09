@@ -15,15 +15,15 @@ public class AlumniDTO {
     private Long id;
     private String studentCode;
     private Boolean isVerified;
-    private UserDTO user;
+    private UserDTO userId;
 
     public AlumniDTO() {
     }
 
-    public AlumniDTO(String studentCode, UserDTO user) {
+    public AlumniDTO(String studentCode, UserDTO userId) {
         this.studentCode = studentCode;
         this.isVerified = false;
-        this.user = user;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -51,11 +51,11 @@ public class AlumniDTO {
     }
 
     public UserDTO getUser() {
-        return user;
+        return userId;
     }
 
     public void setUser(UserDTO user) {
-        this.user = user;
+        this.userId = user;
     }
     
     

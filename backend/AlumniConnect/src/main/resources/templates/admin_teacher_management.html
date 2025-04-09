@@ -108,7 +108,7 @@
                 <div class="modal-content shadow-lg rounded-4" style="background: #f8f9fa;">
                     <form id="createTeacherForm">
                         <!-- Header Modal -->
-                        <div class="modal-header" style="background-color: #429279e6; color: white;">
+                        <div class="modal-header" style="background-color: #429279e6; color: white; border-radius: 15px 15px 0px 0px;">
                             <h5 class="modal-title" id="createTeacherModalLabel">Tạo tài khoản giảng viên mới</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                         </div>
@@ -161,10 +161,10 @@
 
 
 
-        <th:block th:insert="~{modal_noti}"></th:block>
     </main>
+<th:block th:insert="~{modal_noti}"></th:block>
 
-    <script th:src="@{/js/teacher.js}"></script>
-    <footer th:replace="~{layout/base :: footer}"></footer>
+<script th:src="@{/js/teacher.js}"></script>
+<footer th:replace="~{layout/base :: footer}"></footer>
 </body>
 </html>

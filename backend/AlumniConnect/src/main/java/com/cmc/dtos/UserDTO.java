@@ -6,6 +6,7 @@ package com.cmc.dtos;
 
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -28,20 +29,17 @@ public class UserDTO {
     private LocalDateTime deletedDate;
     private Boolean active;
     
+    
 
-    public UserDTO(Long id, String username, String password, String avatar, String cover,
-            String firstName, String lastName, String email, String phone, String role, Boolean active) {
-        this.id = id;
+    public UserDTO(String username, String password, String firstName, String lastName,
+             String email, String phone, String role) {
         this.username = username;
         this.password = password;
-        this.avatar = avatar;
-        this.cover = cover;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.role = role;
-        this.active = active;
     }
     
     public UserDTO() {
@@ -159,12 +157,6 @@ public class UserDTO {
         this.deletedDate = deletedDate;
     }
 
-    @Override
-    public String toString() {
-        return this.firstName + this.lastName;
-    }
-    
-    
     
     
     

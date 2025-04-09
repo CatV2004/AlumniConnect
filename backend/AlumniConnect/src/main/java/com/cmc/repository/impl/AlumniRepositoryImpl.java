@@ -57,16 +57,20 @@ public class AlumniRepositoryImpl implements AlumniRepository {
     @Override
     public Alumni getAlumniById(Long id) {
         Session s = this.getCurrentSession();
-        Query q = s.createQuery("FROM Alumni WHERE id = :id", Alumni.class); 
+        Query q = s.createQuery("FROM Alumni WHERE id = :id", Alumni.class);
         q.setParameter("id", id);
 
         Alumni alumni = (Alumni) q.uniqueResult();
-        return alumni != null ? alumni : null;  
+        return alumni != null ? alumni : null;
     }
 
     @Override
-    public void registerAlumni(Alumni alumni) {
-        getCurrentSession().persist(alumni);
+    public void saveOrUpdateAlumni(Alumni alumni) {
+        if (alumni.getId() == null) {
+            getCurrentSession().persist(alumni);
+        } else {
+            getCurrentSession().merge(alumni);
+        }
     }
 
     @Override
@@ -97,7 +101,7 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
         session.merge(alumni);
         session.merge(user);
-        
+
         return true;
     }
 
@@ -113,12 +117,21 @@ public class AlumniRepositoryImpl implements AlumniRepository {
 
     @Override
     public boolean checkStudentCode(String studentId) {
-        Long count = getCurrentSession()
-                .createQuery("SELECT COUNT(a) FROM Alumni a WHERE a.studentCode = :studentId", Long.class)
+        Boolean exists = getCurrentSession()
+                .createQuery("SELECT EXISTS(SELECT 1 FROM Alumni a WHERE a.studentCode = :studentId)", Boolean.class)
                 .setParameter("studentId", studentId)
                 .uniqueResult();
-        return count != null && count > 0;
+        return exists != null && exists;
     }
+
+//    @Override
+//    public boolean checkStudentCode(String studentId) {
+//        return getCurrentSession()
+//                .createQuery("SELECT 1 FROM Alumni a WHERE a.studentCode = :studentId", Integer.class)
+//                .setParameter("studentId", studentId)
+//                .setMaxResults(1)
+//                .uniqueResult() != null;
+//    }
 
     @Override
     public List<Alumni> getAlumnis(Map<String, String> params) {
