@@ -4,6 +4,8 @@
  */
 package com.cmc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,12 +49,15 @@ public class InvitationPost implements Serializable {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
+    @JsonIgnore
     private Set<Ugroup> ugroupSet;
+    
     @JoinTable(name = "invitation_post_user", joinColumns = {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")})
     @ManyToMany
     private Set<User> userSet;
+    
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Post post;

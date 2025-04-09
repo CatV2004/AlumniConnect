@@ -4,6 +4,7 @@
  */
 package com.cmc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -103,23 +104,41 @@ public class User implements Serializable {
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
+    
     @ManyToMany(mappedBy = "userSet")
+    @JsonIgnore
     private Set<InvitationPost> invitationPostSet;
+    
     @ManyToMany(mappedBy = "userSet")
+    @JsonIgnore
     private Set<Ugroup> ugroupSet;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<Reaction> reactionSet;
+    
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Alumni alumni;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<SurveyDraft> surveyDraftSet;
+    
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Teacher teacher;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<Post> postSet;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<UserSurveyOption> userSurveyOptionSet;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<Comment> commentSet;
 
     public User() {

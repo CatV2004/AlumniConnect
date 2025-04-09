@@ -4,6 +4,7 @@
  */
 package com.cmc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,7 @@ public class PostImage implements Serializable {
     private String image;
     @JoinColumn(name = "post_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Post postId;
     
     @Transient

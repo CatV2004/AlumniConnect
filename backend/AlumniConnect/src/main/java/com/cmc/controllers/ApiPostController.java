@@ -47,6 +47,12 @@ public class ApiPostController {
         );
     }
     
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<Post> getPostById(
+            @PathVariable(value = "postId") Long postId
+    ){
+        return new ResponseEntity<>(this.postService.getPostById(postId), HttpStatus.OK);
+    }
     
     @PostMapping(path = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Post> createPost(@RequestParam Map<String, String> pagram, 
