@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Trang Chủ</title>
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+</head>
+
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+    <main class="container mt-4" th:fragment="~{layout/base :: main}">
+        <div  style="display: flex; margin-top: 20px;" class="justify-content-between">
+            <div style="width: 40%;">
+                <form>
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Thống kê theo năm</label>
+                        <input type="number" class="form-control" name="year" id="year" placeholder="Nhập năm..." min="1990">
+                    </div>
+                    <div class="mb-3">
+                        <label for="month" class="form-label">Thống kê theo tháng</label>
+                        <input type="number" class="form-control" name="month" id="month" placeholder="Nhập tháng..." min="1" max="12">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quarter" class="form-label">Thống kê theo quý</label>
+                        <input type="number" class="form-control" name="quarter" id="quarter" placeholder="Nhập quý..." min="1" max="4">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Thống kê</button>
+                </form>
+            </div>
+            <div style="width: 50%; display: flex;">
+                <div style="width: 40%;">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>STT</th>
+                                <th>Thời gian</th>
+                                <th>Số Người Dùng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="row : ${statsUser}">
+                                <td th:text="${row.stt}"></td>
+                                <td th:text="${row.time}"></td>
+                                <td th:text="${row.users}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="width: 60%;">
+                    <canvas id="myChartUser" style="width: 250px; height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; margin-top: 20px;" class="justify-content-between">
+            <div style="width: 40%;">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>STT</th>
+                            <th>Thời gian</th>
+                            <th>Số bài viết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="row : ${statsPost}">
+                            <td th:text="${row.stt}"></td>
+                            <td th:text="${row.time}"></td>
+                            <td th:text="${row.posts}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="width: 50%;">
+                <canvas id="myChartPost" width="300" height="300"></canvas>
+            </div>
+        </div>
+
+
+        <script th:inline="javascript">
+            document.querySelector("form").addEventListener("submit", function (e) {
+                let year = document.getElementById("year").value;
+                let month = document.getElementById("month").value;
+                let quarter = document.getElementById("quarter").value;
+
+                if (year && year < 1990) {
+                    alert("Năm phải từ 1990 trở đi!");
+                    e.preventDefault();
+                }
+                if (month && (month < 1 || month > 12)) {
+                    alert("Tháng phải từ 1 đến 12!");
+                    e.preventDefault();
+                }
+                if (quarter && (quarter < 1 || quarter > 4)) {
+                    alert("Quý phải từ 1 đến 4!");
+                    e.preventDefault();
+                }
+            });
+            
+            let labelsUser = [[${monthUser}]];
+            let dataUsers = [[${dataUser}]];
+            let labelsPost = [[${monthPost}]];
+            let dataPost = [[${dataPost}]];
+
+            let borderColorUser = [];
+            let backgroundColorUser = [];
+            for (let i of labelsUser) {
+                let r = Math.floor(Math.random() * 255);
+                let g = Math.floor(Math.random() * 255);
+                let b = Math.floor(Math.random() * 255);
+                borderColorUser.push(`rgba(${r}, ${g}, ${b}, 1)`);
+                backgroundColorUser.push(`rgba(${r}, ${g}, ${b}, 0.4)`);
+            }
+
+            const ctxUser = document.getElementById('myChartUser');
+            new Chart(ctxUser, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsUser,
+                    datasets: [{
+                        label: 'Số lượng người dùng Tháng',
+                        data: dataUsers,
+                        borderWidth: 1,
+                        borderColor: borderColorUser,
+                        backgroundColor: backgroundColorUser
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            let borderColorPost = [];
+            let backgroundColorPost = [];
+            for (let i of labelsPost) {
+                let r = Math.floor(Math.random() * 255);
+                let g = Math.floor(Math.random() * 255);
+                let b = Math.floor(Math.random() * 255);
+                borderColorPost.push(`rgba(${r}, ${g}, ${b}, 1)`);
+                backgroundColorPost.push(`rgba(${r}, ${g}, ${b}, 0.4)`);
+            }
+
+            const ctxPost = document.getElementById('myChartPost');
+            new Chart(ctxPost, {
+                type: 'bar',
+                data: {
+                    labels: labelsPost,
+                    datasets: [{
+                        label: 'Số lượng bài đăng Tháng',
+                        data: dataPost,
+                        borderWidth: 1,
+                        borderColor: borderColorPost,
+                        backgroundColor: backgroundColorPost
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+    </main>
+</main>
+<footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>
