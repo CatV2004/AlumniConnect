@@ -47,7 +47,6 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
         long maxFileSize = 52428800; // 50MB
         long maxRequestSize = 52428800; // 50MB
         int fileSizeThreshold = 0;
-
         registration.setMultipartConfig(new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold));
     }
 

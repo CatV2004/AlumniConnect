@@ -4,6 +4,9 @@
  */
 package com.cmc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -65,27 +68,34 @@ public class Post implements Serializable {
     private Boolean lockComment;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime createdDate;
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime updatedDate;
     @Column(name = "deleted_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId",fetch = FetchType.EAGER)
     private Set<PostImage> postImageSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    @JsonIgnore
     private Set<Reaction> reactionSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.EAGER)
+    @JsonIgnore
     private InvitationPost invitationPost;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User userId;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
+    @JsonIgnore
     private SurveyPost surveyPost;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
+    @JsonIgnore
     private Set<Comment> commentSet;
     
   

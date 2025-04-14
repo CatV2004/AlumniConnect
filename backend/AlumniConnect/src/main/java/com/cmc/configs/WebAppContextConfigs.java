@@ -55,7 +55,8 @@ public class WebAppContextConfigs implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
     }
-
+    
+    
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         configurer.setDefaultTimeout(5000);
