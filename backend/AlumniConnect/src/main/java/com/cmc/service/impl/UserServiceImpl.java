@@ -85,12 +85,12 @@ public class UserServiceImpl implements UserService {
         user.setCover(cloudinaryService.uploadFile(cover, "cover"));
 
         user.setActive(true);
-
+        
         this.userRepo.saveOrUpdate(user);
 
         return user;
     }
-
+  
     @Override
     public boolean authUser(String username, String password, String role) {
         User u = this.getUserByUsername(username);
