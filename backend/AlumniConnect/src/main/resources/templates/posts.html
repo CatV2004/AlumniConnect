@@ -9,44 +9,58 @@
 
 <body>
     <header th:replace="~{layout/base :: header}"></header>
-    <main class="container mt-4" th:fragment="~{layout/base :: main}">
-        <form th:action="@{/admin/add-posts}" th:object="${post}" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label  class="form-label" for="content">Nội dung</label>
-                <textarea class="form-control" id="content" th:field="*{content}" rows="4" cols="50"></textarea>
-            </div>
-            <div class="mb-3">
-                <label  class="form-label" for="lockComment">Khóa bình luận?</label>
-                <input class="form-check-label" type="checkbox" id="lockComment" th:field="*{lockComment}" />
-            </div>
-            <div class="mb-3">
-                <label  class="form-label" for="images">Chọn ảnh: </label>
-                <input class="form-control" type="file" id="images" name="images" multiple />
-                <div th:if="${post.id != null && post.postImageSet != null}">
-                    <label>Các ảnh bài viết</label>
-                    <div th:each="img : ${post.postImageSet}">
-                        <img th:src="@{${img.image}}" alt="ảnh" width="100" />
+    <main class="container mt-5" th:fragment="~{layout/base :: main}">
+        <div class="card shadow rounded-4 p-4">
+            <h4 class="mb-4" th:text="${post.id == null} ? 'Tạo bài viết' : 'Chỉnh sửa bài viết'"></h4>
+            <form th:action="@{/admin/add-posts}" th:object="${post}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="content">Nội dung</label>
+                    <textarea class="form-control" id="content" th:field="*{content}" rows="4" placeholder="Nhập nội dung bài viết..."></textarea>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="lockComment" th:field="*{lockComment}">
+                    <label class="form-check-label" for="lockComment">Khóa bình luận</label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold" for="images">Chọn ảnh</label>
+                    <input class="form-control" type="file" id="images" name="images" multiple>
+                </div>
+
+                <div class="mb-3" th:if="${post.id != null && post.postImageSet != null}">
+                    <label class="form-label fw-bold">Ảnh hiện tại</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div th:each="img : ${post.postImageSet}" class="border rounded p-1 bg-light">
+                            <img th:src="@{${img.image}}" alt="ảnh" width="150" class="img-thumbnail" />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="userId" class="form-label">Người đăng</label>
-                <select class="form-control" id="userId" th:field="*{userId}">
-                    <option th:each="user : ${userList}"
-                            th:value="${user.id}"
-                            th:text="${user.username}">
-                    </option>
-                </select>
-            </div>
-            <input type="hidden" th:field="*{id}" />
-            <input type="hidden" th:field="*{createdDate}" />
-            <input type="hidden" th:field="*{deletedDate}" />
-            <input type="hidden" th:field="*{active}" />
-            <input type="hidden" th:field="*{postImageSet}" />
-            <button type="submit" class="btn btn-primary" th:if="${post.id == null}">Lưu bài Viết</button>
-            <button type="submit" class="btn btn-primary mb-3" th:unless="${post.id == null}">Cập nhật bài Viết</button>
-        </form>
+                <div class="mb-3">
+                    <label for="userId" class="form-label fw-bold">Người đăng</label>
+                    <select class="form-select" id="userId" th:field="*{userId.id}">
+                        <option value="" disabled selected>-- Chọn người đăng --</option>
+                        <option th:each="user : ${userList}"
+                                th:value="${user.id}"
+                                th:text="${user.username}">
+                        </option>
+                    </select>
+                </div>
+
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{createdDate}" />
+                <input type="hidden" th:field="*{deletedDate}" />
+                <input type="hidden" th:field="*{active}" />
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        <span th:text="${post.id == null} ? 'Lưu bài viết' : 'Cập nhật bài viết'"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </main>
     <footer th:replace="~{layout/base :: footer}"></footer>
 </body>

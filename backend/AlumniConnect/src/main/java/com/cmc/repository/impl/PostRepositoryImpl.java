@@ -5,22 +5,28 @@
 package com.cmc.repository.impl;
 
 import com.cmc.pojo.Post;
+import com.cmc.pojo.PostImage;
 import com.cmc.repository.PostRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
-import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -29,8 +35,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Transactional
 public class PostRepositoryImpl implements PostRepository {
-
-    private static final int SIZE = 10;
 
     @Autowired
     private LocalSessionFactoryBean Factory;
@@ -82,14 +86,14 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public int deletePost(Long id) {
-        Query q = getSession().createQuery("UPDATE Post p SET p.active = TRUE WHERE p.id = :id");
+        Query q = getSession().createQuery("UPDATE Post p SET p.active = FALSE WHERE p.id = :id");
         q.setParameter("id", id);
         return q.executeUpdate();
     }
 
     @Override
     public int restorePost(Long id) {
-        Query q = getSession().createQuery("UPDATE Post p SET p.active = FALSE WHERE p.id = :id");
+        Query q = getSession().createQuery("UPDATE Post p SET p.active = TRUE WHERE p.id = :id");
         q.setParameter("id", id);
         return q.executeUpdate();
     }
@@ -100,16 +104,6 @@ public class PostRepositoryImpl implements PostRepository {
         q.setParameter("id", id);
         q.setParameter("content", content);
         return q.executeUpdate();
-    }
-
-    @Override
-    public Iterable<Post> findAll(Sort sort) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public Page<Post> findAll(Pageable pageable) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
@@ -168,6 +162,58 @@ public class PostRepositoryImpl implements PostRepository {
         String hql = "SELECT COUNT(*) FROM Post";
         Query query = getSession().createQuery(hql, Long.class);
         return (long) query.getSingleResult();
+    }
+
+    @Override
+    public PostImage addPostImage(Long postId, String imageUrl) {
+        Session s = getSession();
+
+        Post post = s.find(Post.class, postId);
+        if (post == null) {
+            return null;
+        }
+
+        PostImage img = new PostImage();
+        img.setImage(imageUrl);
+        img.setPostId(post);
+
+        s.persist(img);
+
+        post.getPostImageSet().add(img);
+        s.merge(post);
+
+        return img;
+    }
+
+    @Override
+    public int deletePostImage(Long imageId) {
+        Session s = getSession();
+        PostImage img = s.find(PostImage.class, imageId);
+        if (img != null) {
+            s.remove(img);
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public List<PostImage> getImagesByPostId(Long postId) {
+        return this.getSession().createQuery("SELECT pi FROM PostImage pi WHERE pi.postId.id = :postId", PostImage.class)
+                .setParameter("postId", postId)
+                .getResultList();
+    }
+
+    @Override
+    public Post saveOrUpdate(Post post) {
+        post.setUpdatedDate(LocalDateTime.now());
+        if (post.getId() == null) {
+            post.setActive(Boolean.TRUE);
+            post.setCreatedDate(LocalDateTime.now());
+            this.getSession().persist(post);
+        }
+        this.getSession().merge(post);
+        getSession().refresh(post);
+        return post;
     }
 
 }

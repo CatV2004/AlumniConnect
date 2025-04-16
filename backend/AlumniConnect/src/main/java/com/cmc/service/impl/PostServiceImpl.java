@@ -11,9 +11,10 @@ import com.cmc.dtos.PostDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import com.cmc.repository.PostRepository;
-import com.cmc.repository.UserRepository;
 import com.cmc.service.PostService;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,50 +46,42 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private Cloudinary cloudinary;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    public Page<Post> getPosts(Integer pageSize, Integer offset) {
-        Pageable pageable = PageRequest.of(pageSize, offset);
+    @Override
+    public Page<Post> getPosts(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
         List<Post> posts = postRepository.getPosts(pageable);
         long total = postRepository.countTotalPosts();
         return new PageImpl<>(posts, pageable, total);
     }
 
     @Override
-    public int saveOrUpdate(Post post, MultipartFile[] images) {
+    public Post saveOrUpdate(Post post, String[] images) {
         if (images != null) {
-            Set<PostImage> imageSet = new HashSet<>();
-            for (MultipartFile file : images) {
-                if (file != null) {
+            Set<PostImage> currentImages = post.getPostImageSet();
 
-                    try {
-                        Map res = cloudinary.uploader().upload(file, ObjectUtils.asMap("resource_type", "auto"));
-                        PostImage img = new PostImage();
-                        img.setImage(res.get("secure_url").toString());
-                        imageSet.add(img);
-                    } catch (IOException ex) {
-                        Logger.getLogger(PostServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            Set<String> newImageNames = new HashSet<>();
+            if (images != null) {
+                newImageNames.addAll(Arrays.asList(images));
+            }
+            if (currentImages != null) {
+                currentImages.removeIf(img -> !newImageNames.contains(img.getImage()));
+            } else {
+                currentImages = new HashSet<>();
+            }
+
+            for (String file : newImageNames) {
+                boolean exists = currentImages.stream().anyMatch(i -> i.getImage().equals(file));
+                if (!exists) {
+                    PostImage img = new PostImage();
+                    img.setImage(file);
+                    img.setPostId(post);
+                    currentImages.add(img);
                 }
             }
-            post.setPostImageSet(imageSet);
-            this.postRepository.addPost(post);
+            post.setPostImageSet(currentImages);
+            return this.postRepository.saveOrUpdate(post);
         }
-        return 0;
-    }
-
-    @Override
-    public int deletePost(Long id) {
-        return postRepository.deletePost(id);
-    }
-
-    @Override
-    public int updateContent(Long id, String content) {
-        return postRepository.updateContent(id, content);
+        return this.postRepository.saveOrUpdate(post);
     }
 
     @Override
@@ -116,37 +111,64 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public int restorePost(Long id) {
-        return this.postRepository.restorePost(id);
-    }
+    public Post addPost(Post post, List<String> imageUrls) {
+        post.setCreatedDate(LocalDateTime.now());
+        post.setActive(true);
+        post.setLockComment(false); // mặc định cho phép bình luận
 
-    private String uploadImage(MultipartFile file) throws IOException {
-        Map res = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
-        return res.get("secure_url").toString();
+        Post savedPost = postRepository.addPost(post);
+
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                postRepository.addPostImage(savedPost.getId(), url);
+            }
+        }
+
+        return savedPost;
     }
 
     @Override
-    public Post createPost(Map<String, String> pagram, MultipartFile[] images) {
-        Post p = new Post();
-        p.setContent(pagram.get("content"));
-        p.setUserId(this.userRepository.getUserById(Long.parseLong(pagram.get("userId"))));
-        Set<PostImage> imageSet = new HashSet<>();
-        if (images != null) {
-            for (MultipartFile file : images) {
-                if (file != null) {
-                    try {
-                        PostImage img = new PostImage();
-                        img.setImage(uploadImage(file));
-                        img.setPostId(p);
-                        imageSet.add(img);
-                    } catch (IOException ex) {
-                        Logger.getLogger(PostServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-        p.setPostImageSet(imageSet);
+    public boolean updatePostContent(Long postId, String newContent) {
+        return postRepository.updateContent(postId, newContent) == 1;
+    }
 
-        return this.postRepository.addPost(p);
+    @Override
+    public boolean deletePost(Long postId) {
+        return postRepository.deletePost(postId) == 1;
+    }
+
+    @Override
+    public boolean restorePost(Long postId) {
+        return postRepository.restorePost(postId) == 1;
+    }
+
+    @Override
+    public List<Post> getPostsByUser(Long userId) {
+        return postRepository.getPostByUserId(userId);
+    }
+
+    @Override
+    public List<PostImage> getImagesOfPost(Long postId) {
+        return postRepository.getImagesByPostId(postId);
+    }
+
+    @Override
+    public PostImage addImageToPost(Long postId, String imageUrl) {
+        return postRepository.addPostImage(postId, imageUrl);
+    }
+
+    @Override
+    public boolean deleteImage(Long imageId) {
+        return postRepository.deletePostImage(imageId) == 1;
+    }
+
+    @Override
+    public long countPosts() {
+        return postRepository.countTotalPosts();
+    }
+
+    @Override
+    public long countPosts(String keyword) {
+        return postRepository.countTotalPosts(keyword);
     }
 }
