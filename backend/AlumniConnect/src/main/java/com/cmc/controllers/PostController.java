@@ -41,11 +41,12 @@ public class PostController {
 
     @RequestMapping("/admin/posts")
     public String getPosts(
-            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(required = false, defaultValue = "", value = "kw") String keyword,
             @RequestParam(defaultValue = "0", value = "page", name = "page") int page,
             @RequestParam(defaultValue = "10", value = "size", name = "size") int size,
             Model model) {
-        Page<Post> pages = postService.getPosts(page, size);
+        
+        Page<Post> pages = this.postService.searchPosts(keyword, page, size);
         model.addAttribute("posts", pages.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", pages.getTotalPages());
@@ -79,5 +80,5 @@ public class PostController {
         this.postService.saveOrUpdate(post, urlImage.toArray(new String[0]));
         return "redirect:/admin/posts";
     }
-
+    
 }

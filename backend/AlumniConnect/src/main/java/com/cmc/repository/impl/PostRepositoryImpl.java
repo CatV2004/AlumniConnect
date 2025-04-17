@@ -100,7 +100,7 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public int updateContent(Long id, String content) {
-        Query q = getSession().createNamedQuery("UPDATE Post p SET p.content = :content WHERE p.id = :id", Post.class);
+        Query q = getSession().createQuery("UPDATE Post p SET p.content = :content WHERE p.id = :id");
         q.setParameter("id", id);
         q.setParameter("content", content);
         return q.executeUpdate();
@@ -187,20 +187,33 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public int deletePostImage(Long imageId) {
-        Session s = getSession();
-        PostImage img = s.find(PostImage.class, imageId);
-        if (img != null) {
-            s.remove(img);
-            return 1;
+    Session s = getSession();
+    PostImage img = s.find(PostImage.class, imageId);
+    
+    if (img != null) {
+        Post post = img.getPostId();
+        if (post != null) {
+            post.getPostImageSet().remove(img);
         }
-        return 0;
+        s.remove(img);
+        return 1;
     }
+    return 0;
+}
 
     @Override
     public List<PostImage> getImagesByPostId(Long postId) {
         return this.getSession().createQuery("SELECT pi FROM PostImage pi WHERE pi.postId.id = :postId", PostImage.class)
                 .setParameter("postId", postId)
                 .getResultList();
+    }
+    
+    
+    @Override
+    public PostImage getPostImageById(Long id){
+        Query q = this.getSession().createNamedQuery("PostImage.findById", PostImage.class);
+        q.setParameter("id", id);
+        return (PostImage) q.uniqueResult();
     }
 
     @Override

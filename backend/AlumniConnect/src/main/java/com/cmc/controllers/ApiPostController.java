@@ -104,7 +104,7 @@ public class ApiPostController {
         if (u == null) {
             return ResponseEntity.badRequest().body("User không tồn tại!!!");
         }
-        if (!Objects.equals(u.getId(), p.getUserId())) {
+        if (!p.getUserId().getId().equals(userId)) {
             return ResponseEntity.badRequest().body("Bạn không thể sửa bài đăng!!!");
         }
 
@@ -134,11 +134,19 @@ public class ApiPostController {
     }
 
     @DeleteMapping("/posts/images/{imageId}")
-    public ResponseEntity<?> deleteImage(@PathVariable Long imageId) {
-        if (postService.deleteImage(imageId)) {
+    public ResponseEntity<?> deleteImage(
+            @PathVariable Long imageId,
+            @RequestParam(value = "userId") Long userId,
+            @RequestParam(value = "postId") Long postId) {
+        Post p = this.postService.getPostById(postId);
+        if(this.postService.getImagePostById(imageId).getPostId().getId().equals(postId) &&
+                p.getUserId().getId().equals(userId)){
+            if (postService.deleteImage(imageId)) {
             return ResponseEntity.ok("Xóa thành Công");
+        }else
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy ảnh");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy ảnh");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi kết nối server!!!");
     }
 
 }

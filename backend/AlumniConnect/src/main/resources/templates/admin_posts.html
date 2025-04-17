@@ -16,10 +16,10 @@
             </a>
         </div>
         <!-- Form tìm kiếm -->
-        <form th:action="@{/admin/alumnis}" method="get" class="mb-4">
+        <form th:action="@{/admin/posts}" method="get" class="mb-4">
             <div class="input-group">
-                <input type="text" class="form-control" name="studentCode"
-                       th:value="${studentCode}" placeholder="🔍 Tìm theo Mã Sinh Viên">
+                <input type="text" class="form-control" name="kw"
+                       th:value="${kw}" placeholder="🔍 Tìm theo Nội dung bài đăng...">
                 <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Tìm</button>
             </div>
         </form>

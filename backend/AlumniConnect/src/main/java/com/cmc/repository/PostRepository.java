@@ -8,7 +8,6 @@ import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 
 /**
@@ -16,7 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author FPTSHOP
  */
 public interface PostRepository {
-     List<Post> getPostByUserId(Long id);
+    List<Post> getPostByUserId(Long id);
     List<Post> getPostByKeywords(String kw, Pageable pageable);
     List<Post> getPosts(Pageable pageable);
     Post getPostId(Long id);
@@ -31,4 +30,5 @@ public interface PostRepository {
     int deletePostImage(Long imageId);
     List<PostImage> getImagesByPostId(Long postId);
     Post saveOrUpdate(Post post);
+    PostImage getPostImageById(Long id);
 }

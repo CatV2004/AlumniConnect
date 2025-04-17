@@ -4,34 +4,24 @@
  */
 package com.cmc.service.impl;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.PostDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import com.cmc.repository.PostRepository;
 import com.cmc.service.PostService;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -53,6 +43,7 @@ public class PostServiceImpl implements PostService {
         long total = postRepository.countTotalPosts();
         return new PageImpl<>(posts, pageable, total);
     }
+    
 
     @Override
     public Post saveOrUpdate(Post post, String[] images) {
@@ -170,5 +161,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public long countPosts(String keyword) {
         return postRepository.countTotalPosts(keyword);
+    }
+    
+    @Override
+    public PostImage getImagePostById(Long idImage){
+        return this.postRepository.getPostImageById(idImage);
     }
 }

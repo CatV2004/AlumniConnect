@@ -8,10 +8,7 @@ import com.cmc.dtos.PostDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import java.util.List;
-import java.util.Map;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -50,4 +47,6 @@ public interface PostService {
     List<PostImage> getImagesOfPost(Long postId);
     
     List<Post> getPostsByUser(Long userId);
+    
+    PostImage getImagePostById(Long idImage);
 }
