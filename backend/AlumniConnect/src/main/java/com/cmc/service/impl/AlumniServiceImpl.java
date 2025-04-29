@@ -64,7 +64,8 @@ public class AlumniServiceImpl implements AlumniService {
                 alumniDTO.getLastName(),
                 alumniDTO.getEmail(),
                 alumniDTO.getPhone(),
-                "ALUMNI"
+                "ALUMNI",
+                Boolean.FALSE
         );
 
         if (alumniRepository.checkStudentCode(alumniDTO.getStudentCode())) {

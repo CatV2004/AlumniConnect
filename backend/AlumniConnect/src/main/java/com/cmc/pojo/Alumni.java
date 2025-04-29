@@ -44,7 +44,7 @@ public class Alumni implements Serializable {
     @Column(name = "student_code")
     private String studentCode;
     @Column(name = "is_verified")
-    private Boolean isVerified;
+    private boolean isVerified;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     private User userId;

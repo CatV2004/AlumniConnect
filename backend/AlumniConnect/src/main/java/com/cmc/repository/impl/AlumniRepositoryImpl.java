@@ -96,7 +96,7 @@ public class AlumniRepositoryImpl implements AlumniRepository {
         if (alumni == null) {
             throw new EntityNotFoundException("Alumni not found with id: " + id);
         }
-        alumni.setIsVerified(true);
+        alumni.setIsVerified(true); 
         user.setActive(true);
 
         session.merge(alumni);

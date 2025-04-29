@@ -10,6 +10,7 @@ import com.cmc.dtos.AlumniRegisterDTO;
 import com.cmc.dtos.AlumniResponseDTO;
 import com.cmc.dtos.ErrorResponseDTO;
 import com.cmc.dtos.LoginRequestDTO;
+import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
@@ -26,13 +27,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -103,10 +102,24 @@ public class ApiUserController {
 
     @GetMapping(path = "/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<User> details(Principal user) {
+    public ResponseEntity<ResponseUserDTO> details(Principal user) {
         User u = this.userService.getUserByUsername(user.getName());
+        
+        ResponseUserDTO resU = modelMaper.map(u, ResponseUserDTO.class);
 
-        return new ResponseEntity<>(u, HttpStatus.OK);
+        return new ResponseEntity<>(resU, HttpStatus.OK);
+    }
+    
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        ResponseUserDTO resU = modelMaper.map(user, ResponseUserDTO.class);
+        if (user != null) {
+            return ResponseEntity.ok(resU);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body("Người dùng không tồn tại với ID: " + id);
+        }
     }
 
 }
