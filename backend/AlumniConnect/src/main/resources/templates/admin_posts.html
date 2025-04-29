@@ -51,7 +51,9 @@
                     <td class="text-center">
                         <div class="btn-group btn-group-sm" role="group">
                             <button th:if="${post.active}" class="btn btn-danger m-1"
-                                    th:attr="onclick='deletePost(' + ${post.id} + ')'">Xóa</button>
+                                    th:attr="onclick='deletePost(' + ${post.id} + ')'">
+                                <i class="bi bi-trash-fill me-1"></i>
+                            </button>
                             <button th:if="${!post.active}" class="btn btn-secondary"
                                     th:attr="onclick='restorePost(' + ${post.id} + ')'">Khôi phục</button>
                             <a th:href="@{'/admin/posts/' + ${post.id}}" class="btn btn-info text-white">

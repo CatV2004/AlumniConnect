@@ -76,12 +76,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDTO> getPostByUserId(Long id) {
-        List<Post> list = postRepository.getPostByUserId(id);
-        return list.stream().map(m -> modelMapper.map(m, PostDTO.class)).collect(Collectors.toList());
-    }
-
-    @Override
     public Page<Post> searchPosts(String kw, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Post> posts = postRepository.getPostByKeywords(kw, pageable);
@@ -105,16 +99,16 @@ public class PostServiceImpl implements PostService {
     public Post addPost(Post post, List<String> imageUrls) {
         post.setCreatedDate(LocalDateTime.now());
         post.setActive(true);
-        post.setLockComment(false); // mặc định cho phép bình luận
+        post.setLockComment(false);
 
         Post savedPost = postRepository.addPost(post);
-
+        Set<PostImage> images = new HashSet<>();
         if (imageUrls != null) {
             for (String url : imageUrls) {
-                postRepository.addPostImage(savedPost.getId(), url);
+                images.add(postRepository.addPostImage(savedPost.getId(), url));
             }
         }
-
+        savedPost.setPostImageSet(images);
         return savedPost;
     }
 
@@ -131,11 +125,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean restorePost(Long postId) {
         return postRepository.restorePost(postId) == 1;
-    }
-
-    @Override
-    public List<Post> getPostsByUser(Long userId) {
-        return postRepository.getPostByUserId(userId);
     }
 
     @Override
@@ -166,5 +155,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostImage getImagePostById(Long idImage){
         return this.postRepository.getPostImageById(idImage);
+    }
+
+    @Override
+    public Page<Post> getPostsByUser(Long userId, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> posts = postRepository.getPostByUserId(userId, page, size);
+        long total = postRepository.countTotalPostsByUser(userId);
+        return new PageImpl<>(posts, pageable, total);
     }
 }

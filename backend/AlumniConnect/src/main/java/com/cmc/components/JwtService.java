@@ -78,7 +78,7 @@ public class JwtService {
         }
         return username;
     }
-    
+
     public String getRoleFromToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);

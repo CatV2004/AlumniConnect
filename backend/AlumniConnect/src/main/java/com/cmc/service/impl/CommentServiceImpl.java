@@ -38,9 +38,9 @@ public class CommentServiceImpl implements CommentService{
     
     
     @Override
-    public Comment createComment(Map<String, String> pagram, String file){
+    public Comment createComment(Map<String, String> pagram, String file, String username){
         String content = pagram.get("content");
-        User userId = this.userRepo.getUserById(Long.parseLong(pagram.get("userId")));
+        User userId = this.userRepo.getUserByUsername(username);
         Post postId = this.postRepo.getPostId(Long.valueOf(pagram.get("postId")));
         String parentId = pagram.get("parentId");
         

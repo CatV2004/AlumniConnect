@@ -18,7 +18,7 @@ public interface CommentService {
 
     Comment updateComment(Long commentId, Long userId, String newContent);
 
-    Comment createComment(Map<String, String> pagram, String file);
+    Comment createComment(Map<String, String> pagram, String file, String username);
 
     Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size);
 

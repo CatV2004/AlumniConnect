@@ -16,9 +16,9 @@ import org.springframework.data.domain.Page;
  */
 public interface PostService {
 
-    List<PostDTO> getPostByUserId(Long id);
-
     public Page<Post> getPosts(Integer page, Integer size);
+    
+    public Page<Post> getPostsByUser(Long userId, Integer page, Integer size);
 
     Post saveOrUpdate(Post post, String[] images);
 
@@ -45,8 +45,6 @@ public interface PostService {
     PostImage addImageToPost(Long postId, String imageUrl);
 
     List<PostImage> getImagesOfPost(Long postId);
-    
-    List<Post> getPostsByUser(Long userId);
     
     PostImage getImagePostById(Long idImage);
 }

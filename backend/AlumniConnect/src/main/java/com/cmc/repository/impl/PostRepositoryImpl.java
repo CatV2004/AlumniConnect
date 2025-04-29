@@ -44,15 +44,15 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> getPostByUserId(Long id) {
+    public List<Post> getPostByUserId(Long id, Integer page, Integer size) {
         Query q = getSession().createQuery("""
-            SELECT p FROM Post p 
-            JOIN p.userId u  
-            LEFT JOIN p.postImageSet pi  
-            WHERE p.userId = :userId 
+            FROM Post p 
+            WHERE p.userId.id = :userId 
             ORDER BY p.id DESC
-            """);
+            """, Post.class);
         q.setParameter("userId", id);
+        q.setFirstResult(page);
+        q.setMaxResults(size);
         return q.getResultList();
     }
 
@@ -161,6 +161,14 @@ public class PostRepositoryImpl implements PostRepository {
     public long countTotalPosts() {
         String hql = "SELECT COUNT(*) FROM Post";
         Query query = getSession().createQuery(hql, Long.class);
+        return (long) query.getSingleResult();
+    }
+    
+    @Override
+    public long countTotalPostsByUser(Long userId) {
+        String hql = "SELECT COUNT(p) FROM Post p WHERE p.userId.id = :userId ORDER BY p.id DESC";
+        Query query = getSession().createQuery(hql, Long.class);
+        query.setParameter("userId", userId);
         return (long) query.getSingleResult();
     }
 
