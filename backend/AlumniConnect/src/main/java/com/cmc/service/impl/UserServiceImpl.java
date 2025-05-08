@@ -83,8 +83,6 @@ public class UserServiceImpl implements UserService {
 
         user.setAvatar(cloudinaryService.uploadFile(avatar,"avatar"));
         user.setCover(cloudinaryService.uploadFile(cover, "cover"));
-
-        user.setActive(true);
         
         this.userRepo.saveOrUpdate(user);
 
