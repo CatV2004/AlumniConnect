@@ -4,19 +4,18 @@
  */
 package com.cmc.repository;
 
-import com.cmc.dtos.PostDTO;
 import com.cmc.pojo.Post;
+import com.cmc.pojo.PostImage;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 
 /**
  *
  * @author FPTSHOP
  */
-public interface PostRepository extends PagingAndSortingRepository<Post, Integer> {
-    List<Post> getPostByUserId(Long id);
+public interface PostRepository {
+    List<Post> getPostByUserId(Long id, Integer page, Integer size);
     List<Post> getPostByKeywords(String kw, Pageable pageable);
     List<Post> getPosts(Pageable pageable);
     Post getPostId(Long id);
@@ -27,4 +26,10 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     long countTotalPosts();
     int lockComment(Long id);
     int restorePost(Long id);
+    PostImage addPostImage(Long postId, String imageUrl);
+    int deletePostImage(Long imageId);
+    List<PostImage> getImagesByPostId(Long postId);
+    Post saveOrUpdate(Post post);
+    PostImage getPostImageById(Long id);
+    long countTotalPostsByUser(Long userId);
 }

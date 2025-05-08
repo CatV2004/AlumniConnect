@@ -17,7 +17,7 @@ public interface ReactionRepository {
 
     List<Reaction> findByPostId(Long postId);
 
-    List<Reaction> findByReactionType(String reactionType);
+    List<Reaction> findByReactionType(String reactionType, Long postId);
 
     Reaction findByPostIdAndUserId(Long postId, Long userId);
     

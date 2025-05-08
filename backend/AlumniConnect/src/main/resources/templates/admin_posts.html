@@ -9,127 +9,131 @@
 <body>
     <header th:replace="~{layout/base :: header}"></header>
     <main class="container mt-4" th:fragment="~{layout/base :: main}">
-        <div class='d-flex justify-content-between' >
-            <div>
-                <h1>Quản lý bài đăng</h1>
-            </div>
-            <div>
-                <nav aria-label="Page navigation example" th:if="${totalPages > 1}">
-                    <ul th:each="i : ${#numbers.sequence(0, totalPages - 1)}" >
-                        <li class="page-item">
-                            <a th:href="@{/search(keyword=${keyword}, page=${i}, size=10)}"
-                               th:text="${i + 1}"
-                               class="page-link"></a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>Quản lý bài đăng</h2>
+            <a th:href="@{/admin/add-posts}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Thêm bài viết
+            </a>
         </div>
+        <!-- Form tìm kiếm -->
+        <form th:action="@{/admin/posts}" method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="kw"
+                       th:value="${kw}" placeholder="🔍 Tìm theo Nội dung bài đăng...">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> Tìm</button>
+            </div>
+        </form>
 
-        <table class="table table-bordered">
-            <thead class="table-dark">
+        <table class="table table-hover table-bordered shadow-sm">
+            <thead class="table-primary text-center">
                 <tr>
-                    <th>#</th>
-                    <th>Mã Bài Đăng</th>
-                    <th>Nội Dung</th>
-                    <th>Người Đăng Bài</th>
-                    <th>Thời Gian Tạo</th>
-                    <th>Khóa Bình luận</th>
-                    <th>Xóa bài Đăng</th>
+                    <th>STT</th>
+                    <th>Nội dung</th>
+                    <th>Người đăng</th>
+                    <th>Thời gian tạo</th>
+                    <th>Trạng thái bình luận</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="post, iterStat: ${posts}">
-                    <td th:text="${iterStat.count}"></td>
-                    <td th:text="${post.id}"></td>
+                <tr th:each="post, iterStat : ${posts}">
+                    <td class="text-center fw-bold" th:text="${iterStat.count}"></td>
                     <td th:text="${post.content}"></td>
                     <td th:text="${post.userId.username}"></td>
-                    <td th:text="${post.createdDate}"></td>
-                    <td th:switch="${post.lockComment}">
+                    <td th:text="${post.createdDate != null} ? ${#temporals.format(post.createdDate, 'dd/MM/yyyy HH:mm')} : '---'"></td>
+                    <td class="text-center">
                         <button th:id="'status-' + ${post.id}"
-                                th:class="${!post.lockComment} ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm'"
-                                th:text="${!post.lockComment} ? 'Khóa bình luận' : 'Mở khóa bình luận'"
-                            th:attr="onclick='toggleCommentStatus(' + ${post.id} + ', ' + ${!post.lockComment} + ')'">
+                                th:class="${!post.lockComment} ? 'btn btn-outline-danger btn-sm' : 'btn btn-outline-success btn-sm'"
+                                th:text="${!post.lockComment} ? 'Khóa' : 'Mở khóa'"
+                                th:attr="onclick='toggleCommentStatus(' + ${post.id} + ', ' + ${!post.lockComment} + ')'">
                         </button>
                     </td>
-                    <td>
-                        <button th:if="${post.active}" 
-                                class="btn btn-danger btn-sm" 
-                                th:attr="onclick='deletePost(' + ${post.id} + ')'"
-                                >Xóa</button>
-                        <button th:if="${!post.active}" 
-                                class="btn btn-secondary btn-sm" 
-                                th:attr="onclick='restorePost(' + ${post.id} + ')'">Khôi phục</button>
-                        
-                        <a th:href="@{'/admin/posts/' + ${post.id}}" class="btn btn-info">&#128393;</a>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button th:if="${post.active}" class="btn btn-danger m-1"
+                                    th:attr="onclick='deletePost(' + ${post.id} + ')'">
+                                <i class="bi bi-trash-fill me-1"></i>
+                            </button>
+                            <button th:if="${!post.active}" class="btn btn-secondary"
+                                    th:attr="onclick='restorePost(' + ${post.id} + ')'">Khôi phục</button>
+                            <a th:href="@{'/admin/posts/' + ${post.id}}" class="btn btn-info text-white">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             </tbody>
-
         </table>
-        
-        <div>
-            <a th:href="@{/admin/add-posts}">
-                <button class="btn btn-success">Thêm bài viết</button>
-            </a>
-        </div>
+
+        <nav th:if="${totalPages > 1}" aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a class="page-link" th:href="@{/search(keyword=${keyword}, page=${i}, size=10)}" th:text="${i + 1}"></a>
+                </li>
+            </ul>
+        </nav>
         <script>
             function deletePost(postId) {
                 if (confirm('Bạn có chắc chắn muốn XÓA bài viết này!!!')) {
-                    fetch(`/AlumniConnect/api/posts/${postId}`, {
+                    fetch(`/AlumniConnect/api/posts/${postId}/delete`, {
                         method: "DELETE"
                     })
-                    .then(response => {
-                        if(response.status === 204){
-                            alert("Xóa thành công!!!");
-                            location.reload();
-                        }else {
-                            alert("Hệ Thống Bị lỗi !!!");
-                        }
-                    })
-                    .catch(error => console.error("Lỗi:", error));
+                            .then(response => {
+                                if (response.status === 204) {
+                                    alert("Xóa thành công!!!");
+                                    location.reload();
+                                } else {
+                                    alert("Hệ Thống Bị lỗi !!!");
+                                }
+                            })
+                            .catch(error => console.error("Lỗi:", error));
                 }
             }
-            
+
             function restorePost(postId) {
                 if (confirm('Bạn có chắc chắn muốn khôi phục bài viết này!!!')) {
-                    fetch(`/AlumniConnect/api/posts/restore-posts/${postId}`, {
+                    fetch(`/AlumniConnect/api/posts/${postId}/restore-posts`, {
                         method: "PATCH"
                     })
-                    .then(response => {
-                        if(response.status === 204){
-                            alert("Khôi phục thành công!!!");
-                            location.reload();
-                        }else {
-                            alert("Hệ Thống Bị lỗi !!!");
-                        }
-                    })
-                    .catch(error => console.error("Lỗi:", error));
+                            .then(response => {
+                                if (response.status === 204) {
+                                    alert("Khôi phục thành công!!!");
+                                    location.reload();
+                                } else {
+                                    alert("Hệ Thống Bị lỗi !!!");
+                                }
+                            })
+                            .catch(error => console.error("Lỗi:", error));
                 }
             }
 
             function toggleCommentStatus(postId, isLocked) {
-                if (confirm('Bạn có chắc chắn muốn khóa bình luận bài viết này!!!')) {
-                    console.log(`/AlumniConnect/api/posts/${postId}/toggle-comment`);
-                    fetch(`/AlumniConnect/admin/posts/${postId}/toggle-comment`, {
+                const confirmMsg = isLocked
+                        ? 'Bạn có chắc chắn muốn mở khóa bình luận bài viết này?'
+                        : 'Bạn có chắc chắn muốn khóa bình luận bài viết này?';
+
+                if (confirm(confirmMsg)) {
+                    fetch(`/AlumniConnect/api/posts/${postId}/toggle-comment`, {
                         method: 'PATCH'
                     })
-                    .then(response => response.text())
-                    .then(data => {
-                        alert(data);
-                        let statusElement = document.getElementById("status-" + postId);
-                        if (isLocked) {
-                            statusElement.textContent = "Mở khóa bình luận";
-                            statusElement.classList.remove("btn-danger");
-                            statusElement.classList.add("btn-success");
-                            statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, false)`);
-                        } else {
-                            statusElement.textContent = "Khóa bình luận";
-                            statusElement.classList.remove("btn-success");
-                            statusElement.classList.add("btn-danger");
-                            statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, true)`);
-                        }
-                    }).catch(error => console.error("Lỗi:", error));
+                            .then(response => response.text())
+                            .then(data => {
+                                alert(data);
+                                const statusElement = document.getElementById("status-" + postId);
+
+                                if (!isLocked) {
+                                    statusElement.textContent = "Khóa bình luận";
+                                    statusElement.classList.remove("btn-success");
+                                    statusElement.classList.add("btn-danger");
+                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, true)`);
+                                } else {
+                                    statusElement.textContent = "Mở khóa bình luận";
+                                    statusElement.classList.remove("btn-danger");
+                                    statusElement.classList.add("btn-success");
+                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, false)`);
+                                }
+                            })
+                            .catch(error => console.error("Lỗi:", error));
                 }
             }
         </script>

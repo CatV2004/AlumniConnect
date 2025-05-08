@@ -13,7 +13,6 @@ import com.cmc.service.ReactionService;
 import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,10 +53,9 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public int deleteReaction(Long reactionId, Long userId) {
+    public int deleteReaction(Long reactionId, Long userId, Long postId) {
         Reaction reaction = this.reactionRepo.findById(reactionId);
-        System.out.print(reaction.getUserId());
-        if (reaction.getUserId().getId().equals(userId)){
+        if (reaction.getUserId().getId().equals(userId) && reaction.getPostId().getId().equals(postId)){
             this.reactionRepo.deleteReaction(reaction);
             return 1;
         }
@@ -77,5 +75,10 @@ public class ReactionServiceImpl implements ReactionService {
         reaction.setUpdatedDate(LocalDateTime.now());
         reaction.setReaction(reactionType);
         return this.reactionRepo.saveOrUpdate(reaction);
+    }
+
+    @Override
+    public List<Reaction> getByReactionType(Long postId, String reactionType) {
+        return this.reactionRepo.findByReactionType(reactionType, postId);
     }
 }

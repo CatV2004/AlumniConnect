@@ -55,10 +55,11 @@ public class ReactionRepositoryImpl implements ReactionRepository {
     }
 
     @Override
-    public List<Reaction> findByReactionType(String reactionType) {
-        String sql = "From Reaction r WHERE r.reaction = :reactionType Order by -id";
+    public List<Reaction> findByReactionType(String reactionType, Long postId) {
+        String sql = "From Reaction r WHERE r.reaction = :reactionType AND r.postId.id = :postId Order by -id";
         Query q = getSession().createQuery(sql, Reaction.class);
         q.setParameter("reactionType", reactionType);
+        q.setParameter("postId", postId);
         return q.getResultList();
     }
 

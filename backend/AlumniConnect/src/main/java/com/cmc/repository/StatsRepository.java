@@ -5,6 +5,7 @@
 package com.cmc.repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -18,4 +19,6 @@ public interface StatsRepository {
     List<Object[]> countPostsByYear(Integer year);
     List<Object[]> countPostsByMonth(Integer year, Integer month);
     List<Object[]> countPostsByQuarter(Integer year, Integer quarter);
+    List<Object[]> statsUser(Map<String, String> pagram);
+    List<Object[]> statsPost(Map<String, String> pagram);
 }
