@@ -48,15 +48,15 @@ public class WebAppContextConfigs implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
+        registry.addResourceHandler("/js/**").
+                addResourceLocations("classpath:/static/js/");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
     }
-    
-    
+
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
         configurer.setDefaultTimeout(5000);

@@ -5,6 +5,8 @@
 package com.cmc.service.impl;
 
 import com.cmc.components.CloudinaryService;
+import com.cmc.dtos.PageResponse;
+import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder passEncoder;
 
     private final CloudinaryService cloudinaryService;
-    
+
     @Autowired
     public UserServiceImpl(CloudinaryService cloudinaryService) {
         this.cloudinaryService = cloudinaryService;
@@ -81,14 +84,18 @@ public class UserServiceImpl implements UserService {
         user.setPassword(this.passEncoder.encode(user.getPassword()));
         user.setRole("ALUMNI");
 
-        user.setAvatar(cloudinaryService.uploadFile(avatar,"avatar"));
-        user.setCover(cloudinaryService.uploadFile(cover, "cover"));
-        
+        if (avatar != null && !avatar.isEmpty()) {
+            user.setAvatar(cloudinaryService.uploadFile(avatar, "avatar"));
+        }
+        if (cover != null && !cover.isEmpty()) {
+            user.setCover(cloudinaryService.uploadFile(cover, "cover"));
+        }
+
         this.userRepo.saveOrUpdate(user);
 
         return user;
     }
-  
+
     @Override
     public boolean authUser(String username, String password, String role) {
         User u = this.getUserByUsername(username);
@@ -117,6 +124,51 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         return this.userRepo.getUsers();
+    }
+
+    @Override
+    public PageResponse<ResponseUserDTO> getAllUsers(Map<String, Object> params) {
+        PageResponse<User> userPage = userRepo.getAllUsers(params);
+
+        List<ResponseUserDTO> dtos = userPage.getContent()
+                .stream()
+                .map(user -> modelMapper.map(user, ResponseUserDTO.class))
+                .collect(Collectors.toList());
+
+        return new PageResponse<>(
+                dtos,
+                userPage.getCurrentPage(),
+                userPage.getPageSize(),
+                userPage.getTotalItems(),
+                userPage.getTotalPages()
+        );
+    }
+
+    @Override
+    public void updateCurrentUser(String username, String email, String phone,
+            MultipartFile avatar, MultipartFile cover) {
+
+        User user = userRepo.getUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy người dùng!");
+        }
+
+        if (email != null) {
+            user.setEmail(email);
+        }
+        if (phone != null) {
+            user.setPhone(phone);
+        }
+        if (avatar != null) {
+            String avatarUrl = cloudinaryService.uploadFile(avatar, "avatar");
+            user.setAvatar(avatarUrl);
+        }
+        if (cover != null) {
+            String coverUrl = cloudinaryService.uploadFile(cover, "cover");
+            user.setCover(coverUrl);
+        }
+
+        this.userRepo.saveOrUpdate(user);
     }
 
 }

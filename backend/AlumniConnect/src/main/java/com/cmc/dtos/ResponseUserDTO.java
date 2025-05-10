@@ -1,5 +1,7 @@
 package com.cmc.dtos;
 
+import java.time.LocalDateTime;
+
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -10,6 +12,7 @@ package com.cmc.dtos;
  * @author FPTSHOP
  */
 public class ResponseUserDTO {
+
     private Long id;
     private String username;
     private String avatar;
@@ -18,24 +21,24 @@ public class ResponseUserDTO {
     private String lastName;
     private String email;
     private String phone;
+    private LocalDateTime createdDate;
     private String role;
     private Boolean active;
 
     public ResponseUserDTO() {
     }
-    
 
-    public ResponseUserDTO(Long id, String username, String avatar, String cover, String firstName, String lastName, String email, String role, Boolean active) {
-        this.id = id;
-        this.username = username;
-        this.avatar = avatar;
-        this.cover = cover;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.role = role;
-        this.active = active;
-    }
+//    public ResponseUserDTO(Long id, String username, String avatar, String cover, String firstName, String lastName, String email, String role, Boolean active) {
+//        this.id = id;
+//        this.username = username;
+//        this.avatar = avatar;
+//        this.cover = cover;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.email = email;
+//        this.role = role;
+//        this.active = active;
+//    }
 
     public Long getId() {
         return id;
@@ -116,8 +119,14 @@ public class ResponseUserDTO {
     public void setActive(Boolean active) {
         this.active = active;
     }
-    
-    
-    
 
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    
 }

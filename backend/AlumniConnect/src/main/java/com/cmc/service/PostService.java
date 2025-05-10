@@ -18,7 +18,7 @@ public interface PostService {
 
     public Page<Post> getPosts(Integer page, Integer size);
     
-    public Page<Post> getPostsByUser(Long userId, Integer page, Integer size);
+    public Page<Post> getPostsByUser(Long userId, int page, int size);
 
     Post saveOrUpdate(Post post, String[] images);
 

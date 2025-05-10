@@ -158,9 +158,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getPostsByUser(Long userId, Integer page, Integer size) {
+    public Page<Post> getPostsByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Post> posts = postRepository.getPostByUserId(userId, page, size);
+        List<Post> posts = postRepository.getPostsByUserId(userId, page, size);
         long total = postRepository.countTotalPostsByUser(userId);
         return new PageImpl<>(posts, pageable, total);
     }

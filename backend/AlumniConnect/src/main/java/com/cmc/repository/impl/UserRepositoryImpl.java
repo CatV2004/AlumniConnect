@@ -6,11 +6,18 @@ package com.cmc.repository.impl;
 
 import com.cmc.components.CloudinaryService;
 import com.cmc.dtos.ChangePasswordDTO;
+import com.cmc.dtos.PageResponse;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
@@ -100,6 +107,70 @@ public class UserRepositoryImpl implements UserRepository {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createQuery("FROM User", User.class);
         return q.getResultList();
+    }
+
+    @Override
+    public PageResponse<User> getAllUsers(Map<String, Object> params) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<User> dataQuery = cb.createQuery(User.class);
+        Root<User> dataRoot = dataQuery.from(User.class);
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<User> countRoot = countQuery.from(User.class);
+
+        List<Predicate> dataPredicates = new ArrayList<>();
+        List<Predicate> countPredicates = new ArrayList<>();
+
+        if (params.containsKey("excludeUsername")) {
+            String excludeUsername = (String) params.get("excludeUsername");
+            dataPredicates.add(cb.notEqual(dataRoot.get("username"), excludeUsername));
+            countPredicates.add(cb.notEqual(countRoot.get("username"), excludeUsername));
+        }
+
+        dataPredicates.add(cb.or(
+                cb.isNull(dataRoot.get("deletedDate")),
+                cb.equal(dataRoot.get("active"), true)
+        ));
+        countPredicates.add(cb.or(
+                cb.isNull(countRoot.get("deletedDate")),
+                cb.equal(countRoot.get("active"), true)
+        ));
+
+        if (params.containsKey("keyword")) {
+            String keyword = "%" + params.get("keyword").toString().trim().toLowerCase() + "%";
+
+            Predicate dataKeywordPredicate = cb.or(
+                    cb.like(cb.lower(dataRoot.get("firstName")), keyword),
+                    cb.like(cb.lower(dataRoot.get("lastName")), keyword)
+            );
+            dataPredicates.add(dataKeywordPredicate);
+
+            Predicate countKeywordPredicate = cb.or(
+                    cb.like(cb.lower(countRoot.get("firstName")), keyword),
+                    cb.like(cb.lower(countRoot.get("lastName")), keyword)
+            );
+            countPredicates.add(countKeywordPredicate);
+        }
+
+        
+        dataQuery.where(dataPredicates.toArray(new Predicate[0]));
+        countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
+
+        int page = (int) params.getOrDefault("page", 1);
+        int size = (int) params.getOrDefault("size", 10);
+        int firstResult = (page - 1) * size;
+
+        List<User> users = session.createQuery(dataQuery)
+                .setFirstResult(firstResult)
+                .setMaxResults(size)
+                .getResultList();
+
+        Long totalItems = session.createQuery(countQuery).getSingleResult();
+        int totalPages = (int) Math.ceil((double) totalItems / size);
+
+        return new PageResponse<>(users, page, size, totalItems, totalPages);
     }
 
 }

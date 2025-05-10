@@ -8,18 +8,21 @@ const tabs = [
 
 const ProfileTabs = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="flex gap-4 border-b mb-4">
+    <div className="flex border-b mb-4">
       {tabs.map(tab => (
         <button
           key={tab.key}
           onClick={() => setActiveTab(tab.key)}
-          className={`pb-2 px-4 font-medium ${
+          className={`px-8 py-4 font-medium relative ${
             activeTab === tab.key
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600'
+              ? 'text-blue-600'
+              : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
           {tab.label}
+          {activeTab === tab.key && (
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600"></div>
+          )}
         </button>
       ))}
     </div>
