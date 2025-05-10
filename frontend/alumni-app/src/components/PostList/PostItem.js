@@ -42,18 +42,97 @@ const PostItem = ({ post }) => {
         </div>
       </div>
       <p className="mb-2">{post.content}</p>
-      <div className="grid grid-cols-3 gap-2">
-        {post.postImageSet.map((img, index) => (
-          <Link to={`/post/${post.id}`} key={index}>
+      
+      <div className="mb-2">
+        {post.postImageSet.length === 1 && (
+          <Link to={`/post/${post.id}`}>
             <img
-              src={img.image}
-              alt={`img-${index}`}
-              className="w-full h-32 object-cover rounded hover:opacity-80 cursor-pointer transition duration-200"
+              src={post.postImageSet[0].image}
+              alt="post-1"
+              className="w-full h-96 object-cover rounded"
+              style={{ width: "100%" }}
             />
           </Link>
-          // <img key={index} src={img} alt={`img-${index}`} className="w-full h-32 object-cover rounded" />
-        ))}
+        )}
+
+        {post.postImageSet.length === 2 && (
+          <div className="grid grid-cols-2 gap-2">
+            {post.postImageSet.map((img, i) => (
+              <Link to={`/post/${post.id}`} key={i}>
+                <img
+                  key={i}
+                  src={img.image}
+                  alt={`post-${i}`}
+                  className="w-full h-64 object-cover rounded"
+                  style={{ width: "100%" }}
+                />
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {post.postImageSet.length === 3 && (
+          <div className="grid gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              {post.postImageSet.slice(0, 2).map((img, i) => (
+                <Link to={`/post/${post.id}`} key={i}>
+                  <img
+                    key={i}
+                    src={img.image}
+                    alt={`post-${i}`}
+                    className="w-full h-48 object-cover rounded"
+                    style={{ width: "100%" }}
+                  />
+                </Link>
+              ))}
+            </div>
+            <img
+              src={post.postImageSet[2].image}
+              alt="post-2"
+              className="w-full h-60 object-cover rounded"
+            />
+          </div>
+        )}
+
+        {post.postImageSet.length === 4 && (
+          <div className="grid grid-cols-2 gap-2">
+            {post.postImageSet.map((img, i) => (
+              <Link to={`/post/${post.id}`} key={i}>
+                <img
+                  key={i}
+                  src={img.image}
+                  alt={`post-${i}`}
+                  className="w-full h-48 object-cover rounded"
+                  style={{ width: "100%" }}
+                />
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {post.postImageSet.length >= 5 && (
+          <div className="grid grid-cols-2 gap-2">
+            {post.postImageSet.slice(0, 4).map((img, i) => (
+              <div key={i} className="relative">
+                <Link to={`/post/${post.id}`} key={i}>
+                  <img
+                    src={img.image}
+                    alt={`post-${i}`}
+                    className="w-full h-48 object-cover rounded"
+                    style={{ width: "100%" }}
+                  />
+                </Link>
+                {i === 3 && (
+                  <div className="absolute inset-0 bg-black bg-opacity-60 rounded flex items-center justify-center text-white text-lg font-bold">
+                    +{post.postImageSet.length - 4}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+      {/* </div> */}
       <div className=" mt-2 flex justify-between text-sm text-gray-500 mb-1">
         <span>👍 {likeCount} lượt thích</span>
         <span>💬 {commentCount} bình luận</span>
@@ -72,6 +151,7 @@ const PostItem = ({ post }) => {
         </>}
       </div>
     </div>
+
   );
 };
 

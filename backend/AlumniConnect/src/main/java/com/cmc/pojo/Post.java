@@ -77,6 +77,7 @@ public class Post implements Serializable {
     @Column(name = "deleted_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
+    @JsonIgnore
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
