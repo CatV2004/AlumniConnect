@@ -31,8 +31,9 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
-import lombok.Data; 
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
  *
  * @author FPTSHOP
@@ -58,47 +59,57 @@ public class Post implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
+    
     @Basic(optional = false)
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
+    
     @Column(name = "lock_comment")
     private Boolean lockComment;
+    
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime createdDate;
+    
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime updatedDate;
+    
     @Column(name = "deleted_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime deletedDate;
+    
     @Column(name = "active")
     private Boolean active;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId",fetch = FetchType.EAGER)
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId", fetch = FetchType.EAGER)
     private Set<PostImage> postImageSet;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     @JsonIgnore
     private Set<Reaction> reactionSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.EAGER)
+    
+    @OneToOne(cascade = CascadeType.REMOVE, mappedBy = "post", fetch = FetchType.EAGER)
     @JsonIgnore
     private InvitationPost invitationPost;
+    
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User userId;
+    
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.EAGER)
     @JsonIgnore
     private SurveyPost surveyPost;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")
     @JsonIgnore
     private Set<Comment> commentSet;
-    
-  
 
     public Post() {
     }
@@ -107,7 +118,7 @@ public class Post implements Serializable {
         this.id = id;
     }
 
-    public Post(Long id, String content, Boolean lockComment, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime deletedDate, Boolean active,  User userId, Set<PostImage> postImageSet) {
+    public Post(Long id, String content, Boolean lockComment, LocalDateTime createdDate, LocalDateTime updatedDate, LocalDateTime deletedDate, Boolean active, User userId, Set<PostImage> postImageSet) {
         this.id = id;
         this.content = content;
         this.lockComment = lockComment;
@@ -117,7 +128,7 @@ public class Post implements Serializable {
         this.active = active;
         this.userId = userId;
         this.postImageSet = postImageSet;
-  
+
     }
 
     public Post(Long id, String content) {
@@ -251,6 +262,21 @@ public class Post implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.Post[ id=" + id + " ]";
+        return "Post{"
+                + "id=" + id
+                + ", content='" + (content != null ? content.substring(0, Math.min(content.length(), 50)) + "..." : null) + '\''
+                + ", lockComment=" + lockComment
+                + ", createdDate=" + createdDate
+                + ", updatedDate=" + updatedDate
+                + ", active=" + active
+                + ", user=" + (userId != null ? userId.getId() : null)
+                + ", images=" + (postImageSet != null ? postImageSet.size() : 0)
+                + ", reactions=" + (reactionSet != null ? reactionSet.size() : 0)
+                + ", comments=" + (commentSet != null ? commentSet.size() : 0)
+                + ", hasSurveyPost=" + (surveyPost != null)
+                + ", surveyPost=" + (surveyPost != null ? surveyPost.toString() : "null")
+                + ", hasInvitationPost=" + (invitationPost != null)
+                + '}';
     }
+
 }

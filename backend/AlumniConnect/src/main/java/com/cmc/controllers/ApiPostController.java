@@ -6,12 +6,14 @@ package com.cmc.controllers;
 
 import com.cmc.components.CloudinaryService;
 import com.cmc.components.PostComponents;
-import com.cmc.dtos.PostDTO;
+import com.cmc.dtos.PageResponse;
+import com.cmc.dtos.PostResponseDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.User;
 import com.cmc.service.PostService;
 import com.cmc.service.UserService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,29 +58,35 @@ public class ApiPostController {
     @Autowired
     private CloudinaryService CloudinaryService;
 
-
     @GetMapping("/posts")
-    public ResponseEntity<Page<Post>> getPosts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return new ResponseEntity<>(
-                this.postService.getPosts(page, size),
-                HttpStatus.OK
-        );
-    }
+    public ResponseEntity<PageResponse<PostResponseDTO>> getPosts(@RequestParam Map<String, Object> params) {
+        Map<String, Object> filterParams = new HashMap<>();
 
-//    @GetMapping("/user/{userId}/posts")
-//    public ResponseEntity<Page<Post>> getPostsByUser(
-//            @PathVariable Long userId,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size
-//    ) {
-//        return new ResponseEntity<>(
-//                this.postService.getPostsByUser(userId, page, size),
-//                HttpStatus.OK
-//        );
-//    }
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1;
+        filterParams.put("page", page);
+
+        int size = params.containsKey("size") ? Integer.parseInt(params.get("size").toString()) : 10;
+        filterParams.put("size", size);
+
+        String kw = params.containsKey("kw") ? params.get("kw").toString().trim() : "";
+        if (!kw.isEmpty()) {
+            filterParams.put("kw", kw);
+        }
+
+        boolean hasSurvey = params.containsKey("hasSurvey") && Boolean.parseBoolean(params.get("hasSurvey").toString());
+        filterParams.put("hasSurvey", hasSurvey);
+
+        boolean hasImage = params.containsKey("hasImage") && Boolean.parseBoolean(params.get("hasImage").toString());
+        filterParams.put("hasImage", hasImage);
+
+        boolean hasInvitation = params.containsKey("hasInvitation") && Boolean.parseBoolean(params.get("hasInvitation").toString());
+        filterParams.put("hasInvitation", hasInvitation);
+
+        PageResponse<PostResponseDTO> response = postService.getPosts(filterParams);
+
+        return ResponseEntity.ok(response);
+    }
+    
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<Post> getPostById(

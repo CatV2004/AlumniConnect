@@ -6,15 +6,18 @@ package com.cmc.repository.impl;
 
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
+import com.cmc.pojo.SurveyPost;
 import com.cmc.repository.PostRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import org.hibernate.Session;
@@ -59,8 +62,8 @@ public class PostRepositoryImpl implements PostRepository {
         cq.orderBy(cb.desc(root.get("createdDate")));
 
         Query<Post> query = session.createQuery(cq);
-        query.setFirstResult(page * size); 
-        query.setMaxResults(size);        
+        query.setFirstResult(page * size);
+        query.setMaxResults(size);
 
         return query.getResultList();
     }
@@ -95,16 +98,30 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public int deletePost(Long id) {
-        Query q = getSession().createQuery("UPDATE Post p SET p.active = FALSE WHERE p.id = :id");
-        q.setParameter("id", id);
-        return q.executeUpdate();
+        Session session = this.getSession();
+        Post post = session.get(Post.class, id);
+        if (post != null && Boolean.TRUE.equals(post.getActive())) {
+            post.setActive(false);
+            post.setDeletedDate(LocalDateTime.now());
+            post.setUpdatedDate(LocalDateTime.now());
+            session.update(post);
+            return 1;
+        }
+        return 0;
     }
 
     @Override
     public int restorePost(Long id) {
-        Query q = getSession().createQuery("UPDATE Post p SET p.active = TRUE WHERE p.id = :id");
-        q.setParameter("id", id);
-        return q.executeUpdate();
+        Session session = this.getSession();
+        Post post = session.get(Post.class, id);
+        if (post != null && Boolean.FALSE.equals(post.getActive())) {
+            post.setActive(true);
+            post.setDeletedDate(null); 
+            post.setUpdatedDate(LocalDateTime.now());
+            session.update(post);
+            return 1;
+        }
+        return 0;
     }
 
     @Override
@@ -129,8 +146,40 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
+    public long countPosts(Map<String, Object> params) {
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Post> root = cq.from(Post.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.isNull(root.get("deletedDate")));
+
+        if (params.containsKey("kw")) {
+            String kw = params.get("kw").toString();
+            if (!kw.isBlank()) {
+                predicates.add(cb.like(root.get("content"), "%" + kw.trim() + "%"));
+            }
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasSurvey"))) {
+            predicates.add(cb.isNotNull(root.get("surveyPost")));
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasImage"))) {
+            predicates.add(cb.isNotEmpty(root.get("postImageSet")));
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasInvitation"))) {
+            predicates.add(cb.isNotNull(root.get("invitationPost")));
+        }
+
+        cq.select(cb.countDistinct(root)).where(cb.and(predicates.toArray(new Predicate[0])));
+        return getSession().createQuery(cq).getSingleResult();
+    }
+
+    @Override
     public long countTotalPosts(String kw) {
-        String hql = "SELECT COUNT(p) FROM Post p WHERE p.content LIKE :kw";
+        String hql = "SELECT COUNT(p) FROM Post p WHERE p.content LIKE :kw AND p.deletedDate IS NULL";
         Query query = getSession().createQuery(hql, Long.class);
         query.setParameter("kw", "%" + kw + "%");
         return (long) query.getSingleResult();
@@ -168,7 +217,7 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public long countTotalPosts() {
-        String hql = "SELECT COUNT(*) FROM Post";
+        String hql = "SELECT COUNT(p) FROM Post p WHERE p.deletedDate IS NULL";
         Query query = getSession().createQuery(hql, Long.class);
         return (long) query.getSingleResult();
     }
@@ -233,7 +282,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Post saveOrUpdate(Post post) {
+    public void saveOrUpdate(Post post) {
         post.setUpdatedDate(LocalDateTime.now());
         if (post.getId() == null) {
             post.setActive(Boolean.TRUE);
@@ -242,7 +291,54 @@ public class PostRepositoryImpl implements PostRepository {
         }
         this.getSession().merge(post);
         getSession().refresh(post);
-        return post;
+    }
+
+    @Override
+    public List<Post> findPosts(Map<String, Object> params) {
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
+        Root<Post> root = cq.from(Post.class);
+
+        root.fetch("surveyPost", JoinType.LEFT);
+        root.fetch("postImageSet", JoinType.LEFT);
+        root.fetch("invitationPost", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(cb.isNull(root.get("deletedDate")));
+
+        if (params.containsKey("kw")) {
+            String kw = params.get("kw").toString();
+            if (!kw.isBlank()) {
+                predicates.add(cb.like(root.get("content"), "%" + kw.trim() + "%"));
+            }
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasSurvey"))) {
+            predicates.add(cb.isNotNull(root.get("surveyPost")));
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasImage"))) {
+            predicates.add(cb.isNotEmpty(root.get("postImageSet")));
+        }
+
+        if (Boolean.TRUE.equals(params.get("hasInvitation"))) {
+            predicates.add(cb.isNotNull(root.get("invitationPost")));
+        }
+
+        cq.select(root).distinct(true)
+                .where(cb.and(predicates.toArray(new Predicate[0])))
+                .orderBy(cb.desc(root.get("createdDate")));
+
+        Query<Post> query = getSession().createQuery(cq);
+
+        int page = params.get("page") != null ? (int) params.get("page") : 1;
+        int size = params.get("size") != null ? (int) params.get("size") : 10;
+
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+
+        return query.getResultList();
     }
 
 }

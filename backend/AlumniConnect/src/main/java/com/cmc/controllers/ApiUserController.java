@@ -181,18 +181,35 @@ public class ApiUserController {
         }
     }
 
-    @PutMapping("/user/update")
+    @PutMapping(value = "/user/update",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> updateCurrentUser(
             @RequestParam(required = false) MultipartFile avatar,
             @RequestParam(required = false) MultipartFile cover,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String password,
             Principal principal) {
 
         try {
             String username = principal.getName();
-            userService.updateCurrentUser(username, email, phone, avatar, cover);
-            return ResponseEntity.ok("Cập nhật thông tin thành công.");
+            User existingUser = userService.getUserByUsername(username);
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(existingUser.getId()); 
+
+            userDTO.setEmail(email != null ? email : existingUser.getEmail());
+            userDTO.setPhone(phone != null ? phone : existingUser.getPhone());
+            userDTO.setLastName(lastName != null ? lastName : existingUser.getLastName());
+            userDTO.setFirstName(firstName != null ? firstName : existingUser.getFirstName());
+            userDTO.setPassword(password);
+
+            User updatedUser = userService.saveOrUpdate(userDTO, avatar, cover);
+
+            return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi khi cập nhật thông tin: " + e.getMessage());

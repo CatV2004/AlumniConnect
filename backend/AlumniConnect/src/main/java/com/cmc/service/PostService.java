@@ -4,10 +4,12 @@
  */
 package com.cmc.service;
 
-import com.cmc.dtos.PostDTO;
+import com.cmc.dtos.PageResponse;
+import com.cmc.dtos.PostResponseDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 
 /**
@@ -18,9 +20,11 @@ public interface PostService {
 
     public Page<Post> getPosts(Integer page, Integer size);
     
+    PageResponse<PostResponseDTO> getPosts(Map<String, Object> params);
+    
     public Page<Post> getPostsByUser(Long userId, int page, int size);
 
-    Post saveOrUpdate(Post post, String[] images);
+    void saveOrUpdate(Post post, String[] images);
 
     boolean deletePost(Long postId);
 

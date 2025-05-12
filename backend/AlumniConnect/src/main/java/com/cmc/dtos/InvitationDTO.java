@@ -1,0 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.cmc.dtos;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ *
+ * @author FPTSHOP
+ */
+public class InvitationDTO {
+    private String eventName;
+    private List<Long> invitedUserIds;
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public List<Long> getInvitedUserIds() {
+        return invitedUserIds;
+    }
+
+    public void setInvitedUserIds(List<Long> invitedUserIds) {
+        this.invitedUserIds = invitedUserIds;
+    }
+    
+    
+}

@@ -54,3 +54,21 @@ export const getAllUsers = async ({ page = 1, size = 10, keyword = "" }, token) 
   }
 };
 
+export const updateUserAvatarOrCover = async (formData, token) => {
+  try {
+    const res = await axios.put(`${BASE_URL}/user/update`, formData, {
+      headers: {
+        Authorization: token,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Lỗi cập nhật avatar/cover:", {
+      message: error.message,
+      response: error.response?.data,
+    });
+    throw error;
+  }
+};
+

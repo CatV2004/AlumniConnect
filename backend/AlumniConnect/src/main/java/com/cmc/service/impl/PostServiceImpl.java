@@ -4,30 +4,39 @@
  */
 package com.cmc.service.impl;
 
-import com.cmc.dtos.PostDTO;
+import com.cmc.components.PostMapper;
+import com.cmc.dtos.PageResponse;
+import com.cmc.dtos.PostResponseDTO;
+
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import com.cmc.repository.PostRepository;
 import com.cmc.service.PostService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author FPTSHOP
  */
 @Service
+@Transactional
 public class PostServiceImpl implements PostService {
 
     @Autowired
@@ -36,6 +45,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PostMapper postMapper;
+
     @Override
     public Page<Post> getPosts(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -43,10 +55,9 @@ public class PostServiceImpl implements PostService {
         long total = postRepository.countTotalPosts();
         return new PageImpl<>(posts, pageable, total);
     }
-    
 
     @Override
-    public Post saveOrUpdate(Post post, String[] images) {
+    public void saveOrUpdate(Post post, String[] images) {
         if (images != null) {
             Set<PostImage> currentImages = post.getPostImageSet();
 
@@ -70,9 +81,7 @@ public class PostServiceImpl implements PostService {
                 }
             }
             post.setPostImageSet(currentImages);
-            return this.postRepository.saveOrUpdate(post);
         }
-        return this.postRepository.saveOrUpdate(post);
     }
 
     @Override
@@ -151,9 +160,9 @@ public class PostServiceImpl implements PostService {
     public long countPosts(String keyword) {
         return postRepository.countTotalPosts(keyword);
     }
-    
+
     @Override
-    public PostImage getImagePostById(Long idImage){
+    public PostImage getImagePostById(Long idImage) {
         return this.postRepository.getPostImageById(idImage);
     }
 
@@ -164,4 +173,21 @@ public class PostServiceImpl implements PostService {
         long total = postRepository.countTotalPostsByUser(userId);
         return new PageImpl<>(posts, pageable, total);
     }
+
+    @Override
+    public PageResponse<PostResponseDTO> getPosts(Map<String, Object> params) {
+        int page = params.get("page") != null ? (int) params.get("page") : 1;
+        int size = params.get("size") != null ? (int) params.get("size") : 10;
+
+        List<Post> posts = postRepository.findPosts(params);
+        long totalItems = postRepository.countPosts(params);
+        int totalPages = (int) Math.ceil((double) totalItems / size);
+
+        List<PostResponseDTO> postDTOs = posts.stream()
+                .map(postMapper::toPostResponseDTO)
+                .collect(Collectors.toList());
+
+        return new PageResponse<>(postDTOs, page, size, totalItems, totalPages);
+    }
+
 }

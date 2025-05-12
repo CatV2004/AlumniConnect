@@ -55,7 +55,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
             if (user != null) {
                 Set<GrantedAuthority> authorities = new HashSet<>();
-                authorities.add(new SimpleGrantedAuthority(user.getRole()));
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
                 UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                         username, user.getPassword(), true, true, true, true, authorities);
