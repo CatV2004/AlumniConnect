@@ -36,6 +36,8 @@ public interface PostService {
     Page<Post> searchPosts(String kw, int page, int size);
 
     int lockComment(Long id);
+    
+    PostResponseDTO getPostResponseById(Long postId);
 
     Post getPostById(Long id);
     

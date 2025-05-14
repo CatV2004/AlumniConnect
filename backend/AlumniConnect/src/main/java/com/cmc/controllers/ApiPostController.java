@@ -91,10 +91,9 @@ public class ApiPostController {
     }
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Post> getPostById(
-            @PathVariable(value = "postId") Long postId
-    ) {
-        return new ResponseEntity<>(this.postService.getPostById(postId), HttpStatus.OK);
+    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable("postId") Long postId) {
+        PostResponseDTO postDto = postService.getPostResponseById(postId);
+        return ResponseEntity.ok(postDto);
     }
 
     @PostMapping(path = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -264,6 +263,7 @@ public class ApiPostController {
     }
 
     @DeleteMapping("/posts/{postId}/force")
+    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> forceDeletePost(
             @PathVariable("postId") Long postId,
             Principal principal) {

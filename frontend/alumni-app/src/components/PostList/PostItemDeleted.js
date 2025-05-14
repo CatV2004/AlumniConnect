@@ -60,6 +60,7 @@ const PostItem = ({ post }) => {
     }
     return <p className="mb-2 whitespace-pre-line">{post.content}</p>;
   };
+  console.log("post: ", post)
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
@@ -80,13 +81,13 @@ const PostItem = ({ post }) => {
             <div className="ml-2">
               <Link
                 to={`/profile/${post.userId.id}`}
-                className="flex items-center gap-2 hover:opacity-80"
+                className="flex items-center gap-2 hover:opacity-80"x
               >
                 <p className="font-semibold">{post.userId.username}</p>
               </Link>
               <Link to={`/post/${post.id}`}>
                 <p className="text-xs text-gray-500">
-                  {formatDate(post.createdDate)}
+                  {formatDate(post.deletedDate)}
                 </p>
               </Link>
             </div>
@@ -100,6 +101,14 @@ const PostItem = ({ post }) => {
       {/* Post Media */}
       {post.postImages && post.postImages.length > 0 && (
         <PostImagesGallery images={post.postImages} />
+      )}
+
+      {/* Survey Post */}
+      {post.surveyPost && <SurveyPost survey={post.surveyPost} />}
+
+      {/* Invitation Post */}
+      {post.invitationPost && (
+        <InvitationPost invitation={post.invitationPost} />
       )}
 
 

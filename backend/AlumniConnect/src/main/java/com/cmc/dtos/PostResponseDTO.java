@@ -12,11 +12,13 @@ import java.util.List;
  * @author FPTSHOP
  */
 public class PostResponseDTO {
+
     private Long id;
     private String content;
     private Boolean lockComment;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+    private LocalDateTime deletedDate;
     private Boolean active;
 
     private UserDTO userId;
@@ -106,8 +108,14 @@ public class PostResponseDTO {
     public void setSurveyPost(SurveyDTO surveyPost) {
         this.surveyPost = surveyPost;
     }
-    
-    
+
+    public LocalDateTime getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(LocalDateTime deletedDate) {
+        this.deletedDate = deletedDate;
+    }
     
     
 }

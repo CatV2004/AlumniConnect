@@ -1,30 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
 import PostItem from "./PostItem";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchPosts, createPost } from "../../features/posts/postSlice";
 import InfiniteScroll from "react-infinite-scroll-component";
 import PostSkeleton from "./PostSkeleton";
 
-const PostList = () => {
-  const dispatch = useDispatch();
-  const { posts, loading, error, hasMore, currentPage } = useSelector(
-    (state) => state.posts
-  );
-
-  // Load initial posts
-  useEffect(() => {
-    if (posts.length === 0) {
-      dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
-    }
-  }, [dispatch]);
-
-  // Handle infinite scroll
-  const fetchMoreData = useCallback(() => {
-    if (hasMore) {
-      dispatch(fetchPosts({ page: currentPage + 1, size: 10 }));
-    }
-  }, [dispatch, hasMore, currentPage]);
-
+const PostList = ({
+  posts,
+  loading,
+  error,
+  hasMore,
+  fetchMoreData,
+  customEmptyMessage,
+}) => {
   if (loading && posts.length === 0) {
     return (
       <div className="max-w-xl mx-auto space-y-4">
@@ -44,7 +29,7 @@ const PostList = () => {
   }
 
   return (
-    <div className=" mx-auto">
+    <div className="mx-auto">
       <InfiniteScroll
         dataLength={posts.length}
         next={fetchMoreData}
@@ -69,6 +54,11 @@ const PostList = () => {
           ))}
         </div>
       </InfiniteScroll>
+      {!loading &&
+        posts.length === 0 &&
+        (customEmptyMessage || (
+          <div className="text-center py-8 text-gray-500">No posts yet</div>
+        ))}
     </div>
   );
 };

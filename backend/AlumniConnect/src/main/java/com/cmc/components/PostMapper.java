@@ -20,6 +20,7 @@ import com.cmc.pojo.PostImage;
 import com.cmc.pojo.SurveyPost;
 import com.cmc.pojo.SurveyQuestion;
 import com.cmc.pojo.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ public class PostMapper {
         dto.setLockComment(post.getLockComment());
         dto.setCreatedDate(post.getCreatedDate());
         dto.setUpdatedDate(post.getUpdatedDate());
+        dto.setDeletedDate(post.getDeletedDate());
         dto.setActive(post.getActive());
 
         dto.setUserId(toUserDTO(post.getUserId()));

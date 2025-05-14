@@ -115,6 +115,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public PostResponseDTO getPostResponseById(Long postId) {
+        Post post = postRepository.getPostId(postId);
+        return postMapper.toPostResponseDTO(post);
+    }
+
+    @Override
     public Post getPostIdOfDL(Long id) {
         return this.postRepository.getPostIdOfDL(id);
     }

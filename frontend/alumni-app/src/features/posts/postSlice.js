@@ -1,26 +1,39 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import {
   createPost as createPostService,
   updatePost as updatePostService,
+  fetchPosts as fetchPostsService,
 } from "../../services/postService";
-
-const API_URL = "http://localhost:8080/AlumniConnect/api/posts";
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async (
-    { page = 1, size = 10, refresh = false },
-    { rejectWithValue, getState }
-  ) => {
+  async ({ page = 1, size = 10, refresh = false }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}?page=${page}&size=${size}`);
+      const data = await fetchPostsService({ page, size });
       return {
-        posts: response.data.content,
+        posts: data.content,
         currentPage: page,
-        totalPages: response.data.totalPages,
-        hasMore: !response.data.last,
-        refresh, // Thêm flag refresh để xử lý làm mới dữ liệu
+        totalPages: data.totalPages,
+        hasMore: !data.last,
+        refresh,
+      };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const fetchSurveyPosts = createAsyncThunk(
+  "posts/fetchSurveyPosts",
+  async ({ page = 1, size = 10, refresh = false }, { rejectWithValue }) => {
+    try {
+      const data = await fetchPostsService({ page, size, hasSurvey: true });
+      return {
+        posts: data.content,
+        currentPage: page,
+        totalPages: data.totalPages,
+        hasMore: !data.last,
+        refresh,
       };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -54,7 +67,7 @@ export const updatePost = createAsyncThunk(
 
       dispatch(fetchPosts({ page: 1, size: 10, refresh: true }));
 
-      return response; 
+      return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -65,11 +78,15 @@ const postSlice = createSlice({
   name: "posts",
   initialState: {
     posts: [],
+    surveyPosts: [],
     loading: false,
     error: null,
     currentPage: 0,
     totalPages: 0,
     hasMore: true,
+    surveyCurrentPage: 0,
+    surveyTotalPages: 0,
+    surveyHasMore: true,
     isCreating: false, // Thêm trạng thái riêng cho việc tạo post
   },
   reducers: {
@@ -83,6 +100,11 @@ const postSlice = createSlice({
       state.posts = [];
       state.currentPage = 0;
       state.hasMore = true;
+    },
+    resetSurveyPosts: (state) => {
+      state.surveyPosts = [];
+      state.surveyCurrentPage = 0;
+      state.surveyHasMore = true;
     },
   },
   extraReducers: (builder) => {
@@ -119,7 +141,7 @@ const postSlice = createSlice({
         state.error = action.payload;
       })
 
-            // Xử lý update post
+      // Xử lý update post
       .addCase(updatePost.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -136,10 +158,28 @@ const postSlice = createSlice({
       .addCase(updatePost.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
 
+      // Xử lý fetch surveyPosts
+      .addCase(fetchSurveyPosts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSurveyPosts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.surveyPosts = action.payload.refresh
+          ? action.payload.posts
+          : [...state.surveyPosts, ...action.payload.posts];
+        state.surveyCurrentPage = action.payload.currentPage;
+        state.surveyTotalPages = action.payload.totalPages;
+        state.surveyHasMore = action.payload.hasMore;
+      })
+      .addCase(fetchSurveyPosts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { addNewPost, removePost, resetPosts } = postSlice.actions;
+export const { addNewPost, removePost, resetPosts, resetSurveyPosts } = postSlice.actions;
 export default postSlice.reducer;

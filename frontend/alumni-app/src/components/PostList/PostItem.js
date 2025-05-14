@@ -104,7 +104,7 @@ const PostItem = ({ post }) => {
       )}
 
       {/* Survey Post */}
-      {post.surveyPost && <SurveyPost survey={post.surveyPost} />}
+      {post.surveyPost && <SurveyPost survey={post.surveyPost} postId={post.id}/>}
 
       {/* Invitation Post */}
       {post.invitationPost && (

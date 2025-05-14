@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CreatePostModal from "./CreatePostModal";
+import PostForm from "./PostForm";
+
 import defaultAvatar from "../../assets/image/default-user.png";
 
 const CreatePostBar = ({ user }) => {
@@ -52,7 +53,8 @@ const CreatePostBar = ({ user }) => {
       </div>
 
       {showModal && (
-        <CreatePostModal onClose={() => setShowModal(false)} user={user} />
+        // <CreatePostModal onClose={() => setShowModal(false)} user={user} />
+        <PostForm onClose={() => setShowModal(false)} user={user} />
       )}
     </>
   );
