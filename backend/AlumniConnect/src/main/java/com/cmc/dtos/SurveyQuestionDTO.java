@@ -11,9 +11,19 @@ import java.util.List;
  * @author FPTSHOP
  */
 public class SurveyQuestionDTO {
+
+    private Long id;
     private String question;
     private Boolean multiChoice;
     private List<SurveyOptionDTO> options;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getQuestion() {
         return question;
@@ -38,6 +48,5 @@ public class SurveyQuestionDTO {
     public void setOptions(List<SurveyOptionDTO> options) {
         this.options = options;
     }
-    
-    
+
 }

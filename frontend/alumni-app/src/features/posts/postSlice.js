@@ -4,6 +4,22 @@ import {
   updatePost as updatePostService,
   fetchPosts as fetchPostsService,
 } from "../../services/postService";
+import {
+  getSurveyStatistics as getSurveyStatisticsService,
+} from "../../services/surveyPostService";
+
+export const fetchSurveyStatistics = createAsyncThunk(
+  "posts/fetchSurveyStatistics",
+  async (surveyPostId, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const data = await getSurveyStatisticsService(surveyPostId, token);
+      return { surveyPostId, data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
@@ -87,7 +103,12 @@ const postSlice = createSlice({
     surveyCurrentPage: 0,
     surveyTotalPages: 0,
     surveyHasMore: true,
-    isCreating: false, // Thêm trạng thái riêng cho việc tạo post
+    isCreating: false, 
+    surveyStats: {
+      loading: false,
+      error: null,
+      data: {}, 
+    },
   },
   reducers: {
     addNewPost: (state, action) => {
@@ -105,6 +126,10 @@ const postSlice = createSlice({
       state.surveyPosts = [];
       state.surveyCurrentPage = 0;
       state.surveyHasMore = true;
+    },
+    clearSurveyStats: (state) => {
+      state.surveyStats.data = {};
+      state.surveyStats.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -177,9 +202,22 @@ const postSlice = createSlice({
       .addCase(fetchSurveyPosts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(fetchSurveyStatistics.pending, (state) => {
+        state.surveyStats.loading = true;
+        state.surveyStats.error = null;
+      })
+      .addCase(fetchSurveyStatistics.fulfilled, (state, action) => {
+        state.surveyStats.loading = false;
+        state.surveyStats.data[action.payload.surveyPostId] = action.payload.data;
+      })
+      .addCase(fetchSurveyStatistics.rejected, (state, action) => {
+        state.surveyStats.loading = false;
+        state.surveyStats.error = action.payload;
       });
   },
 });
 
-export const { addNewPost, removePost, resetPosts, resetSurveyPosts } = postSlice.actions;
+export const { addNewPost, removePost, resetPosts, resetSurveyPosts, clearSurveyStats } = postSlice.actions;
 export default postSlice.reducer;

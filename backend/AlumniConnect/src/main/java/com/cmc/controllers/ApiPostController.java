@@ -263,11 +263,10 @@ public class ApiPostController {
     }
 
     @DeleteMapping("/posts/{postId}/force")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> forceDeletePost(
             @PathVariable("postId") Long postId,
             Principal principal) {
-
+        
         String username = principal.getName();
         Post post = postService.getPostIdOfDL(postId);
         User user = userService.getUserByUsername(username);

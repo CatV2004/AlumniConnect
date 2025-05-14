@@ -156,10 +156,10 @@ export const restorePost = async (postId, token) => {
 
 // Xóa cứng bài viết
 export const forceDeletePost = async (postId, token) => {
+  console.log("token: ", token)
   try {
-    const response = await axios.put(
+    const response = await axios.delete(
       `${BASE_URL}/posts/${postId}/force`,
-      {},
       {
         headers: {
           Authorization: token,

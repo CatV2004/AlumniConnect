@@ -89,6 +89,7 @@ public class PostMapper {
 
         SurveyDTO dto = new SurveyDTO();
         dto.setSurveyType(survey.getSurveyType());
+        dto.setId(survey.getId());
         dto.setEndTime(survey.getEndTime());
 
         List<SurveyQuestionDTO> questionDTOs = survey.getSurveyQuestionSet().stream()
@@ -101,12 +102,15 @@ public class PostMapper {
 
     private SurveyQuestionDTO toSurveyQuestionDTO(SurveyQuestion question) {
         SurveyQuestionDTO dto = new SurveyQuestionDTO();
+        
+        dto.setId(question.getId());
         dto.setQuestion(question.getQuestion());
         dto.setMultiChoice(question.getMultiChoice());
 
         List<SurveyOptionDTO> optionDTOs = question.getSurveyOptionSet().stream()
                 .map(option -> {
                     SurveyOptionDTO o = new SurveyOptionDTO();
+                    o.setId(option.getId());
                     o.setOptionText(option.getOptionText());
                     return o;
                 })

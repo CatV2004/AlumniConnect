@@ -1,0 +1,27 @@
+.chartContainer {
+  height: 300px;
+  margin-bottom: 20px;
+}
+
+.statsCard {
+  transition: all 0.3s ease;
+}
+
+.statsCard:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.filterSection {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.MuiBackdrop-root {
+  z-index: 1200 !important;
+}
+.MuiModal-root {
+  z-index: 1300 !important;
+  position: relative;
+}
