@@ -48,20 +48,32 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> getPostsByUserId(Long userId, int page, int size) {
+    public List<Post> getPostsByUserId(Map<String, Object> params) {
         Session session = getSession();
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Post> cq = cb.createQuery(Post.class);
         Root<Post> root = cq.from(Post.class);
 
-        Predicate byUser = cb.equal(root.get("userId").get("id"), userId);
-        Predicate notDeleted = cb.isNull(root.get("deletedDate"));
-        Predicate isActive = cb.isTrue(root.get("active"));
-        cq.where(cb.and(byUser, notDeleted, isActive));
+        List<Predicate> predicates = new ArrayList<>();
 
-        cq.orderBy(cb.desc(root.get("createdDate")));
+        if (params.get("userId") != null) {
+            Long userId = (Long) params.get("userId");
+            predicates.add(cb.equal(root.get("userId").get("id"), userId));
+        }
+
+        predicates.add(cb.isNull(root.get("deletedDate")));
+
+        predicates.add(cb.isTrue(root.get("active")));
+
+        cq.select(root)
+                .where(cb.and(predicates.toArray(new Predicate[0])))
+                .orderBy(cb.desc(root.get("createdDate")));
 
         Query<Post> query = session.createQuery(cq);
+
+        int page = params.get("page") != null ? (int) params.get("page") : 0;
+        int size = params.get("size") != null ? (int) params.get("size") : 10;
+
         query.setFirstResult(page * size);
         query.setMaxResults(size);
 
@@ -97,31 +109,54 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public int deletePost(Long id) {
+    public boolean deletePost(Long id) {
         Session session = this.getSession();
         Post post = session.get(Post.class, id);
         if (post != null && Boolean.TRUE.equals(post.getActive())) {
             post.setActive(false);
             post.setDeletedDate(LocalDateTime.now());
             post.setUpdatedDate(LocalDateTime.now());
-            session.update(post);
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     @Override
-    public int restorePost(Long id) {
+    public boolean restorePost(Long id) {
         Session session = this.getSession();
         Post post = session.get(Post.class, id);
         if (post != null && Boolean.FALSE.equals(post.getActive())) {
             post.setActive(true);
-            post.setDeletedDate(null); 
+            post.setDeletedDate(null);
             post.setUpdatedDate(LocalDateTime.now());
-            session.update(post);
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
+    }
+
+    @Override
+    public boolean deletePostPermanently(Long postId) {
+        Session session = getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+
+        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
+        Root<Post> root = cq.from(Post.class);
+        cq.select(root).where(
+                cb.and(
+                        cb.equal(root.get("id"), postId),
+                        cb.isFalse(root.get("active")),
+                        cb.isNotNull(root.get("deletedDate"))
+                )
+        );
+
+        Post post = session.createQuery(cq).uniqueResult();
+
+        if (post != null) {
+            session.remove(post);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -223,11 +258,26 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public long countTotalPostsByUser(Long userId) {
-        String hql = "SELECT COUNT(p) FROM Post p WHERE p.userId.id = :userId ORDER BY p.id DESC";
-        Query query = getSession().createQuery(hql, Long.class);
-        query.setParameter("userId", userId);
-        return (long) query.getSingleResult();
+    public long countTotalPostsByUser(Map<String, Object> params) {
+        CriteriaBuilder cb = getSession().getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<Post> root = cq.from(Post.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params.get("userId") != null) {
+            Long userId = (Long) params.get("userId");
+            predicates.add(cb.equal(root.get("userId").get("id"), userId));
+        }
+
+        predicates.add(cb.isNull(root.get("deletedDate")));
+
+        if (params.get("active") == null || Boolean.TRUE.equals(params.get("active"))) {
+            predicates.add(cb.isTrue(root.get("active")));
+        }
+
+        cq.select(cb.count(root)).where(cb.and(predicates.toArray(new Predicate[0])));
+        return getSession().createQuery(cq).getSingleResult();
     }
 
     @Override
@@ -249,22 +299,6 @@ public class PostRepositoryImpl implements PostRepository {
         s.merge(post);
 
         return img;
-    }
-
-    @Override
-    public int deletePostImage(Long imageId) {
-        Session s = getSession();
-        PostImage img = s.find(PostImage.class, imageId);
-
-        if (img != null) {
-            Post post = img.getPostId();
-            if (post != null) {
-                post.getPostImageSet().remove(img);
-            }
-            s.remove(img);
-            return 1;
-        }
-        return 0;
     }
 
     @Override
@@ -339,6 +373,84 @@ public class PostRepositoryImpl implements PostRepository {
         query.setMaxResults(size);
 
         return query.getResultList();
+    }
+
+    @Override
+    public Post getPostIdOfDL(Long id) {
+        Session session = getSession();
+
+        String hql = "FROM Post p WHERE p.id = :id AND p.active = false AND p.deletedDate IS NOT NULL";
+        return session.createQuery(hql, Post.class)
+                .setParameter("id", id)
+                .uniqueResult();
+    }
+
+    @Override
+    public List<Post> getDeletedPostsByUser(Map<String, Object> params) {
+        Session session = getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Post> query = builder.createQuery(Post.class);
+        Root<Post> root = query.from(Post.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params.get("userId") != null) {
+            Long userId = (Long) params.get("userId");
+            predicates.add(builder.equal(root.get("userId").get("id"), userId));
+        }
+
+        predicates.add(builder.equal(root.get("active"), false));
+
+        query.select(root)
+                .where(builder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(builder.desc(root.get("deletedDate")));
+
+        Query<Post> q = session.createQuery(query);
+
+        // Pagination
+        int page = params.get("page") != null ? (int) params.get("page") : 1;
+        int size = params.get("size") != null ? (int) params.get("size") : 10;
+        int start = (page - 1) * size;
+
+        q.setFirstResult(start);
+        q.setMaxResults(size);
+
+        return q.getResultList();
+    }
+
+    @Override
+    public long countDeletedPostsByUser(Map<String, Object> params) {
+        Session session = getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<Post> root = query.from(Post.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params.get("userId") != null) {
+            Long userId = (Long) params.get("userId");
+            predicates.add(builder.equal(root.get("userId").get("id"), userId));
+        }
+
+        predicates.add(builder.equal(root.get("active"), false));
+
+        query.select(builder.count(root))
+                .where(builder.and(predicates.toArray(new Predicate[0])));
+
+        return session.createQuery(query).getSingleResult();
+    }
+
+    @Override
+    public void createImagePost(Long postId, String url) {
+        Post post = getSession().get(Post.class, postId);
+        if (post == null) {
+            throw new IllegalArgumentException("Post with ID " + postId + " not found.");
+        }
+        PostImage postImage = new PostImage();
+        postImage.setImage(url);
+        postImage.setPostId(post);
+
+        getSession().persist(postImage);
     }
 
 }

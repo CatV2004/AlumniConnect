@@ -1,10 +1,16 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentUser } from './authSlice';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentUser, logout } from "./authSlice";
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const { token, user, loading } = useSelector((state) => state.auth);
+  const { token, user, loading, error } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (token && error?.status === 401) {
+      dispatch(logout());
+    }
+  }, [token, error, dispatch]);
 
   useEffect(() => {
     if (token && !user && !loading) {
@@ -20,17 +26,20 @@ const AuthProvider = ({ children }) => {
           <div className="flex justify-center mb-6">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
           </div>
-          
+
           {/* Loading text with subtle animation */}
           <h2 className="text-2xl font-semibold text-gray-800 mb-2 animate-pulse">
             Đang tải thông tin người dùng
           </h2>
-          
+
           {/* Progress indicator */}
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-            <div className="bg-blue-600 h-2.5 rounded-full animate-pulse" style={{width: '45%'}}></div>
+            <div
+              className="bg-blue-600 h-2.5 rounded-full animate-pulse"
+              style={{ width: "45%" }}
+            ></div>
           </div>
-          
+
           {/* Optional helpful message */}
           <p className="mt-4 text-gray-500 text-sm">
             Vui lòng chờ trong giây lát...

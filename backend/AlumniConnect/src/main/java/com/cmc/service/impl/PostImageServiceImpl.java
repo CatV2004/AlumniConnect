@@ -33,6 +33,8 @@ public class PostImageServiceImpl implements PostImageService {
             return;
         }
 
+        postImageRepository.deleteImagesByPost(post);
+
         for (MultipartFile file : images) {
             if (!file.isEmpty()) {
                 try {
@@ -48,4 +50,24 @@ public class PostImageServiceImpl implements PostImageService {
             }
         }
     }
+
+    @Override
+    public boolean updateImage(Long imageId, MultipartFile image) {
+        try {
+            String imageUrl = cloudinaryService.uploadFile(image);
+
+            boolean isUpdated = this.postImageRepository.updateImage(imageId, imageUrl);
+
+            return isUpdated;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; 
+        }
+    }
+
+    @Override
+    public boolean deleteImage(Long imageId) {
+        return this.postImageRepository.deleteImage(imageId);
+    }
+
 }

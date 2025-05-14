@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function formatDateFromArray(dateArray, options = {}) {
   if (!Array.isArray(dateArray) || dateArray.length < 3) return "";
 
@@ -19,3 +21,15 @@ export function formatDateFromArray(dateArray, options = {}) {
 
   return date.toLocaleString(locale, dateOptions);
 }
+
+export const formatDate = (dateArray) => {
+  if (Array.isArray(dateArray)) {
+    const [year, month, ...rest] = dateArray;
+    const date = new Date(year, month - 1, ...rest);
+    return moment(date).fromNow();
+  }
+
+  if (typeof dateArray === "string") {
+    return moment(dateArray).fromNow();
+  }
+};

@@ -19,7 +19,7 @@ public class PostResponseDTO {
     private LocalDateTime updatedDate;
     private Boolean active;
 
-    private UserDTO user;
+    private UserDTO userId;
 
     private List<String> postImages;
 
@@ -75,12 +75,12 @@ public class PostResponseDTO {
         this.active = active;
     }
 
-    public UserDTO getUser() {
-        return user;
+    public UserDTO getUserId() {
+        return userId;
     }
 
-    public void setUser(UserDTO user) {
-        this.user = user;
+    public void setUserId(UserDTO userId) {
+        this.userId = userId;
     }
 
     public List<String> getPostImages() {

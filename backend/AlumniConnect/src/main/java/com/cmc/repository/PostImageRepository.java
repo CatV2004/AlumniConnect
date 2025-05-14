@@ -4,13 +4,21 @@
  */
 package com.cmc.repository;
 
+import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author FPTSHOP
  */
-
 public interface PostImageRepository {
+
     void saveOrUpdate(PostImage postImage);
+
+    void deleteImagesByPost(Post post);
+    
+    boolean deleteImage(Long imageId);
+    
+    boolean updateImage(Long imageId, String imgUrl);
 }

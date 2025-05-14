@@ -1,74 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import PostItem from './PostItem';
-import { useDispatch, useSelector } from 'react-redux';
-import { createPost, fetchPosts } from '../../features/posts/postSlice';
-import axios from 'axios';
-
-
-// const PostForm = () => {
-//   const [content, setContent] = useState("");
-//   const [image, setImage] = useState("");
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const postData = {
-//         content: content,
-//         image: image
-//       };
-
-//       const response = await axios.post("http://localhost:8080/AlumniConnect/api/posts", postData, {
-//         headers: {
-//           "Content-Type": "application/json"
-//         }
-//       });
-
-//       alert("Đăng bài thành công!");
-//       setContent("");
-//       setImage("");
-//     } catch (error) {
-//       alert("Đăng bài thất bại!");
-//       console.error(error);
-//     }
-//   };
-// }
+import { useEffect, useState, useCallback } from "react";
+import PostItem from "./PostItem";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPosts, createPost } from "../../features/posts/postSlice";
+import InfiniteScroll from "react-infinite-scroll-component";
+import PostSkeleton from "./PostSkeleton";
 
 const PostList = () => {
   const dispatch = useDispatch();
-  // const { posts, loading, error } = useSelector((state) => state.posts);
-  const [content, setContent] = useState('');
-  const [image, setImage] = useState([]);
-
-
-  const BASE_URL = "http://localhost:8080/AlumniConnect/api";
-  const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const pageSize = 5;
-
-  const loadPosts = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/posts?page=${page}&size=${pageSize}`);
-      const newPosts = res.data.content;
-      setPosts((prev) => [...prev, ...newPosts]);
-      setHasMore(!res.data.last);
-    } catch (err) {
-      console.error("Lỗi khi tải bài viết:", err);
-    }
-  };
-
-  useEffect(() => {
-    loadPosts();
-  }, [page]);
-
-  return (
-    <div className="space-y-4">
-      {posts?.map((post) => (
-        <PostItem key={post.id} post={post} />
-      ))}
-    </div>
+  const { posts, loading, error, hasMore, currentPage } = useSelector(
+    (state) => state.posts
   );
 
+  // Load initial posts
+  useEffect(() => {
+    if (posts.length === 0) {
+      dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
+    }
+  }, [dispatch]);
+
+  // Handle infinite scroll
+  const fetchMoreData = useCallback(() => {
+    if (hasMore) {
+      dispatch(fetchPosts({ page: currentPage + 1, size: 10 }));
+    }
+  }, [dispatch, hasMore, currentPage]);
+
+  if (loading && posts.length === 0) {
+    return (
+      <div className="max-w-xl mx-auto space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <PostSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading posts: {error}
+      </div>
+    );
+  }
+
+  return (
+    <div className=" mx-auto">
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={fetchMoreData}
+        hasMore={hasMore}
+        loader={
+          <div className="space-y-4">
+            {[...Array(2)].map((_, i) => (
+              <PostSkeleton key={i} />
+            ))}
+          </div>
+        }
+        endMessage={
+          <p className="text-center text-gray-500 py-4">
+            You've seen all posts
+          </p>
+        }
+        scrollThreshold={0.8}
+      >
+        <div className="space-y-4">
+          {posts.map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+      </InfiniteScroll>
+    </div>
+  );
 };
 
 export default PostList;

@@ -25,17 +25,25 @@ public interface PostRepository {
 
     List<Post> findPosts(Map<String, Object> params);
 
-    List<Post> getPostsByUserId(Long id, int page, int size);
+    List<Post> getPostsByUserId(Map<String, Object> params);
 
     List<Post> getPostByKeywords(String kw, Pageable pageable);
 
     List<Post> getPosts(Pageable pageable);
 
     Post getPostId(Long id);
+    
+    Post getPostIdOfDL(Long id);
 
     Post addPost(Post post);
 
-    int deletePost(Long id);
+    boolean deletePost(Long id);
+    
+    boolean deletePostPermanently(Long postId);
+    
+    List<Post> getDeletedPostsByUser(Map<String, Object> params);
+    
+    long countDeletedPostsByUser(Map<String, Object> params);
 
     int updateContent(Long id, String content);
 
@@ -43,16 +51,16 @@ public interface PostRepository {
 
     int lockComment(Long id);
 
-    int restorePost(Long id);
+    boolean restorePost(Long id);
 
     PostImage addPostImage(Long postId, String imageUrl);
-
-    int deletePostImage(Long imageId);
 
     List<PostImage> getImagesByPostId(Long postId);
 
     PostImage getPostImageById(Long id);
 
-    long countTotalPostsByUser(Long userId);
+    long countTotalPostsByUser(Map<String, Object> params);
+    
+    void createImagePost(Long postId, String url);
 
 }

@@ -5,6 +5,7 @@ import HomePage from "../pages/Home";
 import RegisterPage from "../pages/RegisterPage";
 import Profile from "../pages/Profile";
 import Layout from "../components/layout/Layout";
+import DeletedPostsPage from "../pages/DeletedPostsPage";
 
 const RoutesConfig = () => (
   <Router>
@@ -14,6 +15,7 @@ const RoutesConfig = () => (
         <Route index element={<HomePage />} /> 
         <Route path="home" element={<HomePage />} />
         <Route path="profile/:id" element={<Profile />} />
+        <Route path="/deleted-posts" element={<DeletedPostsPage />} />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />

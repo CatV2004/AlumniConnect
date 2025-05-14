@@ -91,7 +91,6 @@ const PostItem = ({ post }) => {
               </Link>
             </div>
           </div>
-          <PostOptionsDropdown post={post} onEdit={handleEditClick} />
         </div>
 
         {/* Post Content */}
@@ -103,13 +102,6 @@ const PostItem = ({ post }) => {
         <PostImagesGallery images={post.postImages} />
       )}
 
-      {/* Survey Post */}
-      {post.surveyPost && <SurveyPost survey={post.surveyPost} />}
-
-      {/* Invitation Post */}
-      {post.invitationPost && (
-        <InvitationPost invitation={post.invitationPost} />
-      )}
 
       {/* Post Stats */}
       <div className="px-4 pt-2 pb-1 border-t border-gray-100">
@@ -155,20 +147,6 @@ const PostItem = ({ post }) => {
         </button>
       </div>
 
-      {/* Comments Section */}
-      {showComment && (
-        <div className="bg-gray-50 p-4 border-t border-gray-100">
-          <CommentList postId={post.id} />
-          <CommentCreated postId={post.id} />
-        </div>
-      )}
-      {isEditModalOpen && (
-        <PostForm
-          onClose={() => setIsEditModalOpen(false)}
-          user={post.userId}
-          postId={post.id}
-        />
-      )}
     </div>
   );
 };

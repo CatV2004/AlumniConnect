@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import defaultAvatar from "../../assets/image/default-user.png";
-import { createPost } from "../../services/postService";
+import { createPost, getPostById, updatePost } from "../../services/postService";
 import { toast } from "react-toastify";
 import {
   FaTimes,
@@ -13,20 +13,52 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { fetchPosts } from "../../features/posts/postSlice";
 
-const CreatePostModal = ({ onClose, user }) => {
+const PostForm = ({ onClose, user, postId = null }) => {
   const dispatch = useDispatch();
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   const [lockComment, setLockComment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [privacy, setPrivacy] = useState("public");
   const fileInputRef = useRef(null);
+
+  // Load post data if in edit mode
+  useEffect(() => {
+    if (postId) {
+      const loadPostData = async () => {
+        setIsLoadingPost(true);
+        try {
+          const postData = await getPostById(postId);
+          
+          setContent(postData.content || "");
+          setLockComment(postData.lockComment || false);
+          setPrivacy(postData.privacy || "public");
+          
+          if (postData.postImageSet && postData.postImageSet.length > 0) {
+            setExistingImages(postData.postImageSet.map(img => ({
+              id: img.id,
+              imageUrl: img.image
+            })));
+          }
+        } catch (error) {
+          toast.error("Failed to load post data");
+          console.error("Error loading post:", error);
+        } finally {
+          setIsLoadingPost(false);
+        }
+      };
+      
+      loadPostData();
+    }
+  }, [postId]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 10) {
-      toast.warning("Bạn chỉ có thể tải lên tối đa 10 ảnh");
+      toast.warning("You can only upload up to 10 images");
       return;
     }
 
@@ -44,42 +76,74 @@ const CreatePostModal = ({ onClose, user }) => {
     setImagePreviews(newPreviews);
   };
 
+  const removeExistingImage = (index) => {
+    const newExistingImages = [...existingImages];
+    newExistingImages.splice(index, 1);
+    setExistingImages(newExistingImages);
+  };
+
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim() && images.length === 0) {
-      toast.warning("Vui lòng nhập nội dung hoặc thêm ảnh");
+    if (!content.trim() && images.length === 0 && existingImages.length === 0) {
+      toast.warning("Please enter content or add images");
       return;
     }
 
     const formData = new FormData();
     formData.append("content", content);
-    formData.append("lockcomment", lockComment ? "true" : "false");
+    formData.append("lockComment", lockComment);
     formData.append("privacy", privacy);
+    
+    // Append new images
     images.forEach((img) => formData.append("images", img));
+    
+    // Append existing image IDs to keep
+    existingImages.forEach((img) => {
+      formData.append("existingImages", img.id);
+    });
 
     try {
       setLoading(true);
-      await createPost(formData, localStorage.getItem("token"));
-      toast.success("Đăng bài thành công!");
+      
+      if (postId) {
+        // Update existing post
+        await updatePost(postId, formData, localStorage.getItem("token"));
+        toast.success("Post updated successfully!");
+      } else {
+        // Create new post
+        await createPost(formData, localStorage.getItem("token"));
+        toast.success("Post created successfully!");
+      }
+      
       dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
       onClose();
     } catch (err) {
-      console.error("Lỗi đăng bài:", err);
-      toast.error("Đăng bài thất bại!");
+      console.error("Error:", err);
+      toast.error(postId ? "Failed to update post" : "Failed to create post");
     } finally {
       setLoading(false);
     }
   };
 
   const privacyOptions = {
-    public: { icon: <FaGlobeAmericas />, label: "Công khai" },
-    friends: { icon: <FaUserLock />, label: "Bạn bè" },
-    private: { icon: <FaUserLock />, label: "Chỉ mình tôi" },
+    public: { icon: <FaGlobeAmericas />, label: "Public" },
+    friends: { icon: <FaUserLock />, label: "Friends" },
+    private: { icon: <FaUserLock />, label: "Only me" },
   };
+
+  if (isLoadingPost) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+        <div className="bg-white rounded-lg p-8 text-center">
+          <p>Loading post data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
@@ -89,7 +153,9 @@ const CreatePostModal = ({ onClose, user }) => {
       >
         {/* Header */}
         <div className="border-b border-gray-200 p-4 relative flex-shrink-0">
-          <h2 className="text-xl font-bold text-center">Tạo bài viết</h2>
+          <h2 className="text-xl font-bold text-center">
+            {postId ? "Edit Post" : "Create Post"}
+          </h2>
           <button
             onClick={onClose}
             className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
@@ -108,7 +174,7 @@ const CreatePostModal = ({ onClose, user }) => {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <div className="font-semibold">{user?.lastName}</div>
+                <div className="font-semibold">{user?.username}</div>
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   <button
                     onClick={() =>
@@ -133,14 +199,44 @@ const CreatePostModal = ({ onClose, user }) => {
           <form onSubmit={handleSubmit} className="p-4">
             <textarea
               className="w-full p-3 text-lg resize-none outline-none placeholder-gray-500"
-              placeholder={`${user?.lastName} ơi, bạn đang nghĩ gì thế?`}
+              placeholder={`What's on your mind, ${user?.username}?`}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={4}
               autoFocus
             />
 
-            {/* Image Preview */}
+            {/* Existing Images */}
+            {existingImages.length > 0 && (
+              <div
+                className={`mt-3 rounded-lg overflow-hidden ${
+                  existingImages.length === 1
+                    ? "max-h-96"
+                    : "grid grid-cols-2 gap-1"
+                }`}
+              >
+                {existingImages.map((img, i) => (
+                  <div key={`existing-${img.id}`} className="relative group">
+                    <img
+                      src={img.imageUrl}
+                      alt="existing"
+                      className="w-full h-48 object-cover"
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeExistingImage(i);
+                      }}
+                      className="absolute top-2 right-2 bg-black bg-opacity-60 text-white rounded-full p-1 hover:bg-opacity-80"
+                    >
+                      <IoMdClose size={18} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* New Image Previews */}
             {imagePreviews.length > 0 && (
               <div
                 className={`mt-3 rounded-lg overflow-hidden ${
@@ -150,7 +246,7 @@ const CreatePostModal = ({ onClose, user }) => {
                 }`}
               >
                 {imagePreviews.map((src, i) => (
-                  <div key={i} className="relative group">
+                  <div key={`new-${i}`} className="relative group">
                     <img
                       src={src}
                       alt="preview"
@@ -173,7 +269,7 @@ const CreatePostModal = ({ onClose, user }) => {
             {/* Add to post */}
             <div className="mt-4 border border-gray-200 rounded-lg p-3">
               <div className="text-sm font-semibold mb-2">
-                Thêm vào bài viết
+                Add to your post
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -184,7 +280,7 @@ const CreatePostModal = ({ onClose, user }) => {
                   <div className="bg-green-100 p-2 rounded-full">
                     <FaImage className="text-green-600" />
                   </div>
-                  <span>Ảnh/video</span>
+                  <span>Photo/Video</span>
                 </button>
 
                 <button
@@ -194,7 +290,7 @@ const CreatePostModal = ({ onClose, user }) => {
                   <div className="bg-yellow-100 p-2 rounded-full">
                     <FaSmile className="text-yellow-600" />
                   </div>
-                  <span>Cảm xúc</span>
+                  <span>Feeling</span>
                 </button>
 
                 <input
@@ -212,7 +308,7 @@ const CreatePostModal = ({ onClose, user }) => {
             <div className="mt-3 flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-gray-600">
                 <label htmlFor="lockComment" className="font-semibold">
-                  Cho phép bình luận
+                  Allow comments
                 </label>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -228,7 +324,7 @@ const CreatePostModal = ({ onClose, user }) => {
                     } relative peer-focus:outline-none peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`}
                   ></div>
                   <span className="ml-2 text-xs text-gray-500">
-                    {!lockComment ? "Đang mở bình luận" : "Bình luận đã bị tắt"}
+                    {!lockComment ? "Comments enabled" : "Comments disabled"}
                   </span>
                 </label>
               </div>
@@ -246,13 +342,15 @@ const CreatePostModal = ({ onClose, user }) => {
                 ? "bg-blue-300 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
             } ${
-              !content.trim() && images.length === 0
+              !content.trim() && images.length === 0 && existingImages.length === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
-            disabled={loading || (!content.trim() && images.length === 0)}
+            disabled={loading || (!content.trim() && images.length === 0 && existingImages.length === 0)}
           >
-            {loading ? "Đang đăng..." : "Đăng"}
+            {loading 
+              ? (postId ? "Updating..." : "Posting...") 
+              : (postId ? "Update" : "Post")}
           </button>
         </div>
       </div>
@@ -260,4 +358,4 @@ const CreatePostModal = ({ onClose, user }) => {
   );
 };
 
-export default CreatePostModal;
+export default PostForm;

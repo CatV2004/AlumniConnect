@@ -11,6 +11,7 @@ import com.cmc.pojo.PostImage;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -22,21 +23,27 @@ public interface PostService {
     
     PageResponse<PostResponseDTO> getPosts(Map<String, Object> params);
     
-    public Page<Post> getPostsByUser(Long userId, int page, int size);
+    PageResponse<PostResponseDTO> getPostsByUser(Map<String, Object> params);
 
     void saveOrUpdate(Post post, String[] images);
 
     boolean deletePost(Long postId);
+    
+    boolean deletePostPermanently(Long postId);
+    
+    PageResponse<PostResponseDTO> getDeletedPostsByUser(Map<String, Object> params);
 
     Page<Post> searchPosts(String kw, int page, int size);
 
     int lockComment(Long id);
 
     Post getPostById(Long id);
+    
+    Post getPostIdOfDL(Long id);
 
     boolean restorePost(Long postId);
 
-    Post addPost(Post post, List<String> imageUrls);
+    public Post addOrUpdatePost(Post post, List<MultipartFile> images, boolean isCreate);
 
     long countPosts(String keyword);
 
@@ -44,11 +51,13 @@ public interface PostService {
 
     boolean updatePostContent(Long postId, String newContent);
 
-    boolean deleteImage(Long imageId);
-
     PostImage addImageToPost(Long postId, String imageUrl);
 
     List<PostImage> getImagesOfPost(Long postId);
     
     PostImage getImagePostById(Long idImage);
+    
+    void createImagePost(Long postId, List<MultipartFile> files);
+    
+    
 }

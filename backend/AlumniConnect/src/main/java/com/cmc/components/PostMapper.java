@@ -40,7 +40,7 @@ public class PostMapper {
         dto.setUpdatedDate(post.getUpdatedDate());
         dto.setActive(post.getActive());
 
-        dto.setUser(toUserDTO(post.getUserId()));
+        dto.setUserId(toUserDTO(post.getUserId()));
 
         List<String> imageUrls = post.getPostImageSet().stream()
                 .map(PostImage::getImage)

@@ -2,16 +2,22 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8080/AlumniConnect/api";
 
 export const getUserProfile = async (userId, token) => {
-  const response = await axios.get(`${BASE_URL}/users/${userId}`, {
-    headers: { Authorization: token },
-  });
-  return response.data;
+  try {
+    const response = await axios.get(`${BASE_URL}/users/${userId}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
 };
 
-
-export const getUserPosts = async (userId, token, page = 0, size = 10) => {
+export const getUserPosts = async (userId, token, page = 0, size = 5) => {
   try {
-    const response = await axios.get(`${BASE_URL}/user/${userId}/posts`, {
+    const response = await axios.get(`${BASE_URL}/users/${userId}/posts`, {
       headers: {
         Authorization: token,
       },
@@ -20,7 +26,6 @@ export const getUserPosts = async (userId, token, page = 0, size = 10) => {
         size,
       },
     });
-    console.log("data posts of user: ", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching user posts:", error);
@@ -28,8 +33,10 @@ export const getUserPosts = async (userId, token, page = 0, size = 10) => {
   }
 };
 
-
-export const getAllUsers = async ({ page = 1, size = 10, keyword = "" }, token) => {
+export const getAllUsers = async (
+  { page = 1, size = 10, keyword = "" },
+  token
+) => {
   try {
     const params = { page, size };
     if (keyword.trim() !== "") {
@@ -39,8 +46,8 @@ export const getAllUsers = async ({ page = 1, size = 10, keyword = "" }, token) 
     const response = await axios.get(`${BASE_URL}/users`, {
       params,
       headers: {
-        Authorization: token
-      }
+        Authorization: token,
+      },
     });
 
     return response.data;
@@ -48,7 +55,7 @@ export const getAllUsers = async ({ page = 1, size = 10, keyword = "" }, token) 
     console.error("Lỗi API getAllUsers:", {
       message: error.message,
       response: error.response?.data,
-      config: error.config
+      config: error.config,
     });
     throw error;
   }
@@ -71,4 +78,3 @@ export const updateUserAvatarOrCover = async (formData, token) => {
     throw error;
   }
 };
-

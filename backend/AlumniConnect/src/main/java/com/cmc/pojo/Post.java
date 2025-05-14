@@ -88,7 +88,8 @@ public class Post implements Serializable {
     @Column(name = "active")
     private Boolean active;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "postId", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<PostImage> postImageSet;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")

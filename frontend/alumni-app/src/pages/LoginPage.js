@@ -63,6 +63,7 @@ const LoginPage = () => {
             >
               <option value="ALUMNI">Cựu sinh viên</option>
               <option value="TEACHER">Giảng viên</option>
+              <option value="ADMIN">Quản trị viên</option>
             </select>
           </div>
 

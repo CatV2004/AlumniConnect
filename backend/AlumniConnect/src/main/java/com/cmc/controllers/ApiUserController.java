@@ -11,6 +11,7 @@ import com.cmc.dtos.AlumniResponseDTO;
 import com.cmc.dtos.ErrorResponseDTO;
 import com.cmc.dtos.LoginRequestDTO;
 import com.cmc.dtos.PageResponse;
+import com.cmc.dtos.PostResponseDTO;
 import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
@@ -112,12 +113,15 @@ public class ApiUserController {
     }
 
     @GetMapping(path = "/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseUserDTO> details(Principal user) {
+    public ResponseEntity<?> details(Principal user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized: Missing or expired token");
+        }
+
         User u = this.userService.getUserByUsername(user.getName());
-
         ResponseUserDTO resU = modelMaper.map(u, ResponseUserDTO.class);
-
-        return new ResponseEntity<>(resU, HttpStatus.OK);
+        return ResponseEntity.ok(resU);
     }
 
     @GetMapping("/users/{id}")
@@ -132,20 +136,24 @@ public class ApiUserController {
         }
     }
 
-    @GetMapping("/user/{id}/posts")
-    public ResponseEntity<?> getPostsByUser(
+    @GetMapping("/users/{id}/posts")
+    public ResponseEntity<PageResponse<PostResponseDTO>> getPostsByUser(
             @PathVariable("id") Long userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        try {
-            Page<Post> postPage = postService.getPostsByUser(userId, page, size);
+            @RequestParam Map<String, Object> params) {
 
-            return ResponseEntity.ok(postPage);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Lỗi khi lấy danh sách bài viết: " + e.getMessage());
-        }
+        Map<String, Object> filterParams = new HashMap<>();
+
+        filterParams.put("userId", userId);
+
+        int page = params.containsKey("page") ? Integer.parseInt(params.get("page").toString()) : 1;
+        filterParams.put("page", page);
+
+        int size = params.containsKey("size") ? Integer.parseInt(params.get("size").toString()) : 10;
+        filterParams.put("size", size);
+
+        PageResponse<PostResponseDTO> response = postService.getPostsByUser(filterParams);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/users")
@@ -199,7 +207,7 @@ public class ApiUserController {
             User existingUser = userService.getUserByUsername(username);
 
             UserDTO userDTO = new UserDTO();
-            userDTO.setId(existingUser.getId()); 
+            userDTO.setId(existingUser.getId());
 
             userDTO.setEmail(email != null ? email : existingUser.getEmail());
             userDTO.setPhone(phone != null ? phone : existingUser.getPhone());

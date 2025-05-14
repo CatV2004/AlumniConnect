@@ -15,4 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PostImageService {
 
     void uploadAndSaveImages(Post post, List<MultipartFile> images);
+
+    boolean deleteImage(Long imageId);
+
+    boolean updateImage(Long imageId, MultipartFile file);
+
 }
