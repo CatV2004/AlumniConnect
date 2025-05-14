@@ -10,12 +10,6 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
     const [parentId, setParentId] = useState(parentComment);
     const [file, setFile] = useState(null);
 
-
-    const getTokenFromCookie = () => {
-        const match = cookie.load('token') || null;
-        return match ? match : '';
-    };
-
     const handleSubmitAddComment = async (e) => {
         e.preventDefault();
 
@@ -25,13 +19,13 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
         if (parentId) formData.append("parentId", parentId);
         if (file) formData.append("file", file);
 
-        const token = getTokenFromCookie();
-
         try {
             const response = await axios.post(`${BASE_URL}/comment`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}`, }
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: localStorage.getItem('token') || null }
             });
-            if (response.ok) {
+            if (response.status === 201) {
                 const result = await response.json();
                 alert('Bình luận đã được gửi!');
                 console.log(result);
@@ -42,7 +36,7 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
                 alert('Lỗi khi gửi bình luận');
             }
         } catch (error) {
-            console.error('Lỗi:', error);
+            console.error('Lỗi:', JSON.stringify(error));
             alert('Lỗi khi gửi bình luận');
         }
     }

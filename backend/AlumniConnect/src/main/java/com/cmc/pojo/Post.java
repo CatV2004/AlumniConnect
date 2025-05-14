@@ -92,7 +92,7 @@ public class Post implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User userId;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.EAGER)
     @JsonIgnore
     private SurveyPost surveyPost;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "postId")

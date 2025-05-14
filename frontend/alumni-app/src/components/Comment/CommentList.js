@@ -3,8 +3,10 @@ import CommentCreated from "./CommentCreated";
 import axios from "axios";
 import moment from "moment";
 import 'moment/locale/vi';
-moment.locale('vi');
+import cookie from 'react-cookies';
 
+
+moment.locale('vi');
 
 const CommentList = ({ post }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
@@ -16,7 +18,11 @@ const CommentList = ({ post }) => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/comment/${post}/post?page=${page}&size=${size}`);
+            const response = await axios.get(`${BASE_URL}/comment/${post}/post?page=${page}&size=${size}`, {
+                headers: {
+                    Authorization: localStorage.getItem('token') || null
+                }
+            });
             const newComments = response.data.content;
             console.log(newComments)
             setComments([...newComments, ...comments]);

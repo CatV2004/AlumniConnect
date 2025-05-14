@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
  * @author FPTSHOP
  */
 public interface PostRepository {
-    List<Post> getPostByUserId(Long id, Integer page, Integer size);
+    List<Post> getPostsByUserId(Long id, int page, int size);
     List<Post> getPostByKeywords(String kw, Pageable pageable);
     List<Post> getPosts(Pageable pageable);
     Post getPostId(Long id);

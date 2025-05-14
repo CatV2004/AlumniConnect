@@ -10,6 +10,7 @@ import com.cmc.repository.PostRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,16 +45,24 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> getPostByUserId(Long id, Integer page, Integer size) {
-        Query q = getSession().createQuery("""
-            FROM Post p 
-            WHERE p.userId.id = :userId 
-            ORDER BY p.id DESC
-            """, Post.class);
-        q.setParameter("userId", id);
-        q.setFirstResult(page);
-        q.setMaxResults(size);
-        return q.getResultList();
+    public List<Post> getPostsByUserId(Long userId, int page, int size) {
+        Session session = getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
+        Root<Post> root = cq.from(Post.class);
+
+        Predicate byUser = cb.equal(root.get("userId").get("id"), userId);
+        Predicate notDeleted = cb.isNull(root.get("deletedDate"));
+        Predicate isActive = cb.isTrue(root.get("active"));
+        cq.where(cb.and(byUser, notDeleted, isActive));
+
+        cq.orderBy(cb.desc(root.get("createdDate")));
+
+        Query<Post> query = session.createQuery(cq);
+        query.setFirstResult(page * size); 
+        query.setMaxResults(size);        
+
+        return query.getResultList();
     }
 
     @Override
@@ -163,7 +172,7 @@ public class PostRepositoryImpl implements PostRepository {
         Query query = getSession().createQuery(hql, Long.class);
         return (long) query.getSingleResult();
     }
-    
+
     @Override
     public long countTotalPostsByUser(Long userId) {
         String hql = "SELECT COUNT(p) FROM Post p WHERE p.userId.id = :userId ORDER BY p.id DESC";
@@ -195,19 +204,19 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public int deletePostImage(Long imageId) {
-    Session s = getSession();
-    PostImage img = s.find(PostImage.class, imageId);
-    
-    if (img != null) {
-        Post post = img.getPostId();
-        if (post != null) {
-            post.getPostImageSet().remove(img);
+        Session s = getSession();
+        PostImage img = s.find(PostImage.class, imageId);
+
+        if (img != null) {
+            Post post = img.getPostId();
+            if (post != null) {
+                post.getPostImageSet().remove(img);
+            }
+            s.remove(img);
+            return 1;
         }
-        s.remove(img);
-        return 1;
+        return 0;
     }
-    return 0;
-}
 
     @Override
     public List<PostImage> getImagesByPostId(Long postId) {
@@ -215,10 +224,9 @@ public class PostRepositoryImpl implements PostRepository {
                 .setParameter("postId", postId)
                 .getResultList();
     }
-    
-    
+
     @Override
-    public PostImage getPostImageById(Long id){
+    public PostImage getPostImageById(Long id) {
         Query q = this.getSession().createNamedQuery("PostImage.findById", PostImage.class);
         q.setParameter("id", id);
         return (PostImage) q.uniqueResult();

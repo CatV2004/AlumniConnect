@@ -10,34 +10,45 @@ import com.cmc.dtos.AlumniRegisterDTO;
 import com.cmc.dtos.AlumniResponseDTO;
 import com.cmc.dtos.ErrorResponseDTO;
 import com.cmc.dtos.LoginRequestDTO;
+import com.cmc.dtos.PageResponse;
 import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
+import com.cmc.pojo.Post;
 import com.cmc.pojo.User;
 import com.cmc.service.AlumniService;
+import com.cmc.service.PostService;
 import com.cmc.service.UserService;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
  * @author FPTSHOP
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api")
 public class ApiUserController {
 
@@ -49,9 +60,10 @@ public class ApiUserController {
     private ModelMapper modelMaper;
     @Autowired
     private AlumniService alumniService;
+    @Autowired
+    private PostService postService;
 
     @PostMapping("/login")
-    @CrossOrigin
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginDTO) {
         Map<String, Object> response = new HashMap<>();
 
@@ -71,7 +83,6 @@ public class ApiUserController {
     @PostMapping(path = "/users",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    @CrossOrigin
     public ResponseEntity<?> addUser(@ModelAttribute AlumniRegisterDTO alumniRegisterDTO) {
         try {
             Alumni alumni = this.alumniService.registerAlumni(alumniRegisterDTO);
@@ -101,15 +112,14 @@ public class ApiUserController {
     }
 
     @GetMapping(path = "/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin
     public ResponseEntity<ResponseUserDTO> details(Principal user) {
         User u = this.userService.getUserByUsername(user.getName());
-        
+
         ResponseUserDTO resU = modelMaper.map(u, ResponseUserDTO.class);
 
         return new ResponseEntity<>(resU, HttpStatus.OK);
     }
-    
+
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
@@ -118,7 +128,74 @@ public class ApiUserController {
             return ResponseEntity.ok(resU);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                 .body("Người dùng không tồn tại với ID: " + id);
+                    .body("Người dùng không tồn tại với ID: " + id);
+        }
+    }
+
+    @GetMapping("/user/{id}/posts")
+    public ResponseEntity<?> getPostsByUser(
+            @PathVariable("id") Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            Page<Post> postPage = postService.getPostsByUser(userId, page, size);
+
+            return ResponseEntity.ok(postPage);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi lấy danh sách bài viết: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<PageResponse<ResponseUserDTO>> getUsers(
+            @RequestParam Map<String, String> params) {
+
+        Map<String, Object> filterParams = new HashMap<>();
+
+        try {
+            // Xử lý tham số
+            if (params.containsKey("currentUsername")) {
+                filterParams.put("excludeUsername", params.get("currentUsername"));
+            }
+
+            if (params.containsKey("page")) {
+                filterParams.put("page", Integer.parseInt(params.get("page")));
+            }
+
+            if (params.containsKey("size")) {
+                int size = Integer.parseInt(params.get("size"));
+                filterParams.put("size", Math.min(size, 100)); // Giới hạn max 100 items/page
+            }
+
+            if (params.containsKey("keyword")) {
+                filterParams.put("keyword", params.get("keyword"));
+            }
+
+            PageResponse<ResponseUserDTO> response = userService.getAllUsers(filterParams);
+            return ResponseEntity.ok(response);
+
+        } catch (NumberFormatException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid page/size parameter");
+        }
+    }
+
+    @PutMapping("/user/update")
+    public ResponseEntity<?> updateCurrentUser(
+            @RequestParam(required = false) MultipartFile avatar,
+            @RequestParam(required = false) MultipartFile cover,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone,
+            Principal principal) {
+
+        try {
+            String username = principal.getName();
+            userService.updateCurrentUser(username, email, phone, avatar, cover);
+            return ResponseEntity.ok("Cập nhật thông tin thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi cập nhật thông tin: " + e.getMessage());
         }
     }
 

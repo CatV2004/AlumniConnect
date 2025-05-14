@@ -68,17 +68,17 @@ public class ApiPostController {
         );
     }
 
-    @GetMapping("/user/{userId}/posts")
-    public ResponseEntity<Page<Post>> getPostsByUser(
-            @PathVariable Long userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return new ResponseEntity<>(
-                this.postService.getPostsByUser(userId, page, size),
-                HttpStatus.OK
-        );
-    }
+//    @GetMapping("/user/{userId}/posts")
+//    public ResponseEntity<Page<Post>> getPostsByUser(
+//            @PathVariable Long userId,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        return new ResponseEntity<>(
+//                this.postService.getPostsByUser(userId, page, size),
+//                HttpStatus.OK
+//        );
+//    }
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<Post> getPostById(
