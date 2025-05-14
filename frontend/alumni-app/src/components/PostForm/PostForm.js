@@ -100,11 +100,14 @@ const PostForm = ({ onClose, user, postId = null }) => {
     
     // Append new images
     images.forEach((img) => formData.append("images", img));
+    console.log("images: ", images)
     
     // Append existing image IDs to keep
     existingImages.forEach((img) => {
+      console.log("img.id", img.id)
       formData.append("existingImages", img.id);
     });
+    console.log("existingImages: ", existingImages)
 
     try {
       setLoading(true);

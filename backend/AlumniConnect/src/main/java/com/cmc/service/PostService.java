@@ -43,8 +43,10 @@ public interface PostService {
 
     boolean restorePost(Long postId);
 
-    public Post addOrUpdatePost(Post post, List<MultipartFile> images, boolean isCreate);
+    public Post addOrUpdatePost(Post post, List<MultipartFile> images, List<Long> existingImageIds, boolean isCreate);
 
+    void deleteImagesNotInList(Post post, List<Long> keepImageIds);
+        
     long countPosts(String keyword);
 
     long countPosts();

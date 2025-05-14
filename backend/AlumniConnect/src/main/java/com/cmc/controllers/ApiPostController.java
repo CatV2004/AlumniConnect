@@ -116,7 +116,7 @@ public class ApiPostController {
         }
         post.setUserId(user);
 
-        Post created = postService.addOrUpdatePost(post, images, true);
+        Post created = postService.addOrUpdatePost(post, images, null, true);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -126,9 +126,10 @@ public class ApiPostController {
             @RequestParam(name = "content", required = true) String content,
             @RequestParam(name = "lockComment", required = false) Boolean lockComment,
             @RequestPart(name = "images", required = false) List<MultipartFile> images,
-            @RequestHeader("Authorization") String authorizationHeader) {
+            @RequestParam(name = "existingImages", required = false) List<Long> existingImageIds,
+            Principal principal) {
 
-        String username = this.postComponents.authorization(authorizationHeader);
+        String username = principal.getName();
         User user = userService.getUserByUsername(username);
 
         Post post = postService.getPostById(id);
@@ -138,7 +139,7 @@ public class ApiPostController {
 
         post.setContent(content);
         post.setLockComment(lockComment != null ? lockComment : false);
-        Post updatedPost = postService.addOrUpdatePost(post, images, false);
+        Post updatedPost = postService.addOrUpdatePost(post, images, existingImageIds, false);
         return ResponseEntity.ok(updatedPost);
     }
 

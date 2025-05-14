@@ -120,18 +120,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post addOrUpdatePost(Post post, List<MultipartFile> images, boolean isCreate) {
+    public Post addOrUpdatePost(Post post, List<MultipartFile> images, List<Long> existingImageIds, boolean isCreate) {
         if (isCreate) {
             post.setCreatedDate(LocalDateTime.now());
             post.setActive(true);
 //            post.setLockComment(false);
         } else {
             post.setUpdatedDate(LocalDateTime.now());
+            this.deleteImagesNotInList(post, existingImageIds);
         }
 
         Post savedPost = postRepository.addPost(post);
         postImageService.uploadAndSaveImages(post, images);
         return savedPost;
+    }
+
+    @Override
+    public void deleteImagesNotInList(Post post, List<Long> keepImageIds) {
+        this.postRepository.deleteImagesNotInList(post, keepImageIds);
     }
 
     @Override

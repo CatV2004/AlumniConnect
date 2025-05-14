@@ -62,5 +62,9 @@ public interface PostRepository {
     long countTotalPostsByUser(Map<String, Object> params);
     
     void createImagePost(Long postId, String url);
+    
+    void deleteImagesByPost(Post post);
+    
+    void deleteImagesNotInList(Post post, List<Long> keepImageIds);
 
 }

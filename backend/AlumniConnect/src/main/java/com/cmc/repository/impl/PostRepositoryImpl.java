@@ -453,4 +453,46 @@ public class PostRepositoryImpl implements PostRepository {
         getSession().persist(postImage);
     }
 
+    @Override
+    public void deleteImagesByPost(Post post) {
+        Session session = getSession();
+
+        String hql = "DELETE FROM PostImage WHERE postId = :post";
+        session.createMutationQuery(hql)
+                .setParameter("post", post)
+                .executeUpdate();
+
+        post.getPostImageSet().clear();
+    }
+
+    @Override
+    public void deleteImagesNotInList(Post post, List<Long> keepImageIds) {
+        if (keepImageIds == null || keepImageIds.isEmpty()) {
+            System.out.println("xóa tất cảaaaaaaaaaaaaaaaaaaaaaaaaa");
+            this.deleteImagesByPost(post);
+            return;
+        }
+
+        keepImageIds.forEach(id -> System.out.println("keepImageIdsId: " + id));
+
+        Session session = this.getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<PostImage> cq = cb.createQuery(PostImage.class);
+        Root<PostImage> root = cq.from(PostImage.class);
+
+        Predicate postPredicate = cb.equal(root.get("postId"), post);
+        Predicate notInKeepIds = root.get("id").in(keepImageIds).not();
+        cq.select(root).where(cb.and(postPredicate, notInKeepIds));
+
+        List<PostImage> imagesToDelete = session.createQuery(cq).getResultList();
+
+        for (PostImage image : imagesToDelete) {
+            post.getPostImageSet().remove(image); 
+            session.remove(image);              
+
+            // TODO: Xóa file khỏi Cloudinary nếu cần
+            System.out.println("Đã xóa ảnh có ID: " + image.getId());
+        }
+    }
+
 }

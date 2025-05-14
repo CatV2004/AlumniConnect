@@ -33,8 +33,6 @@ public class PostImageServiceImpl implements PostImageService {
             return;
         }
 
-        postImageRepository.deleteImagesByPost(post);
-
         for (MultipartFile file : images) {
             if (!file.isEmpty()) {
                 try {
