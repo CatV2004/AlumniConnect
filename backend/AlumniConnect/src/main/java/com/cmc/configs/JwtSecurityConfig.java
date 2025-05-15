@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -49,13 +50,15 @@ public class JwtSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login/**").permitAll()
-                    .requestMatchers("/api/current-user/**").permitAll()
-                    .requestMatchers("/api/posts**").permitAll()
-//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                .requestMatchers("/api/users/**").hasAnyRole("ALUMNI", "TEACHER")
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/**").authenticated()
+                //.requestMatchers("/api/login/**").permitAll()
+                
+                .requestMatchers("/api/current-user/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/survey-posts/**").hasRole("ADMIN")
+                //.requestMatchers("/api/admin/**").hasRole("ADMIN")
+                //.requestMatchers("/api/users/**").hasAnyRole("ALUMNI", "TEACHER")
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

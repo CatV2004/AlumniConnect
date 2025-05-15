@@ -1,12 +1,10 @@
 import axios from "axios";
 import { useReducer, useState } from "react";
-import cookie from 'react-cookies'
 
 
-const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
+const CommentCreated = ({ postId, parentComment = null, onCommentAdded  }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [content, setContent] = useState('');
-    const [postId, setPostId] = useState(post);
     const [parentId, setParentId] = useState(parentComment);
     const [file, setFile] = useState(null);
 
@@ -18,15 +16,17 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
         formData.append("postId", postId);
         if (parentId) formData.append("parentId", parentId);
         if (file) formData.append("file", file);
+        console.log(formData);
+        console.log(postId)
 
         try {
             const response = await axios.post(`${BASE_URL}/comment`, formData, {
                 headers: { 
                     'Content-Type': 'multipart/form-data',
-                    Authorization: localStorage.getItem('token') || null }
+                    "Authorization": localStorage.getItem('token') || null }
             });
             if (response.status === 201) {
-                const result = await response.json();
+                const result = response.data;
                 alert('Bình luận đã được gửi!');
                 console.log(result);
                 setFile(null);

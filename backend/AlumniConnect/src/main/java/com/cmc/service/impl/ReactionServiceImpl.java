@@ -46,10 +46,25 @@ public class ReactionServiceImpl implements ReactionService {
         }
         return null;
     }
+    
+    @Override
+    public Reaction findByPostIdAndUserId(Long postId, Long userId){
+        return this.reactionRepo.findByPostIdAndUserId(postId, userId);
+    }
 
     @Override
     public List<Reaction> getReactionsByPost(Long PostId) {
         return this.reactionRepo.findByPostId(PostId);
+    }
+    
+    @Override
+    public Long countLikesByPost(Long postId){
+        return this.reactionRepo.countLikesByPostId(postId);
+    }
+    
+    @Override
+    public boolean hasUserLikedPost(Long postId, Long userId){
+        return this.reactionRepo.hasUserLikedPost(postId, userId);
     }
 
     @Override

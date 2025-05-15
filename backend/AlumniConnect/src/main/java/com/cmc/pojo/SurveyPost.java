@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
@@ -38,26 +39,32 @@ public class SurveyPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
+//    @Basic(optional = false)
     @NotNull
     @Column(name = "id")
     private Long id;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 23)
     @Column(name = "survey_type")
     private String surveyType;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
     private Set<SurveyQuestion> surveyQuestionSet;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
     private Set<SurveyDraft> surveyDraftSet;
+    
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
+    @MapsId
     private Post post;
 
     public SurveyPost() {
@@ -143,7 +150,17 @@ public class SurveyPost implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyPost[ id=" + id + " ]";
-    }
+        return "SurveyPost{"
+                + "id=" + id
+                + ", endTime=" + endTime
+                + ", surveyType='" + surveyType + '\''
+                + ", questions=" + (surveyQuestionSet != null
+                        ? surveyQuestionSet.stream().map(SurveyQuestion::toString).toList()
+                        : "[]"
     
+
+) +
+            '}';
+    }
+
 }

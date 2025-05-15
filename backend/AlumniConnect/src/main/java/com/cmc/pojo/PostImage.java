@@ -48,6 +48,7 @@ public class PostImage implements Serializable {
     private Post postId;
     
     @Transient
+    @JsonIgnore
     private MultipartFile file;
 
     public PostImage() {

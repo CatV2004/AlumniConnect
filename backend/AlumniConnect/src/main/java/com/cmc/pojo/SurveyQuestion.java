@@ -139,7 +139,13 @@ public class SurveyQuestion implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyQuestion[ id=" + id + " ]";
+        return "SurveyQuestion{"
+                + "id=" + id
+                + ", question='" + question + '\''
+                + ", multiChoice=" + multiChoice
+                + ", surveyOptions=" + (surveyOptionSet != null
+                        ? surveyOptionSet.stream().map(SurveyOption::toString).toList() : "[]")
+                + '}';
     }
-    
+
 }

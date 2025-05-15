@@ -1,50 +1,77 @@
-import React, { useEffect, useState } from 'react';
-import PostItem from './PostItem';
-import axios from 'axios';
+import PostItem from "./PostItem";
+import InfiniteScroll from "react-infinite-scroll-component";
+import PostSkeleton from "./PostSkeleton";
+import { useEffect, useState } from "react";
 
-const PostList = () => {
-
-  const BASE_URL = "http://localhost:8080/AlumniConnect/api";
-  const [posts, setPosts] = useState([]);
+const PostList = ({
+  posts,
+  loading,
+  error,
+  hasMore,
+  fetchMoreData,
+  customEmptyMessage,
+}) => {
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const pageSize = 5;
-
-  const loadPosts = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/posts?page=${page}&size=${pageSize}`);
-      const newPosts = res.data.content;
-      setPosts((prev) => [...prev, ...newPosts]);
-      setHasMore(!res.data.last);
-    } catch (err) {
-      console.error("Lỗi khi tải bài viết:", err);
-    }
-  };
-
-  useEffect(() => {
-    loadPosts();
-  }, [page]);
-
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight -100 && hasMore){
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && hasMore) {
         setPage((prev) => prev + 1)
       }
     }
+    if (loading && posts.length === 0) {
+      return (
+        <div className="max-w-xl mx-auto space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <PostSkeleton key={i} />
+          ))}
+        </div>
+      );
+    }
 
+    if (error) {
+      return (
+        <div className="text-center text-red-500 p-4">
+          Error loading posts: {error}
+        </div>
+      );
+    }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore]);
+  }, [hasMore, page]);
 
   return (
-    <div className="space-y-4">
-      {posts?.map((post) => (
-        <PostItem key={post.id} post={post} />
-      ))}
-      {!hasMore && <p className='text-center text-gray-500'>không còn bài viết nào.</p>}
+    <div className="mx-auto">
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={fetchMoreData}
+        hasMore={hasMore}
+        loader={
+          <div className="space-y-4">
+            {[...Array(2)].map((_, i) => (
+              <PostSkeleton key={i} />
+            ))}
+          </div>
+        }
+        endMessage={
+          <p className="text-center text-gray-500 py-4">
+            You've seen all posts
+          </p>
+        }
+        scrollThreshold={0.8}
+      >
+        <div className="space-y-4">
+          {posts.map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+      </InfiniteScroll>
+      {!loading &&
+        posts.length === 0 &&
+        (customEmptyMessage || (
+          <div className="text-center py-8 text-gray-500">No posts yet</div>
+        ))}
     </div>
   );
-
 };
 
 export default PostList;

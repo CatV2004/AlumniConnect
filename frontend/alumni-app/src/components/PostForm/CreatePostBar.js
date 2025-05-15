@@ -1,18 +1,16 @@
-import React from "react";
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import CreatePostModal from "./CreatePostModal";
-import defaultAvatar from '../../assets/image/default-user.png';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import PostForm from "./PostForm";
 
+import defaultAvatar from "../../assets/image/default-user.png";
 
 const CreatePostBar = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
-  const lastName = user?.lastName || "Bạn";
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
     } else {
       setShowModal(true);
     }
@@ -21,7 +19,7 @@ const CreatePostBar = ({ user }) => {
   return (
     <>
       <div className="bg-white p-4 rounded-xl shadow">
-        <div className="bg-white p-4 rounded-xl shadow flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
           <img
             src={user?.avatar || defaultAvatar}
             alt="avatar"
@@ -32,11 +30,12 @@ const CreatePostBar = ({ user }) => {
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 flex-1 text-left px-4 py-2 rounded-full"
           >
             {user
-              ? `${lastName} ơi, bạn đang nghĩ gì thế?`
+              ? `${
+                  user.lastName ? user.lastName : "ADMIN"
+                } ơi, bạn đang nghĩ gì thế?`
               : "Bạn đang nghĩ gì thế?"}
           </button>
         </div>
-
         <div className="flex justify-between mt-4 px-2 text-sm text-gray-600">
           <button className="flex items-center space-x-1 hover:bg-gray-100 p-2 rounded">
             <span className="text-red-500">📹</span>
@@ -54,7 +53,8 @@ const CreatePostBar = ({ user }) => {
       </div>
 
       {showModal && (
-        <CreatePostModal onClose={() => setShowModal(false)} user={user} />
+        // <CreatePostModal onClose={() => setShowModal(false)} user={user} />
+        <PostForm onClose={() => setShowModal(false)} user={user} />
       )}
     </>
   );

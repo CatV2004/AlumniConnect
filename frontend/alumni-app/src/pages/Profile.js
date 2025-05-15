@@ -7,73 +7,100 @@ import ProfileTimeline from "../components/Profile/ProfileTimeline";
 import ProfileAbout from "../components/Profile/ProfileAbout";
 import ProfilePhotos from "../components/Profile/ProfilePhotos";
 import { useSelector } from "react-redux";
-import Navbar from "../components/layout/Navbar";
-import { ChatService } from "../services/chatService";
-import ChatContainer from "../components/Message/ChatContainer";
+import CreatePostBar from "../components/PostForm/CreatePostBar";
 
 const Profile = () => {
   const { id } = useParams();
-  const { token, user } = useSelector((state) => state.auth);
-  console.log("user info: ", user)
-  // const [user, setUser] = useState(null);
-
+  const { token, user: currentUser } = useSelector((state) => state.auth);
+  const [profileUser, setProfileUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [activeTab, setActiveTab] = useState("timeline");
   const [loading, setLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const loadPosts = async (pageNumber, reset = false) => {
     try {
-      const response = await getUserPosts(id, token, pageNumber);
+      setLoading(true);
+      const response = await getUserPosts(id, token, pageNumber, 5); 
       setPosts((prev) =>
         reset ? response.content : [...prev, ...response.content]
       );
       setHasMore(!response.last);
+      setInitialLoad(false);
     } catch (error) {
       console.error("Error loading posts:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (token) {
-      // getUserProfile(id, token).then(setUser);
+      const fetchProfile = async () => {
+        try {
+          const userData = await getUserProfile(id, token);
+          setProfileUser(userData);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+      
+      fetchProfile();
       setPage(0);
       loadPosts(0, true);
-      console.log("Current posts:", posts);
     }
   }, [id, token]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    return loadPosts(nextPage);
+    await loadPosts(nextPage);
   };
 
-  if (!user)
+  if (!profileUser && initialLoad) {
     return (
       <div className="max-w-4xl mx-auto mt-6 space-y-4">
         <div className="h-48 bg-gray-200 animate-pulse rounded-xl" />
         <div className="h-12 bg-gray-200 animate-pulse rounded-xl" />
       </div>
     );
+  }
 
+  const isCurrentUserProfile = currentUser?.id === profileUser?.id;
   return (
     <div className="max-w-4xl mx-auto">
-      <ProfileHeader user={user} />
+      {profileUser && <ProfileHeader user={profileUser} />}
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === "timeline" && (
-        <ProfileTimeline
-          posts={posts}
-          loadMore={handleLoadMore}
-          hasMore={hasMore}
-        />
+        <>
+          {isCurrentUserProfile && (
+            <div className="max-w-xl mx-auto mb-4">
+              <CreatePostBar user={currentUser} />
+            </div>
+          )}
+          <ProfileTimeline
+            posts={posts}
+            loadMore={handleLoadMore}
+            hasMore={hasMore}
+            loading={loading}
+          />
+        </>
       )}
 
-      {activeTab === "about" && <ProfileAbout user={user} />}
+      {activeTab === "about" && (
+        <div className="max-w-xl mx-auto">
+          <ProfileAbout user={profileUser} />
+        </div>
+      )}
 
-      {activeTab === "photos" && <ProfilePhotos posts={posts} />}
+      {activeTab === "photos" && (
+        <div className="max-w-xl mx-auto">
+          <ProfilePhotos posts={posts} />
+        </div>
+      )}
     </div>
   );
 };

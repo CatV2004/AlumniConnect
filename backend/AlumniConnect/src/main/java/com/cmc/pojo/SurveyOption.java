@@ -128,7 +128,10 @@ public class SurveyOption implements Serializable {
 
     @Override
     public String toString() {
-        return "com.cmc.pojo.SurveyOption[ id=" + id + " ]";
+        return "SurveyOption{"
+                + "id=" + id
+                + ", optionText='" + optionText + '\''
+                + '}';
     }
-    
+
 }

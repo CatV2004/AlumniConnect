@@ -34,11 +34,11 @@ export const fetchCurrentUser = createAsyncThunk(
     try {
       return await getCurrentUser(token);
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || {
-          message: "Không thể lấy thông tin người dùng",
-        }
-      );
+      return rejectWithValue({
+        message:
+          error.response?.data?.message || "Không thể lấy thông tin người dùng",
+        status: error.response?.status,
+      });
     }
   }
 );
@@ -46,8 +46,8 @@ export const fetchCurrentUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    token: localStorage.getItem('token') || null,
-    role: localStorage.getItem('role') || null,
+    token: localStorage.getItem("token") || null,
+    role: localStorage.getItem("role") || null,
     user: null,
     loading: false,
     error: null,
@@ -57,8 +57,9 @@ const authSlice = createSlice({
       state.token = null;
       state.role = null;
       state.user = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      state.error = null;
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
     },
   },
   extraReducers: (builder) => {
@@ -100,9 +101,9 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error =
-          action.payload?.message || "Không thể lấy thông tin người dùng";
+        state.error = action.payload;
         state.user = null;
+        console.log("error: ", action.payload?.message);
       });
   },
 });

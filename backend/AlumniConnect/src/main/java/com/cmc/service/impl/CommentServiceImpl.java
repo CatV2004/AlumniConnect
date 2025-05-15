@@ -91,7 +91,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Comment> comments = this.commentRepo.findByPostIdAndActiveTrueOrderByCreatedDateAsc(postId);
+        List<Comment> comments = this.commentRepo.findByPostIdAndActiveTrueOrderByCreatedDateAsc(postId, page, size);
         long totalCommentByPost = this.commentRepo.totalCommentByPost(postId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
     }
@@ -99,7 +99,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Page<Comment> getCommentByComments(Long parentId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Comment> comments = this.commentRepo.getCommentByComment(parentId);
+        List<Comment> comments = this.commentRepo.getCommentByComment(parentId, page, size);
         long totalCommentByPost = this.commentRepo.totalCommentByComment(parentId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
     }

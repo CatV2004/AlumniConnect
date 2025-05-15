@@ -20,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -66,8 +67,10 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/login", "/admin/register").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/posts**").permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/survey-posts/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/js/**").permitAll()
                 .anyRequest().authenticated()
                 )
@@ -105,5 +108,5 @@ public class SpringSecurityConfig {
                 "secure", true
         ));
     }
-    
+
 }

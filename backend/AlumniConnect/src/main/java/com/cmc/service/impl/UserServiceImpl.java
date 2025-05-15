@@ -70,7 +70,13 @@ public class UserServiceImpl implements UserService {
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        
+        String role = user.getRole();
+        if (role == null || role.isEmpty()) {
+            throw new UsernameNotFoundException("User role is missing for: " + username);
+        }
+        
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(), user.getPassword(), authorities);
@@ -78,21 +84,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveOrUpdate(UserDTO userDTO, MultipartFile avatar, MultipartFile cover) {
-        User user = new User();
-        user = modelMapper.map(userDTO, User.class);
+        User user;
 
-        user.setPassword(this.passEncoder.encode(user.getPassword()));
-        user.setRole("ALUMNI");
+        if (userDTO.getId() != null) {
+            user = userRepo.getUserById(userDTO.getId());
+            if (user == null) {
+                throw new RuntimeException("User not found with id: " + userDTO.getId());
+            }
+
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPhone(userDTO.getPhone());
+
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                user.setPassword(passEncoder.encode(userDTO.getPassword()));
+            }
+
+        } else {
+            user = modelMapper.map(userDTO, User.class);
+            user.setPassword(passEncoder.encode(userDTO.getPassword()));
+            user.setRole("ALUMNI");
+        }
 
         if (avatar != null && !avatar.isEmpty()) {
             user.setAvatar(cloudinaryService.uploadFile(avatar, "avatar"));
         }
+
         if (cover != null && !cover.isEmpty()) {
             user.setCover(cloudinaryService.uploadFile(cover, "cover"));
         }
 
-        this.userRepo.saveOrUpdate(user);
-
+        userRepo.saveOrUpdate(user);
         return user;
     }
 
@@ -164,6 +187,7 @@ public class UserServiceImpl implements UserService {
             user.setAvatar(avatarUrl);
         }
         if (cover != null) {
+            System.out.println("coverUrl: " + cover);
             String coverUrl = cloudinaryService.uploadFile(cover, "cover");
             user.setCover(coverUrl);
         }

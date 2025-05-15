@@ -1,158 +1,203 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import ReactionButton from '../Reaction/Reaction';
-import Comment from '../Comment/Comment';
-import axios from 'axios';
-import moment from 'moment';
-import 'moment/locale/vi';
-import CommentList from '../Comment/CommentList';
-import CommentCreated from '../Comment/CommentCreated';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import CommentList from "../Comment/CommentList";
+import CommentCreated from "../Comment/CommentCreated";
+import moment from "moment";
+import "moment/locale/vi";
+import { FaThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
+import { ImSpinner8 } from "react-icons/im";
 
+import PostOptionsDropdown from "./PostOptionsDropdown";
+import PostImagesGallery from "./PostImagesGallery";
+import SurveyPost from "./SurveyPost";
+import InvitationPost from "./InvitationPost";
+import { formatDate } from "../../app/utils/dateUtils";
+import PostForm from "../PostForm/PostForm";
+import addReaction from "../Reaction/AddReaction";
+import CountReaction from "../Reaction/CountReaction";
+import ReactionOfPost from "../Reaction/ReactionOfPost";
+
+moment.locale("vi");
 
 const PostItem = ({ post }) => {
+  const [showComment, setShowComment] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likeCount || 0);
+  const [commentCount, setCommentCount] = useState(post.commentCount || 0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
-  const [showComment, setShowCommnet] = useState(false);
-  const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
-  moment.locale('vi');
+  const MAX_CONTENT_LENGTH = 300;
 
-  const loadLike = async () => {
-    const response = axios.get(BASE_URL)
-  }
 
+  useEffect(() => {
+    const fetchReactions = async () => {
+      const liked = await ReactionOfPost(post.id);
+      const count = await CountReaction(post.id);
+      setIsLiked(liked);
+      setLikeCount(count);
+    };
+
+    fetchReactions();
+  }, [post.id]);
+
+  const toggleComments = () => {
+    setShowComment(!showComment);
+  };
+
+  const toggleLike = async () => {
+    const newLiked = !isLiked;
+    setIsLiked(newLiked);
+
+    // TODO: Call API to update like status
+    try {
+      const res = await addReaction(post.id);
+      if (newLiked) {
+        setLikeCount((prev) => prev + 1);
+      } else {
+        setLikeCount((prev) => Math.max(prev - 1, 0));
+      }
+    } catch (error) {
+      setIsLiked((prev) => !prev);
+      console.error("Failed to toggle like", error);
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const renderContent = () => {
+    if (!post.content) return null;
+
+    if (post.content.length > MAX_CONTENT_LENGTH && !isExpanded) {
+      return (
+        <>
+          <p className="mb-2 whitespace-pre-line">
+            {post.content.substring(0, MAX_CONTENT_LENGTH)}...
+          </p>
+          <button
+            onClick={() => setIsExpanded(true)}
+            className="text-blue-500 text-sm hover:underline"
+          >
+            See more
+          </button>
+        </>
+      );
+    }
+    return <p className="mb-2 whitespace-pre-line">{post.content}</p>;
+  };
 
   return (
-    <div className="p-4 bg-white rounded-xl shadow-md max-w-xl mx-auto mb-4">
-      <div className="flex items-center mb-2">
-        <Link to={`/profile/${post.userId.id}`} className="flex items-center gap-2 hover:opacity-80">
-          <img src={post.userId.avatar || '/default-avatar.png'} alt="avatar" className="w-10 h-10 rounded-full mr-2" />
-        </Link>
-        <div>
-          <Link to={`/profile/${post.userId.id}`} className="flex items-center gap-2 hover:opacity-80">
-            <p className="font-semibold">{post.userId.username}</p>
-          </Link>
-          <Link to={`/post/${post.id}`}>
-            <p className="text-sm text-gray-500">{
-              Array.isArray(post.createdDate)
-                ? moment(post.createdDate).format('DD-MM-YYYY HH:mm')
-                : moment(post.createdDate, 'DD-MM-YYYY HH:mm').fromNow()
-            }</p>
-          </Link>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+      {/* Post Header */}
+      <div className="p-4">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center">
+            <Link
+              to={`/profile/${post.userId.id}`}
+              className="flex items-center gap-2 hover:opacity-80"
+            >
+              <img
+                src={post.userId.avatar || "/default-avatar.png"}
+                alt="avatar"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            </Link>
+            <div className="ml-2">
+              <Link
+                to={`/profile/${post.userId.id}`}
+                className="flex items-center gap-2 hover:opacity-80"
+              >
+                <p className="font-semibold">{post.userId.username}</p>
+              </Link>
+              <Link to={`/post/${post.id}`}>
+                <p className="text-xs text-gray-500">
+                  {formatDate(post.createdDate)}
+                </p>
+              </Link>
+            </div>
+          </div>
+          <PostOptionsDropdown post={post} onEdit={handleEditClick} />
+        </div>
+
+        {/* Post Content */}
+        <div className="mt-3">{renderContent()}</div>
+      </div>
+
+      {/* Post Media */}
+      {post.postImages && post.postImages.length > 0 && (
+        <PostImagesGallery images={post.postImages} />
+      )}
+
+      {/* Survey Post */}
+      {post.surveyPost && <SurveyPost survey={post.surveyPost} postId={post.id} />}
+
+      {/* Invitation Post */}
+      {post.invitationPost && (
+        <InvitationPost invitation={post.invitationPost} />
+      )}
+
+      {/* Post Stats */}
+      <div className="px-4 pt-2 pb-1 border-t border-gray-100">
+        <div className="flex justify-between text-sm text-gray-500">
+          <span>{likeCount} likes</span>
+          <span>{commentCount} comments</span>
         </div>
       </div>
-      <p className="mb-2">{post.content}</p>
-      
-      <div className="mb-2">
-        {post.postImageSet.length === 1 && (
-          <Link to={`/post/${post.id}`}>
-            <img
-              src={post.postImageSet[0].image}
-              alt="post-1"
-              className="w-full h-96 object-cover rounded"
-              style={{ width: "100%" }}
-            />
-          </Link>
-        )}
 
-        {post.postImageSet.length === 2 && (
-          <div className="grid grid-cols-2 gap-2">
-            {post.postImageSet.map((img, i) => (
-              <Link to={`/post/${post.id}`} key={i}>
-                <img
-                  key={i}
-                  src={img.image}
-                  alt={`post-${i}`}
-                  className="w-full h-64 object-cover rounded"
-                  style={{ width: "100%" }}
-                />
-              </Link>
-            ))}
-          </div>
-        )}
 
-        {post.postImageSet.length === 3 && (
-          <div className="grid gap-2">
-            <div className="grid grid-cols-2 gap-2">
-              {post.postImageSet.slice(0, 2).map((img, i) => (
-                <Link to={`/post/${post.id}`} key={i}>
-                  <img
-                    key={i}
-                    src={img.image}
-                    alt={`post-${i}`}
-                    className="w-full h-48 object-cover rounded"
-                    style={{ width: "100%" }}
-                  />
-                </Link>
-              ))}
-            </div>
-            <img
-              src={post.postImageSet[2].image}
-              alt="post-2"
-              className="w-full h-60 object-cover rounded"
-            />
-          </div>
-        )}
-
-        {post.postImageSet.length === 4 && (
-          <div className="grid grid-cols-2 gap-2">
-            {post.postImageSet.map((img, i) => (
-              <Link to={`/post/${post.id}`} key={i}>
-                <img
-                  key={i}
-                  src={img.image}
-                  alt={`post-${i}`}
-                  className="w-full h-48 object-cover rounded"
-                  style={{ width: "100%" }}
-                />
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {post.postImageSet.length >= 5 && (
-          <div className="grid grid-cols-2 gap-2">
-            {post.postImageSet.slice(0, 4).map((img, i) => (
-              <div key={i} className="relative">
-                <Link to={`/post/${post.id}`} key={i}>
-                  <img
-                    src={img.image}
-                    alt={`post-${i}`}
-                    className="w-full h-48 object-cover rounded"
-                    style={{ width: "100%" }}
-                  />
-                </Link>
-                {i === 3 && (
-                  <div className="absolute inset-0 bg-black bg-opacity-60 rounded flex items-center justify-center text-white text-lg font-bold">
-                    +{post.postImageSet.length - 4}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      {/* </div> */}
-      <div className=" mt-2 flex justify-between text-sm text-gray-500 mb-1">
-        <span>👍 {likeCount} lượt thích</span>
-        <span>💬 {commentCount} bình luận</span>
-      </div>
-      <div className="mt-2 flex justify-around border-t pt-2 text-gray-600 text-sm">
-        <ReactionButton />
-        <button className="flex items-center gap-1 hover:text-blue-600" onClick={() => { setShowCommnet(true) }}>
-          💬 <span className='text-l font-bold drop-shadow-sm'>Bình luận</span>
+      {/* Post Actions */}
+      <div className="px-4 py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
+        <button
+          onClick={toggleLike}
+          className={`flex items-center justify-center gap-2 w-full py-2 rounded-md 
+                transition-all duration-150 ease-in-out 
+                ${isLiked
+              ? "text-blue-600 font-semibold"
+              : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
+            }`}
+        >
+          <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
+          Like
         </button>
-        {/* <Comment post={post.id} /> */}
+
+        <button
+          onClick={toggleComments}
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+               text-gray-600 hover:text-blue-500 hover:bg-gray-100 
+               transition-all duration-150 ease-in-out"
+        >
+          <FaRegCommentDots className="w-5 h-5" />
+          Comment
+        </button>
+
+        <button
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+               text-gray-600 hover:text-blue-500 hover:bg-gray-100 
+               transition-all duration-150 ease-in-out"
+        >
+          <FaShare className="w-5 h-5" />
+          Share
+        </button>
       </div>
-      <div>
-        {showComment && <>
-          <CommentList post={post.id} />
-          <CommentCreated post={post.id} parentComment={null} />
-        </>}
-      </div>
+
+      {/* Comments Section */}
+      {showComment && (
+        <div className="bg-gray-50 p-4 border-t border-gray-100">
+          <CommentList postId={post.id} />
+          <CommentCreated postId={post.id} />
+        </div>
+      )}
+      {isEditModalOpen && (
+        <PostForm
+          onClose={() => setIsEditModalOpen(false)}
+          user={post.userId}
+          postId={post.id}
+        />
+      )}
     </div>
 
   );
 };
-
 export default PostItem;
