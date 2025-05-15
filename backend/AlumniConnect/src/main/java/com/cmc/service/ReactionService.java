@@ -12,10 +12,20 @@ import java.util.List;
  * @author PHAT
  */
 public interface ReactionService {
-    Reaction addReaction(Long postId, Long userId, String reactionType);
-    List<Reaction> getReactionsByPost(Long PostId);
-    int deleteReaction(Long reactionId, Long userId, Long postId);
-    Reaction addOrUpdateReaction(Long postId,Long userId,String reactionType);
-    List<Reaction> getByReactionType(Long postId, String reactionType);
-}
 
+    Reaction addReaction(Long postId, Long userId, String reactionType);
+
+    List<Reaction> getReactionsByPost(Long PostId);
+
+    int deleteReaction(Long reactionId, Long userId, Long postId);
+
+    Reaction addOrUpdateReaction(Long postId, Long userId, String reactionType);
+
+    List<Reaction> getByReactionType(Long postId, String reactionType);
+
+    boolean hasUserLikedPost(Long postId, Long userId);
+
+    Long countLikesByPost(Long postId);
+    
+    Reaction findByPostIdAndUserId(Long postId, Long userId);
+}

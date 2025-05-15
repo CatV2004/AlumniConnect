@@ -53,7 +53,28 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         q.setParameter("postId", postId);
         return q.getResultList();
     }
-
+    
+    @Override
+    public Long countLikesByPostId(Long postId) {
+        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.reaction = :type";
+        Query<Long> query = getSession().createQuery(hql, Long.class);
+        query.setParameter("postId", postId);
+        query.setParameter("type", "LIKE");
+        return query.uniqueResult();
+    }
+    
+    @Override
+    public boolean hasUserLikedPost(Long postId, Long userId) {
+        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId AND r.reaction = :type";
+        Query<Long> query = getSession().createQuery(hql, Long.class);
+        query.setParameter("postId", postId);
+        query.setParameter("userId", userId);
+        query.setParameter("type", "LIKE");
+        Long count = query.uniqueResult();
+        return count != null && count > 0;
+    }
+    
+    
     @Override
     public List<Reaction> findByReactionType(String reactionType, Long postId) {
         String sql = "From Reaction r WHERE r.reaction = :reactionType AND r.postId.id = :postId Order by -id";

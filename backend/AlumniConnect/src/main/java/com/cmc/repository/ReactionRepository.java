@@ -24,4 +24,9 @@ public interface ReactionRepository {
     Reaction saveOrUpdate(Reaction reaction);
     
     void deleteReaction(Reaction reaction);
+    
+    Long countLikesByPostId(Long postId);
+    
+    boolean hasUserLikedPost(Long postId, Long userId);
+    
 }

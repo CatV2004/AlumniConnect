@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CommentList from "../Comment/CommentList";
 import CommentCreated from "../Comment/CommentCreated";
@@ -18,7 +18,11 @@ import SurveyPost from "./SurveyPost";
 import InvitationPost from "./InvitationPost";
 import { formatDate } from "../../app/utils/dateUtils";
 import PostForm from "../PostForm/PostForm";
+import addReaction from "../Reaction/AddReaction";
+import CountReaction from "../Reaction/CountReaction";
+import ReactionOfPost from "../Reaction/ReactionOfPost";
 import { useSelector } from "react-redux";
+import CountComment from "../Comment/CountComment";
 
 moment.locale("vi");
 
@@ -35,14 +39,44 @@ const PostItem = ({ post }) => {
 
   const MAX_CONTENT_LENGTH = 300;
 
+
+  useEffect(() => {
+    const fetchReactions = async () => {
+      const liked = await ReactionOfPost(post.id);
+      const count = await CountReaction(post.id);
+      setIsLiked(liked);
+      setLikeCount(count);
+    };
+
+    const fetchCommentByPost = async () => {
+      const countC = await CountComment(post.id);
+      setCommentCount(countC);
+    }
+
+    fetchReactions();
+    fetchCommentByPost();
+  }, [post.id]);
+
   const toggleComments = () => {
     setShowComment(!showComment);
   };
 
-  const toggleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+  const toggleLike = async () => {
+    const newLiked = !isLiked;
+    setIsLiked(newLiked);
+
     // TODO: Call API to update like status
+    try {
+      const res = await addReaction(post.id);
+      if (newLiked) {
+        setLikeCount((prev) => prev + 1);
+      } else {
+        setLikeCount((prev) => Math.max(prev - 1, 0));
+      }
+    } catch (error) {
+      setIsLiked((prev) => !prev);
+      console.error("Failed to toggle like", error);
+    }
   };
 
   const handleEditClick = () => {
@@ -130,17 +164,17 @@ const PostItem = ({ post }) => {
         </div>
       </div>
 
+
       {/* Post Actions */}
       <div className="px-4 py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
         <button
           onClick={toggleLike}
           className={`flex items-center justify-center gap-2 w-full py-2 rounded-md 
                 transition-all duration-150 ease-in-out 
-                ${
-                  isLiked
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
-                }`}
+                ${isLiked
+              ? "text-blue-600 font-semibold"
+              : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
+            }`}
         >
           <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
           Like
@@ -203,7 +237,7 @@ const PostItem = ({ post }) => {
         />
       )}
     </div>
+
   );
 };
-
 export default PostItem;

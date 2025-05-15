@@ -34,8 +34,8 @@ import org.springframework.web.server.ResponseStatusException;
  * @author PHAT
  */
 @RestController
-@RequestMapping("/api")
 @CrossOrigin
+@RequestMapping("/api")
 public class ApiReactionController {
 
     @Autowired
@@ -54,7 +54,13 @@ public class ApiReactionController {
             @RequestParam String reactionType
     ) {
         String username = this.PostComponents.authorization(authorizationHeader);
-        Reaction reaction = reactionService.addOrUpdateReaction(postId, this.userService.getUserByUsername(username).getId(), reactionType);
+        Long userId = this.userService.getUserByUsername(username).getId();
+        Reaction reactionOdd = this.reactionService.findByPostIdAndUserId(postId, userId);
+        if (reactionOdd != null){
+            this.reactionService.deleteReaction(reactionOdd.getId(), userId, postId);
+            return ResponseEntity.ok(reactionOdd);
+        }
+        Reaction reaction = reactionService.addOrUpdateReaction(postId, userId, reactionType);
         return ResponseEntity.ok(reaction);
     }
 
@@ -75,6 +81,30 @@ public class ApiReactionController {
     @GetMapping("/reactions/{postId}/posts")
     public ResponseEntity<List<Reaction>> getReactions(@PathVariable(value = "postId") Long postId) {
         return new ResponseEntity(this.reactionService.getReactionsByPost(postId), HttpStatus.OK);
+    }
+    
+    
+    @GetMapping("/reactions/{postId}/user")
+    public void getReactionUserByPost(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable(value = "postId") Long postId) {
+
+    }
+    
+    @GetMapping("/liked/{postId}")
+    public ResponseEntity<Boolean> hasUserLikedPost(
+           @RequestHeader("Authorization") String authorizationHeader,
+           @PathVariable(value = "postId") Long postId) {
+        String username = this.PostComponents.authorization(authorizationHeader);
+        boolean liked = reactionService.hasUserLikedPost(postId, this.userService.getUserByUsername(username).getId());
+        return ResponseEntity.ok(liked);
+    }
+    
+    
+    @GetMapping("/like-count/{postId}")
+    public ResponseEntity<Long> countLikes(@PathVariable(value = "postId") Long postId) {
+        Long count = reactionService.countLikesByPost(postId);
+        return ResponseEntity.ok(count);
     }
 
     @GetMapping("/reactions/{postId}/type-reaction")
