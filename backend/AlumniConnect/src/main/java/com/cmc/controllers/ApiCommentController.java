@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author PHAT
  */
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RequestMapping("/api")
 public class ApiCommentController {
 
@@ -53,7 +53,7 @@ public class ApiCommentController {
             @PathVariable Long id,
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String content) {
-        
+
         String username = this.postComponents.authorization(authorizationHeader);
 
         Comment updated = commentService.updateComment(id, this.userService.getUserByUsername(username).getId(), content);
@@ -66,9 +66,9 @@ public class ApiCommentController {
     @PostMapping(value = "/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Comment> addComment(
             @RequestParam Map<String, String> param,
-            @RequestParam(value = "file", required = false) MultipartFile file, 
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestHeader("Authorization") String authorizationHeader) {
-        
+
         String username = this.postComponents.authorization(authorizationHeader);
 
         String urlImage = null;
@@ -84,7 +84,7 @@ public class ApiCommentController {
     public ResponseEntity<?> deleteComment(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authorizationHeader) {
-        
+
         String username = this.postComponents.authorization(authorizationHeader);
 
         boolean deleted = commentService.deleteComment(id, this.userService.getUserByUsername(username).getId());
@@ -109,5 +109,18 @@ public class ApiCommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(commentService.getCommentByComments(parentId, page, size));
+    }
+
+    @GetMapping("/comment/{postId}/total-post")
+    public ResponseEntity<Long> getCommentsByPost(
+            @PathVariable(value = "postId") Long postId
+    ) {
+        try {
+            Long totalComment = this.commentService.totalCommentByPost(postId);
+            return ResponseEntity.ok(totalComment);
+        }catch (Exception ex){
+            return ResponseEntity.ok(Long.parseLong("0"));
+        }
+
     }
 }

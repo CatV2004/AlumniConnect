@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/Home";
 import RegisterPage from "../pages/RegisterPage";
@@ -8,6 +13,8 @@ import Layout from "../components/layout/Layout";
 import DeletedPostsPage from "../pages/DeletedPostsPage";
 import SurveyPage from "../pages/SurveyPage";
 import SurveyDetailPage from "../pages/SurveyDetailPage";
+import SurveyStatsPage from "../pages/SurveyStatsPage";
+import PrivateRoute from "../components/routing/PrivateRoute";
 
 const RoutesConfig = () => (
   <Router>
@@ -20,6 +27,12 @@ const RoutesConfig = () => (
         <Route path="/survey/:postId" element={<SurveyDetailPage />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/deleted-posts" element={<DeletedPostsPage />} />
+        <Route
+          path="/surveys/stats/:surveyPostId"
+          element={
+            <PrivateRoute roles={["ADMIN"]} element={<SurveyStatsPage />} />
+          }
+        />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />

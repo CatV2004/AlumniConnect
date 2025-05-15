@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { formatDateFromArray } from "../../app/utils/dateUtils";
 
 const SurveyPost = ({ survey, postId }) => {
   return (
@@ -14,7 +15,8 @@ const SurveyPost = ({ survey, postId }) => {
           <div>
             <h3 className="font-semibold text-blue-700">{survey.content}</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Survey • Ends on {new Date(survey.endTime).toLocaleDateString()}
+              Survey • Ends on{" "}
+              {formatDateFromArray(survey.endTime, { includeTime: true })}
             </p>
           </div>
           <div className="text-blue-600 font-medium">Take Survey →</div>

@@ -12,11 +12,20 @@ import java.util.List;
  * @author FPTSHOP
  */
 public class SurveyDTO {
+    private Long id;
     private String content; 
     private UserDTO userId;
     private String surveyType;
     private LocalDateTime endTime;
     private List<SurveyQuestionDTO> questions;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getSurveyType() {
         return surveyType;

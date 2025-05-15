@@ -23,4 +23,6 @@ public interface CommentService {
     Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size);
 
     Page<Comment> getCommentByComments(Long parentId, Integer page, Integer size);
+    
+    Long totalCommentByPost(Long postId);
 }

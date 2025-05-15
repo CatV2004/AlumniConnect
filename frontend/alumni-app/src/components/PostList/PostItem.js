@@ -4,9 +4,14 @@ import CommentList from "../Comment/CommentList";
 import CommentCreated from "../Comment/CommentCreated";
 import moment from "moment";
 import "moment/locale/vi";
-import { FaThumbsUp, FaRegCommentDots, FaShare } from "react-icons/fa";
+import {
+  FaThumbsUp,
+  FaRegCommentDots,
+  FaShare,
+  FaChartBar,
+} from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
-
+import SurveyStatsModal from "../survey/SurveyStatsModal";
 import PostOptionsDropdown from "./PostOptionsDropdown";
 import PostImagesGallery from "./PostImagesGallery";
 import SurveyPost from "./SurveyPost";
@@ -16,16 +21,21 @@ import PostForm from "../PostForm/PostForm";
 import addReaction from "../Reaction/AddReaction";
 import CountReaction from "../Reaction/CountReaction";
 import ReactionOfPost from "../Reaction/ReactionOfPost";
+import { useSelector } from "react-redux";
+import CountComment from "../Comment/CountComment";
 
 moment.locale("vi");
 
 const PostItem = ({ post }) => {
+  const role = useSelector((state) => state.auth.role);
+
   const [showComment, setShowComment] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   const [isLiked, setIsLiked] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
   const MAX_CONTENT_LENGTH = 300;
 
@@ -38,7 +48,13 @@ const PostItem = ({ post }) => {
       setLikeCount(count);
     };
 
+    const fetchCommentByPost = async () => {
+      const countC = await CountComment(post.id);
+      setCommentCount(countC);
+    }
+
     fetchReactions();
+    fetchCommentByPost();
   }, [post.id]);
 
   const toggleComments = () => {
@@ -131,7 +147,9 @@ const PostItem = ({ post }) => {
       )}
 
       {/* Survey Post */}
-      {post.surveyPost && <SurveyPost survey={post.surveyPost} postId={post.id} />}
+      {post.surveyPost && (
+        <SurveyPost survey={post.surveyPost} postId={post.id} />
+      )}
 
       {/* Invitation Post */}
       {post.invitationPost && (
@@ -172,14 +190,28 @@ const PostItem = ({ post }) => {
           Comment
         </button>
 
-        <button
-          className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+        {post.surveyPost && role === "ADMIN" && (
+          <button
+            onClick={() => setStatsModalOpen(true)}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+                 text-gray-600 hover:text-blue-500 hover:bg-gray-100 
+                 transition-all duration-150 ease-in-out"
+          >
+            <FaChartBar className="w-5 h-5" />
+            Stats
+          </button>
+        )}
+
+        {!post.surveyPost && (
+          <button
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
                text-gray-600 hover:text-blue-500 hover:bg-gray-100 
                transition-all duration-150 ease-in-out"
-        >
-          <FaShare className="w-5 h-5" />
-          Share
-        </button>
+          >
+            <FaShare className="w-5 h-5" />
+            Share
+          </button>
+        )}
       </div>
 
       {/* Comments Section */}
@@ -194,6 +226,14 @@ const PostItem = ({ post }) => {
           onClose={() => setIsEditModalOpen(false)}
           user={post.userId}
           postId={post.id}
+        />
+      )}
+      {post.surveyPost && (
+        <SurveyStatsModal
+          open={statsModalOpen}
+          onClose={() => setStatsModalOpen(false)}
+          surveyPostId={post.surveyPost.id}
+          token={localStorage.getItem("token")}
         />
       )}
     </div>

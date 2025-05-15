@@ -34,8 +34,8 @@ import org.springframework.web.server.ResponseStatusException;
  * @author PHAT
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class ApiReactionController {
 
     @Autowired
@@ -88,7 +88,7 @@ public class ApiReactionController {
     public void getReactionUserByPost(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable(value = "postId") Long postId) {
-        
+
     }
     
     @GetMapping("/liked/{postId}")
