@@ -217,8 +217,8 @@ const PostItem = ({ post }) => {
       {/* Comments Section */}
       {showComment && (
         <div className="bg-gray-50 p-4 border-t border-gray-100">
-          <CommentList postId={post.id} />
-          <CommentCreated postId={post.id} />
+          <CommentList post={post} />
+          <CommentCreated post={post} />
         </div>
       )}
       {isEditModalOpen && (

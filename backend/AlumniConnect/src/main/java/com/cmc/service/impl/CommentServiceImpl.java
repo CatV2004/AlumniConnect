@@ -61,14 +61,21 @@ public class CommentServiceImpl implements CommentService{
     
 
     @Override
-    public Comment updateComment(Long commentId, Long userId, String newContent) {
+    public Comment updateComment(Long commentId, Long userId, String newContent, String pathFile) {
         Comment cmt = commentRepo.getCommentById(commentId);
         if (cmt == null || !cmt.getUserId().getId().equals(userId)) {
             return null;
         }
         cmt.setContent(newContent);
+        cmt.setImage(pathFile);
         cmt.setUpdatedDate(LocalDateTime.now());
         return commentRepo.saveOrUpdate(cmt);
+    }
+    
+    
+    @Override
+    public Comment getCommentById(Long id){
+        return this.commentRepo.getCommentById(id);
     }
 
     @Override

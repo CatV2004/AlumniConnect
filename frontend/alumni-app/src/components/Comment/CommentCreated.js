@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useReducer, useState } from "react";
+import { toast } from "react-toastify";
 
 
-const CommentCreated = ({ postId, parentComment = null, onCommentAdded  }) => {
+const CommentCreated = ({ post, parentComment = null, onCommentAdded  }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [content, setContent] = useState('');
     const [parentId, setParentId] = useState(parentComment);
@@ -13,24 +14,21 @@ const CommentCreated = ({ postId, parentComment = null, onCommentAdded  }) => {
 
         const formData = new FormData();
         formData.append("content", content);
-        formData.append("postId", postId);
+        formData.append("postId", post.id);
         if (parentId) formData.append("parentId", parentId);
         if (file) formData.append("file", file);
-        console.log(formData);
-        console.log(postId)
 
         try {
             const response = await axios.post(`${BASE_URL}/comment`, formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     "Authorization": localStorage.getItem('token') || null }
             });
             if (response.status === 201) {
                 const result = response.data;
-                alert('Bình luận đã được gửi!');
-                console.log(result);
+                toast.success("Bình luận thành công");
                 setFile(null);
                 setContent('');
+                setFile(null);
                 if (onCommentAdded) onCommentAdded();
             } else {
                 alert('Lỗi khi gửi bình luận');
