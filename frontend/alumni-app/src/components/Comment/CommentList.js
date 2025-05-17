@@ -8,7 +8,7 @@ import CommentHasmore from "./CommentHasmore";
 
 moment.locale('vi');
 
-const CommentList = ({ postId }) => {
+const CommentList = ({ post }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(0);
@@ -20,7 +20,7 @@ const CommentList = ({ postId }) => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/comment/${postId}/post?page=${page}&size=${size}`, {
+            const response = await axios.get(`${BASE_URL}/comment/${post.id}/post?page=${page}&size=${size}`, {
                 headers: {
                     Authorization: localStorage.getItem('token') || null
                 }
@@ -61,21 +61,21 @@ const CommentList = ({ postId }) => {
 
     useEffect(() => {
         fetchComments();
-    }, [postId, page, size]);
+    }, [post.id, page, size]);
 
     return (
         <div className="mt-3 space-y-6 gap-3">
             {comments.map(comment => (
                 <div key={comment.id}>
                     <div className="flex gap-3">
-                        <CommentItem comment={comment} postId={postId} onCommentAdded={fetchComments} />
+                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={fetchComments} />
                     </div>
 
                     {/* Replies */}
                     {repliesMap[comment.id]?.length > 0 && (
                         <div className="mt-4 ml-7 pl-6 space-y-4 border-l border-gray-200">
                             {repliesMap[comment.id].map(reply => (
-                                <CommentItem key={reply.id} comment={reply} postId={postId} onCommentAdded={fetchReplies} />
+                                <CommentItem userId={post.userId.id} key={reply.id} comment={reply} post={post} onCommentAdded={fetchReplies} />
                             ))}
                         </div>
                     )}

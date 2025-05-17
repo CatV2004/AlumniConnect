@@ -27,7 +27,7 @@ const Home = () => {
 
   const fetchMoreData = () => {
     if (hasMore) {
-      dispatch(fetchPosts({ page: currentPage + 1, size: 10 }));
+      dispatch(fetchPosts({ page: currentPage + 1, size: 3 }));
     }
   };
 
