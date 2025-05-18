@@ -16,11 +16,15 @@ public interface CommentService {
 
     boolean deleteComment(Long commentId, Long currentUserId);
 
-    Comment updateComment(Long commentId, Long userId, String newContent);
+    Comment updateComment(Long commentId, Long userId, String newContent, String pathFile);
 
     Comment createComment(Map<String, String> pagram, String file, String username);
 
     Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size);
 
     Page<Comment> getCommentByComments(Long parentId, Integer page, Integer size);
+    
+    Long totalCommentByPost(Long postId);
+    
+    public Comment getCommentById(Long id);
 }

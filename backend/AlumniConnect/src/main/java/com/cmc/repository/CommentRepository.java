@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface CommentRepository {
 
-    List<Comment> findByPostIdAndActiveTrueOrderByCreatedDateAsc(Long postId);
+    List<Comment> findByPostIdAndActiveTrueOrderByCreatedDateAsc(Long postId, Integer page, Integer size);
 
     List<Comment> findByUserId(Long userId);
 
@@ -23,7 +23,7 @@ public interface CommentRepository {
 
     long totalCommentByComment(Long parentId);
 
-    List<Comment> getCommentByComment(Long parentId);
+    List<Comment> getCommentByComment(Long parentId, Integer page, Integer size);
     
     Comment saveOrUpdate(Comment c);
     

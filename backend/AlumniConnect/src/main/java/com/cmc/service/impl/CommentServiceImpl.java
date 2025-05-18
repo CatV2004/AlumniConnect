@@ -61,14 +61,21 @@ public class CommentServiceImpl implements CommentService{
     
 
     @Override
-    public Comment updateComment(Long commentId, Long userId, String newContent) {
+    public Comment updateComment(Long commentId, Long userId, String newContent, String pathFile) {
         Comment cmt = commentRepo.getCommentById(commentId);
         if (cmt == null || !cmt.getUserId().getId().equals(userId)) {
             return null;
         }
         cmt.setContent(newContent);
+        cmt.setImage(pathFile);
         cmt.setUpdatedDate(LocalDateTime.now());
         return commentRepo.saveOrUpdate(cmt);
+    }
+    
+    
+    @Override
+    public Comment getCommentById(Long id){
+        return this.commentRepo.getCommentById(id);
     }
 
     @Override
@@ -91,15 +98,20 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Comment> comments = this.commentRepo.findByPostIdAndActiveTrueOrderByCreatedDateAsc(postId);
+        List<Comment> comments = this.commentRepo.findByPostIdAndActiveTrueOrderByCreatedDateAsc(postId, page, size);
         long totalCommentByPost = this.commentRepo.totalCommentByPost(postId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
     }
     
     @Override
+    public Long totalCommentByPost(Long postId){
+        return this.commentRepo.totalCommentByPost(postId);
+    }
+    
+    @Override
     public Page<Comment> getCommentByComments(Long parentId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Comment> comments = this.commentRepo.getCommentByComment(parentId);
+        List<Comment> comments = this.commentRepo.getCommentByComment(parentId, page, size);
         long totalCommentByPost = this.commentRepo.totalCommentByComment(parentId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
     }

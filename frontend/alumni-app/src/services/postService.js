@@ -6,6 +6,8 @@ export const fetchPosts = async (params = {}) => {
     const response = await axios.get(`${BASE_URL}/posts`, {
       params,
     });
+    console.log(params);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);

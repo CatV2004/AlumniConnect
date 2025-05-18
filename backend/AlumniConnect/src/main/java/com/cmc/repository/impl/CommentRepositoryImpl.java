@@ -26,18 +26,21 @@ public class CommentRepositoryImpl  implements CommentRepository  {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Comment> findByPostIdAndActiveTrueOrderByCreatedDateAsc(Long postId) {
+    public List<Comment> findByPostIdAndActiveTrueOrderByCreatedDateAsc(Long postId, Integer page, Integer size) {
         Session s = this.factory.getObject().getCurrentSession();
-        String hql = "From Comment c Where c.postId.id = :postId AND c.active = TRUE ORDER BY c.id DESC";
+        String hql = "From Comment c Where c.postId.id = :postId AND c.active = TRUE and c.parentId IS NULL ORDER BY c.id DESC";
         Query q = s.createQuery(hql, Comment.class);
         q.setParameter("postId", postId);
+        int start = page * size;
+        q.setFirstResult(start);
+        q.setMaxResults(size);
         return q.getResultList();
     }
     
     @Override
     public long totalCommentByPost(Long postId) {
         Session s = this.factory.getObject().getCurrentSession();
-        String hql = "SELECT COUNT(*) FROM Comment WHERE postId.id = :postId AND active = TRUE";
+        String hql = "SELECT COUNT(*) FROM Comment WHERE postId.id = :postId AND active = TRUE AND parentId IS NULL";
         Query query = s.createQuery(hql, Long.class);
         query.setParameter("postId", postId);
         return (long) query.getSingleResult();
@@ -54,11 +57,14 @@ public class CommentRepositoryImpl  implements CommentRepository  {
     
     
     @Override
-    public List<Comment> getCommentByComment(Long parentId) {
+    public List<Comment> getCommentByComment(Long parentId, Integer page, Integer size) {
         Session s = this.factory.getObject().getCurrentSession();
         String hql = "Comment.findByParentId";
         Query query = s.createNamedQuery(hql, Comment.class);
         query.setParameter("parentId", parentId);
+        int start = page * size;
+        query.setFirstResult(start);
+        query.setMaxResults(size);
         return query.getResultList();
     }
     

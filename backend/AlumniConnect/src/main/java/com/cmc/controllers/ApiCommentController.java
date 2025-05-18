@@ -9,6 +9,7 @@ import com.cmc.components.PostComponents;
 import com.cmc.pojo.Comment;
 import com.cmc.service.CommentService;
 import com.cmc.service.UserService;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author PHAT
  */
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RequestMapping("/api")
 public class ApiCommentController {
 
@@ -48,50 +49,71 @@ public class ApiCommentController {
     @Autowired
     private PostComponents postComponents;
 
-    @PatchMapping("/comment/{id}")
-    public ResponseEntity<Comment> updateComment(
+    @PatchMapping(value = "/comment/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateComment(
             @PathVariable Long id,
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String content) {
-        
-        String username = this.postComponents.authorization(authorizationHeader);
-
-        Comment updated = commentService.updateComment(id, this.userService.getUserByUsername(username).getId(), content);
-        if (updated == null) {
-            return (ResponseEntity<Comment>) ResponseEntity.status(HttpStatus.FORBIDDEN);
+        try {
+            String username = this.postComponents.authorization(authorizationHeader);
+            Comment c = this.commentService.getCommentById(id);
+            if (c == null) {
+                return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+            }
+            String urlImage = null;
+            if (file != null && !file.isEmpty()) {
+                urlImage = this.cloudianryService.uploadFile(file);
+            }
+            Comment updated = commentService.updateComment(id, this.userService.getUserByUsername(username).getId(), content, urlImage);
+            if (updated == null) {
+                return (ResponseEntity<Comment>) ResponseEntity.status(HttpStatus.FORBIDDEN);
+            }
+            return new ResponseEntity(updated, HttpStatus.OK);
+        } catch (Exception ex) {
+            return (ResponseEntity<Comment>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity(updated, HttpStatus.OK);
     }
 
     @PostMapping(value = "/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Comment> addComment(
+    public ResponseEntity<?> addComment(
             @RequestParam Map<String, String> param,
-            @RequestParam(value = "file", required = false) MultipartFile file, 
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestHeader("Authorization") String authorizationHeader) {
-        
-        String username = this.postComponents.authorization(authorizationHeader);
+        try {
+            String username = this.postComponents.authorization(authorizationHeader);
 
-        String urlImage = null;
-        if (file != null && !file.isEmpty()) {
-            urlImage = this.cloudianryService.uploadFile(file);
+            String urlImage = null;
+            if (file != null && !file.isEmpty()) {
+                urlImage = this.cloudianryService.uploadFile(file);
+            }
+
+            Comment created = commentService.createComment(param, urlImage, username);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (Exception ex) {
+            Map<String, String> error = new HashMap<>();
+            error.put("mess", "Server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-
-        Comment created = commentService.createComment(param, urlImage, username);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authorizationHeader) {
-        
-        String username = this.postComponents.authorization(authorizationHeader);
+        try {
+            String username = this.postComponents.authorization(authorizationHeader);
 
-        boolean deleted = commentService.deleteComment(id, this.userService.getUserByUsername(username).getId());
-        if (deleted) {
-            return ResponseEntity.ok("Comment deleted");
+            boolean deleted = commentService.deleteComment(id, this.userService.getUserByUsername(username).getId());
+            if (deleted) {
+                return ResponseEntity.ok("Comment deleted");
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not allowed to delete");
+        } catch (Exception ex) {
+            Map<String, String> error = new HashMap<>();
+            error.put("mess", "Server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not allowed to delete");
     }
 
     @GetMapping("/comment/{postId}/post")
@@ -109,5 +131,18 @@ public class ApiCommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(commentService.getCommentByComments(parentId, page, size));
+    }
+
+    @GetMapping("/comment/{postId}/total-post")
+    public ResponseEntity<Long> getCommentsByPost(
+            @PathVariable(value = "postId") Long postId
+    ) {
+        try {
+            Long totalComment = this.commentService.totalCommentByPost(postId);
+            return ResponseEntity.ok(totalComment);
+        } catch (Exception ex) {
+            return ResponseEntity.ok(Long.parseLong("0"));
+        }
+
     }
 }
