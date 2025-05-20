@@ -28,4 +28,6 @@ public interface CommentRepository {
     Comment saveOrUpdate(Comment c);
     
     Comment getCommentById(Long id);
+    
+    List<Comment> getRepliesByParentId(Long parentId);
 }

@@ -81,9 +81,10 @@ public class CommentRepositoryImpl  implements CommentRepository  {
     @Override
     public long countByPostId(Long postId) {
         Session s = this.factory.getObject().getCurrentSession();
-        String hql = "COUNT(c) FROM Comment c";
-        Query q = s.createQuery(hql, Long.class);
-        return (long) q.getSingleResult();
+        String hql = "SELECT COUNT(*) FROM Comment WHERE postId.id = :postId AND active = TRUE";
+        Query query = s.createQuery(hql, Long.class);
+        query.setParameter("postId", postId);
+        return (long) query.getSingleResult();
     }
     
     
@@ -103,5 +104,13 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         Session s = this.factory.getObject().getCurrentSession();
         return s.createNamedQuery("Comment.findById", Comment.class).setParameter("id", id).getSingleResult();
     }
-
+    
+    @Override
+    public List<Comment> getRepliesByParentId(Long parentId) {
+        String hql = "FROM Comment c WHERE c.parentId = :parentId AND c.active = TRUE";
+        return this.factory.getObject().getCurrentSession()
+            .createQuery(hql, Comment.class)
+            .setParameter("parentId", parentId)
+            .getResultList();
+}
 }
