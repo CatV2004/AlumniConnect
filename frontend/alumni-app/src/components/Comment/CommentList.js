@@ -4,11 +4,12 @@ import moment from "moment";
 import 'moment/locale/vi';
 import CommentItem from "./CommentItem";
 import CommentHasmore from "./CommentHasmore";
+import CommentCreated from "./CommentCreated";
 
 
 moment.locale('vi');
 
-const CommentList = ({ post }) => {
+const CommentList = ({ post, showComment, setCountComment }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(0);
@@ -63,12 +64,25 @@ const CommentList = ({ post }) => {
         fetchComments();
     }, [post.id, page, size]);
 
+
+    const handleNewComment = (comment) => {
+        setCountComment(prev => prev + 1);
+        setComments(prev => [comment, ...prev]);
+    };
+
+    const handleCommentUpdated = (updated) => {
+        setComments(prev =>
+            prev.map(c => c.id === updated.id ? updated : c)
+        );
+    };
+
     return (
-        <div className="mt-3 space-y-6 gap-3">
+        <div className=" space-y-2 gap-3">
             {comments.map(comment => (
                 <div key={comment.id}>
                     <div className="flex gap-3">
-                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={fetchComments} />
+                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={handleNewComment}
+                         handleCommentUpdated={handleCommentUpdated} showComment={showComment}/>
                     </div>
 
                     {/* Replies */}
@@ -96,6 +110,11 @@ const CommentList = ({ post }) => {
             {hasMore && (
                 <CommentHasmore setPage={setPage} />
             )}
+
+            <CommentCreated
+                post={post}
+                onCommentAdded={handleNewComment}
+            />
         </div>
     );
 };

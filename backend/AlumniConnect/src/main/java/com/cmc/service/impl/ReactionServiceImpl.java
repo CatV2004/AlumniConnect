@@ -28,7 +28,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private ReactionRepository reactionRepo;
 
@@ -36,8 +36,8 @@ public class ReactionServiceImpl implements ReactionService {
     public Reaction addReaction(Long postId, Long userId, String reactionType) {
         Post p = this.postService.getPostById(postId);
         User u = this.userService.getUserById(userId);
-        
-        if (p != null && u != null){
+
+        if (p != null && u != null) {
             Reaction re = new Reaction();
             re.setReaction(reactionType);
             re.setUserId(u);
@@ -46,9 +46,9 @@ public class ReactionServiceImpl implements ReactionService {
         }
         return null;
     }
-    
+
     @Override
-    public Reaction findByPostIdAndUserId(Long postId, Long userId){
+    public Reaction findByPostIdAndUserId(Long postId, Long userId) {
         return this.reactionRepo.findByPostIdAndUserId(postId, userId);
     }
 
@@ -56,21 +56,21 @@ public class ReactionServiceImpl implements ReactionService {
     public List<Reaction> getReactionsByPost(Long PostId) {
         return this.reactionRepo.findByPostId(PostId);
     }
-    
+
     @Override
-    public Long countLikesByPost(Long postId){
+    public Long countLikesByPost(Long postId) {
         return this.reactionRepo.countLikesByPostId(postId);
     }
-    
+
     @Override
-    public boolean hasUserLikedPost(Long postId, Long userId){
+    public boolean hasUserLikedPost(Long postId, Long userId) {
         return this.reactionRepo.hasUserLikedPost(postId, userId);
     }
 
     @Override
     public int deleteReaction(Long reactionId, Long userId, Long postId) {
         Reaction reaction = this.reactionRepo.findById(reactionId);
-        if (reaction.getUserId().getId().equals(userId) && reaction.getPostId().getId().equals(postId)){
+        if (reaction.getUserId().getId().equals(userId) && reaction.getPostId().getId().equals(postId)) {
             this.reactionRepo.deleteReaction(reaction);
             return 1;
         }
@@ -80,10 +80,16 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public Reaction addOrUpdateReaction(Long postId, Long userId, String reactionType) {
         Reaction reaction = this.reactionRepo.findByPostIdAndUserId(postId, userId);
-        if (reaction == null){
+        if (reaction == null) {
+            
+            Post p = this.postService.getPostById(postId);
+            User u = this.userService.getUserById(userId);
+            if (p == null || u == null) 
+                return null;
+            
             reaction = new Reaction();
-            reaction.setPostId(this.postService.getPostById(postId));
-            reaction.setUserId(this.userService.getUserById(userId));
+            reaction.setUserId(u);
+            reaction.setPostId(p);
             reaction.setCreatedDate(LocalDateTime.now());
             reaction.setActive(Boolean.TRUE);
         }

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { Flag, MoreVertical, Trash2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaImage, FaPaperPlane, FaSpinner } from "react-icons/fa";
 
 
 const DropdownItem = ({ icon, children, onClick }) => (
@@ -18,7 +19,7 @@ const DropdownItem = ({ icon, children, onClick }) => (
     </button>
 );
 
-const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
+const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdated, showComment }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
     const [content, setContent] = useState(comment.content);
@@ -27,7 +28,8 @@ const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
     const dropdownRef = useRef(null);
     const currentUser = useSelector((state) => state.auth.user);
     const [openComment, setOpenComment] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const formRef = useRef(null);
     const BASE_URL = "http://localhost:8080/AlumniConnect/api"
 
     console.log(userId);
@@ -62,7 +64,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
 
     const updateComment = async () => {
         try {
-            setLoading(true);
+            setIsSubmitting(true);
             const formData = new FormData();
             formData.append("content", content);
             if (file) formData.append("file", file);
@@ -77,6 +79,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
                 setUpdate(false);
                 setIsOpen(false);
                 setOpenComment(true);
+                handleCommentUpdated(res.data);
             } else if (res.status > 500)
                 toast.error("Lỗi server không thẻ sửa bình luận!!!")
             else {
@@ -86,17 +89,34 @@ const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
             toast.error("Xóa bài viết thất bại: " + error.message);
             setIsOpen(false);
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
+
         }
     }
 
     useEffect(() => {
         const handleClickOutside = (e) =>
-            dropdownRef.current && !dropdownRef.current.contains(e.target) && setIsOpen(false);
+         dropdownRef.current && !dropdownRef.current.contains(e.target) && setIsOpen(false);
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+
+    useEffect(() => {
+        if (!update) return;
+
+        const handleClickOutside = (e) => {
+            if (formRef.current && !formRef.current.contains(e.target)) {
+                setUpdate(false);
+                setContent(comment.content);
+                setFile(null);
+                showComment(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [update, comment]);
 
     return (
         <div className="flex">
@@ -187,81 +207,79 @@ const CommentItem = ({ comment, post, userId, onCommentAdded }) => {
                 </div>
             )}
 
+            <div onDoubleClick={() => setUpdate(true)}>
+          {/* nội dung comment */}
+        </div>
 
             {update && (
-                <div className="flex">
-                    <div className="mt-2">
-                        <img
-                            src={comment.userId.avatar || '/default-avatar.png'}
-                            alt="avatar"
-                            className="w-7 h-7 rounded-full"
-                        />
-                    </div>
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        updateComment();
-                    }}
-                        className="flex flex-col gap-3 items-start border p-2 rounded-lg" >
-                        <div className="w-full">
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    updateComment();
+                }}
+                    ref={formRef}
+                    className="flex items-start gap-4 p-2 border rounded-lg" >
+                    <img
+                        src={comment.userId.avatar || '/default-avatar.png'}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full object-cover"
+                    />
+                    {/* Row: input + send */}
+                    <div className="flex-1 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
                             <input
                                 type="text"
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 placeholder="Viết bình luận..."
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
+                                onChange={e => setContent(e.target.value)}
+                                disabled={isSubmitting}
                             />
+                            <button
+                                type="submit"
+                                className={`p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition
+                                                    ${isSubmitting
+                                        ? 'bg-gray-300 cursor-not-allowed'
+                                        : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
+                            >
+                                {isSubmitting
+                                    ? <FaSpinner className="w-4 h-4 animate-spin text-gray-600" />
+                                    : <FaPaperPlane className="w-4 h-4 text-white" />
+                                }
+                            </button>
                         </div>
-                        <div className=" items-center mt-1">
-                            {file !== null ? <>
+                        {/* Row: image picker */}
+                        <label className="flex items-center text-gray-500 hover:text-gray-700 cursor-pointer">
+                            <FaImage className="w-5 h-5 mr-1 text-blue" />
+                            <span className="text-sm">Chọn hình</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={e => setFile(e.target.files[0])}
+                                disabled={isSubmitting}
+                            />
+                        </label>
+                        {file !== null ? <>
+                            <img
+                                src={URL.createObjectURL(file)}
+                                alt="preview"
+                                style={{ width: "350px" }}
+                                className="mt-2 rounded"
+                            />
+                        </> : <>
+                            {comment.image && (
                                 <img
-                                    src={URL.createObjectURL(file)}
-                                    alt="preview"
+                                    src={comment.image}
+                                    alt="comment"
                                     style={{ width: "350px" }}
-                                    className="mt-2 rounded"
-                                />
-                            </> : <>
-                                {comment.image && (
-                                    <img
-                                        src={comment.image}
-                                        alt="comment"
-                                        style={{ width: "350px" }}
-                                        className="mt-2 rounded" />
-                                )}
+                                    className="mt-2 rounded" />
+                            )}
 
-                            </>}
-                            <div className="mt-0">
-                                <input
-                                    type="file"
-                                    className="text-sm file:mr-3 file:px-3 file:py-1 file:rounded-md file:border-0 file:bg-gray-200 hover:file:bg-gray-300"
-                                    onChange={(e) => setFile(e.target.files[0])}
-                                />
-                            </div>
-                            <div className="flex w-full justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="bg-blue-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2 disabled:opacity-60"
-                                >
-                                    {loading && (
-                                        <svg
-                                            className="animate-spin h-4 w-4 text-white"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle className="opacity-25" cx="12" cy="12" r="10"
-                                                stroke="currentColor" strokeWidth="4" />
-                                            <path className="opacity-75" fill="currentColor"
-                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                                        </svg>
-                                    )}
-                                    {loading ? "Đang sửa..." : "Sửa bình luận"}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>)
-            }
+                        </>}
+                    </div>
+                </form>
+
+            )}
 
         </div >
     )
