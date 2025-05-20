@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 
-const CommentCreated = ({ post, parentComment = null, onCommentAdded }) => {
+const CommentCreated = ({ post, parentComment = null, onCommentAdded, handleReplies, setReplyTo }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [content, setContent] = useState('');
     const [parentId, setParentId] = useState(parentComment);
@@ -33,12 +33,14 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded }) => {
                     "Authorization": localStorage.getItem('token') || null
                 }
             });
-            console.log(response);
             if (response.status === 201) {
                 const result = response.data;
                 toast.success("Bình luận thành công");
-                // setCountComment((prev) => prev + 1);
-                onCommentAdded(result);
+                if(parentId !== null){
+                    setReplyTo(null);
+                    handleReplies(response.data, parentId);
+                }
+                else onCommentAdded(result);
                 setFile(null);
                 setContent('');
                 setFile(null);

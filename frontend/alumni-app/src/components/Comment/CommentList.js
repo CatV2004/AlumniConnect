@@ -43,10 +43,16 @@ const CommentList = ({ post, showComment, setCountComment }) => {
                 }
             });
             const newReplies = res.data.content;
-            setRepliesMap(prev => ({
-                ...prev,
-                [parentId]: [...(prev[parentId] || []), ...newReplies]
-            }));
+            setRepliesMap(prev => {
+                const existing = prev[parentId] || [];
+                const uniqueReplies = newReplies.filter(
+                    r => !existing.some(e => e.id === r.id)
+                );
+                return {
+                    ...prev,
+                    [parentId]: [...existing, ...uniqueReplies]
+                };
+            });
             setReplyPages(prev => ({
                 ...prev,
                 [parentId]: page + 1
@@ -70,26 +76,57 @@ const CommentList = ({ post, showComment, setCountComment }) => {
         setComments(prev => [comment, ...prev]);
     };
 
-    const handleCommentUpdated = (updated) => {
+    const handleDeleteComment = (commentId = null) => {
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        setCountComment(prev => prev - 1);
+        if (commentId !== null) {
+            setRepliesMap(prev => {
+                const updatedMap = { ...prev };
+                delete updatedMap[commentId];
+                return updatedMap;
+            });
+
+        }
+    };
+
+    const handleCommentUpdated = (updated, parentComment = null) => {
         setComments(prev =>
             prev.map(c => c.id === updated.id ? updated : c)
         );
+        if (updated !== null && parentComment !== null) {
+            setRepliesMap(prev => ({
+                ...prev,
+                [parentComment]: prev[parentComment].map(reply =>
+                    reply.id === updated.id ? updated : reply
+                )
+            }));
+        }
     };
+
+    const handleReplies = (comment, parentId) => {
+        if (comment !== null) {
+            setRepliesMap(prev => ({
+                ...prev,
+                [parentId]: [comment, ...(prev[parentId] || [])]
+            }));
+        }
+    }
 
     return (
         <div className=" space-y-2 gap-3">
             {comments.map(comment => (
                 <div key={comment.id}>
                     <div className="flex gap-3">
-                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={handleNewComment}
-                         handleCommentUpdated={handleCommentUpdated} showComment={showComment}/>
+                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={handleReplies}
+                            handleCommentUpdated={handleCommentUpdated} showComment={showComment} handleDeleteComment={handleDeleteComment} />
                     </div>
 
                     {/* Replies */}
                     {repliesMap[comment.id]?.length > 0 && (
                         <div className="mt-4 ml-7 pl-6 space-y-4 border-l border-gray-200">
                             {repliesMap[comment.id].map(reply => (
-                                <CommentItem userId={post.userId.id} key={reply.id} comment={reply} post={post} onCommentAdded={fetchReplies} />
+                                <CommentItem userId={post.userId.id} key={reply.id} parentComment={comment.id} comment={reply} post={post} onCommentAdded={handleReplies}
+                                    handleCommentUpdated={handleCommentUpdated} showComment={showComment} handleDeleteComment={handleDeleteComment} />
                             ))}
                         </div>
                     )}

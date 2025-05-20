@@ -3,7 +3,7 @@ import 'moment/locale/vi';
 import { useEffect, useRef, useState } from "react";
 import CommentCreated from "./CommentCreated";
 import { useSelector } from "react-redux";
-import { Flag, MoreVertical, Trash2 } from "lucide-react";
+import { Edit, Flag, MoreVertical, Trash2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FaImage, FaPaperPlane, FaSpinner } from "react-icons/fa";
@@ -19,7 +19,7 @@ const DropdownItem = ({ icon, children, onClick }) => (
     </button>
 );
 
-const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdated, showComment }) => {
+const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdated, showComment, handleDeleteComment, parentComment=null }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
     const [content, setContent] = useState(comment.content);
@@ -31,9 +31,6 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
     const [isSubmitting, setIsSubmitting] = useState(false);
     const formRef = useRef(null);
     const BASE_URL = "http://localhost:8080/AlumniConnect/api"
-
-    console.log(userId);
-    console.log("=====> ", currentUser);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -49,9 +46,8 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                     }
                 });
                 if (res.status === 200) {
+                    handleDeleteComment(comment.id);
                     toast.success("Xóa bình luận thành công");
-                    setIsOpen(false);
-                    setOpenComment(false);
                 } else
                     toast.error("Lỗi không thể xóa bình luận!!!")
 
@@ -79,7 +75,9 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                 setUpdate(false);
                 setIsOpen(false);
                 setOpenComment(true);
-                handleCommentUpdated(res.data);
+                if (parentComment)
+                    handleCommentUpdated(res.data, parentComment);
+                else handleCommentUpdated(res.data);
             } else if (res.status > 500)
                 toast.error("Lỗi server không thẻ sửa bình luận!!!")
             else {
@@ -89,6 +87,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
             toast.error("Xóa bài viết thất bại: " + error.message);
             setIsOpen(false);
         } finally {
+            setUpdate(false);
             setIsSubmitting(false);
 
         }
@@ -160,7 +159,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
 
                             {replyTo === comment.id && (
                                 <div className="mt-2">
-                                    <CommentCreated post={post} parentComment={comment.id} onCommentAdded={onCommentAdded} />
+                                    <CommentCreated post={post} parentComment={comment.id} handleReplies={onCommentAdded} setReplyTo={setReplyTo} />
                                 </div>
                             )}
                         </div>
@@ -188,7 +187,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                                     setIsOpen(false);
                                                     setOpenComment(false);
                                                 }}
-                                                icon={<Flag className="w-4 h-4" />}
+                                                icon={<Edit className="w-4 h-4" />}
                                             >
                                                 Sửa bình luận
                                             </DropdownItem>
@@ -199,6 +198,15 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                                 Xóa bình luận
                                             </DropdownItem>
                                         )}
+
+                                        <DropdownItem
+                                            onClick={() => {
+                                                
+                                            }}
+                                            icon={<Flag className="w-4 h-4" />}
+                                        >
+                                            Báo cáo bình luận
+                                        </DropdownItem>
                                     </div>
                                 </div>
                             )}
@@ -280,7 +288,6 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                 </form>
 
             )}
-
         </div >
     )
 }

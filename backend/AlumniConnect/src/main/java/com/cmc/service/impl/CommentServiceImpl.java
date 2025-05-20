@@ -90,6 +90,14 @@ public class CommentServiceImpl implements CommentService{
             cmt.setActive(false);
             cmt.setDeletedDate(LocalDateTime.now());
             commentRepo.saveOrUpdate(cmt);
+            
+            List<Comment> replies = commentRepo.getRepliesByParentId(commentId);
+
+            for (Comment reply : replies) {
+                reply.setActive(false);
+                reply.setDeletedDate(LocalDateTime.now());
+                commentRepo.saveOrUpdate(reply);
+            }
             return true;
         }
         return false;
@@ -105,7 +113,7 @@ public class CommentServiceImpl implements CommentService{
     
     @Override
     public Long totalCommentByPost(Long postId){
-        return this.commentRepo.totalCommentByPost(postId);
+        return this.commentRepo.countByPostId(postId);
     }
     
     @Override

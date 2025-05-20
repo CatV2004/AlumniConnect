@@ -468,7 +468,6 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public void deleteImagesNotInList(Post post, List<Long> keepImageIds) {
         if (keepImageIds == null || keepImageIds.isEmpty()) {
-            System.out.println("xóa tất cảaaaaaaaaaaaaaaaaaaaaaaaaa");
             this.deleteImagesByPost(post);
             return;
         }

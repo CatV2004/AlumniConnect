@@ -12,32 +12,39 @@ const PostList = ({
   customEmptyMessage,
 }) => {
   const [page, setPage] = useState(0);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && hasMore) {
-        setPage((prev) => prev + 1)
+      if (
+        window.innerHeight + window.scrollY >=
+          document.body.offsetHeight - 100 &&
+        hasMore
+      ) {
+        setPage((prev) => prev + 1);
       }
-    }
-    if (loading && posts.length === 0) {
-      return (
-        <div className="max-w-xl mx-auto space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <PostSkeleton key={i} />
-          ))}
-        </div>
-      );
-    }
+    };
 
-    if (error) {
-      return (
-        <div className="text-center text-red-500 p-4">
-          Error loading posts: {error}
-        </div>
-      );
-    }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, page]);
+  }, [hasMore]);
+
+  if (loading && posts.length === 0) {
+    return (
+      <div className="max-w-xl mx-auto space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <PostSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading posts: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto">
