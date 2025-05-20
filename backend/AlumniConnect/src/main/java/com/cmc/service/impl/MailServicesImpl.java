@@ -68,4 +68,23 @@ public class MailServicesImpl implements MailServices {
 
         mailUtils.sendEmail(teacherEmail, subject, body);
     }
+
+    @Async
+    @Override
+    public void sendInvitationEmail(String recipientEmail, String eventName, String eventDetails, LocalDateTime eventTime) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String formattedEventTime = eventTime.format(dateFormatter);
+
+        String subject = "Thư mời tham dự sự kiện: " + eventName;
+        String body = "Kính gửi Anh/Chị,\n\n"
+                + "Chúng tôi trân trọng mời Anh/Chị tham dự sự kiện:\n\n"
+                + "📌 Tên sự kiện: " + eventName + "\n"
+                + "🕒 Thời gian: " + formattedEventTime + "\n"
+                + "📝 Nội dung chi tiết:\n" + eventDetails + "\n\n"
+                + "Rất mong được đón tiếp Anh/Chị tại sự kiện.\n\n"
+                + "Trân trọng,\n"
+                + "Ban tổ chức";
+
+        mailUtils.sendEmail(recipientEmail, subject, body);
+    }
 }

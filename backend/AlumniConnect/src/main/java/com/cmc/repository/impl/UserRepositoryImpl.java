@@ -154,7 +154,6 @@ public class UserRepositoryImpl implements UserRepository {
             countPredicates.add(countKeywordPredicate);
         }
 
-        
         dataQuery.where(dataPredicates.toArray(new Predicate[0]));
         countQuery.select(cb.count(countRoot)).where(countPredicates.toArray(new Predicate[0]));
 
@@ -171,6 +170,36 @@ public class UserRepositoryImpl implements UserRepository {
         int totalPages = (int) Math.ceil((double) totalItems / size);
 
         return new PageResponse<>(users, page, size, totalItems, totalPages);
+    }
+
+    @Override
+    public List<User> findAllActiveUsers() {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> query = session.createQuery(
+                "FROM User u WHERE u.active = true",
+                User.class);
+        return query.list();
+    }
+
+    @Override
+    public List<User> findUsersInGroup(Long groupId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> query = session.createQuery(
+                "SELECT u FROM User u JOIN u.ugroupSet ug WHERE ug.id = :groupId",
+                User.class);
+        query.setParameter("groupId", groupId);
+        return query.list();
+    }
+
+    @Override
+    public List<User> findUsersNotInGroup(Long groupId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query<User> query = session.createQuery(
+                "FROM User u WHERE u.active = true AND NOT EXISTS "
+                + "(SELECT 1 FROM u.ugroupSet ug WHERE ug.id = :groupId)",
+                User.class);
+        query.setParameter("groupId", groupId);
+        return query.list();
     }
 
 }

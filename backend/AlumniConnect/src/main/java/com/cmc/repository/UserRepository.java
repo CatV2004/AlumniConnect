@@ -33,4 +33,10 @@ public interface UserRepository {
 
     public PageResponse<User> getAllUsers(Map<String, Object> params);
 
+    List<User> findAllActiveUsers();
+
+    List<User> findUsersInGroup(Long groupId);
+
+    List<User> findUsersNotInGroup(Long groupId);
+
 }

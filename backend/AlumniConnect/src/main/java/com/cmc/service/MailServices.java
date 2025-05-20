@@ -17,4 +17,6 @@ public interface MailServices {
     void notifyTeacherPasswordReset(String teacherEmail, String teacherName, LocalDateTime passwordChangeDeadline);
 
     void notifyTeacherAccountCreation(String teacherEmail, String teacherName, String username, String defaultPassword);
+
+    void sendInvitationEmail(String recipientEmail, String eventName, String eventDetails, LocalDateTime eventTime);
 }
