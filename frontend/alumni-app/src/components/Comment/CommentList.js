@@ -4,11 +4,12 @@ import moment from "moment";
 import 'moment/locale/vi';
 import CommentItem from "./CommentItem";
 import CommentHasmore from "./CommentHasmore";
+import CommentCreated from "./CommentCreated";
 
 
 moment.locale('vi');
 
-const CommentList = ({ post }) => {
+const CommentList = ({ post, showComment, setCountComment }) => {
     const BASE_URL = 'http://localhost:8080/AlumniConnect/api';
     const [comments, setComments] = useState([]);
     const [page, setPage] = useState(0);
@@ -42,10 +43,16 @@ const CommentList = ({ post }) => {
                 }
             });
             const newReplies = res.data.content;
-            setRepliesMap(prev => ({
-                ...prev,
-                [parentId]: [...(prev[parentId] || []), ...newReplies]
-            }));
+            setRepliesMap(prev => {
+                const existing = prev[parentId] || [];
+                const uniqueReplies = newReplies.filter(
+                    r => !existing.some(e => e.id === r.id)
+                );
+                return {
+                    ...prev,
+                    [parentId]: [...existing, ...uniqueReplies]
+                };
+            });
             setReplyPages(prev => ({
                 ...prev,
                 [parentId]: page + 1
@@ -63,19 +70,63 @@ const CommentList = ({ post }) => {
         fetchComments();
     }, [post.id, page, size]);
 
+
+    const handleNewComment = (comment) => {
+        setCountComment(prev => prev + 1);
+        setComments(prev => [comment, ...prev]);
+    };
+
+    const handleDeleteComment = (commentId = null) => {
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        setCountComment(prev => prev - 1);
+        if (commentId !== null) {
+            setRepliesMap(prev => {
+                const updatedMap = { ...prev };
+                delete updatedMap[commentId];
+                return updatedMap;
+            });
+
+        }
+    };
+
+    const handleCommentUpdated = (updated, parentComment = null) => {
+        setComments(prev =>
+            prev.map(c => c.id === updated.id ? updated : c)
+        );
+        if (updated !== null && parentComment !== null) {
+            setRepliesMap(prev => ({
+                ...prev,
+                [parentComment]: prev[parentComment].map(reply =>
+                    reply.id === updated.id ? updated : reply
+                )
+            }));
+        }
+    };
+
+    const handleReplies = (comment, parentId) => {
+        if (comment !== null) {
+            setRepliesMap(prev => ({
+                ...prev,
+                [parentId]: [comment, ...(prev[parentId] || [])]
+            }));
+        }
+    }
+
     return (
-        <div className="mt-3 space-y-6 gap-3">
+        <div className=" space-y-2 gap-3">
             {comments.map(comment => (
                 <div key={comment.id}>
                     <div className="flex gap-3">
-                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={fetchComments} />
+                        <CommentItem userId={post.userId.id} comment={comment} post={post} onCommentAdded={handleReplies}
+                            handleCommentUpdated={handleCommentUpdated} showComment={showComment} handleDeleteComment={handleDeleteComment} />
                     </div>
 
                     {/* Replies */}
                     {repliesMap[comment.id]?.length > 0 && (
                         <div className="mt-4 ml-7 pl-6 space-y-4 border-l border-gray-200">
                             {repliesMap[comment.id].map(reply => (
-                                <CommentItem userId={post.userId.id} key={reply.id} comment={reply} post={post} onCommentAdded={fetchReplies} />
+                                <CommentItem userId={post.userId.id} key={reply.id} parentComment={comment.id} comment={reply} post={post} onCommentAdded={handleReplies}
+                                    handleCommentUpdated={handleCommentUpdated} showComment={showComment} handleDeleteComment={handleDeleteComment} />
                             ))}
                         </div>
                     )}
@@ -96,6 +147,11 @@ const CommentList = ({ post }) => {
             {hasMore && (
                 <CommentHasmore setPage={setPage} />
             )}
+
+            <CommentCreated
+                post={post}
+                onCommentAdded={handleNewComment}
+            />
         </div>
     );
 };

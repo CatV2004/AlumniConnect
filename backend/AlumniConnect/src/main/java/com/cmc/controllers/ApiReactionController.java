@@ -48,20 +48,29 @@ public class ApiReactionController {
     private PostComponents PostComponents;
 
     @PostMapping("/reactions")
-    public ResponseEntity<Reaction> createOrUpdateReaction(
+    public ResponseEntity<?> createOrUpdateReaction(
             @RequestParam Long postId,
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String reactionType
     ) {
-        String username = this.PostComponents.authorization(authorizationHeader);
-        Long userId = this.userService.getUserByUsername(username).getId();
-        Reaction reactionOdd = this.reactionService.findByPostIdAndUserId(postId, userId);
-        if (reactionOdd != null){
-            this.reactionService.deleteReaction(reactionOdd.getId(), userId, postId);
-            return ResponseEntity.ok(reactionOdd);
-        }
-        Reaction reaction = reactionService.addOrUpdateReaction(postId, userId, reactionType);
-        return ResponseEntity.ok(reaction);
+//        try{
+            String username = this.PostComponents.authorization(authorizationHeader);
+            Long userId = this.userService.getUserByUsername(username).getId();
+            Reaction reactionOdd = this.reactionService.findByPostIdAndUserId(postId, userId);
+            if (reactionOdd != null){
+                if (!reactionOdd.getReaction().equals(reactionType)){
+                    return ResponseEntity.ok(this.reactionService.addOrUpdateReaction(postId, userId, reactionType));
+                }else{
+                    this.reactionService.deleteReaction(reactionOdd.getId(), userId, postId);
+                    return ResponseEntity.ok("DELETED");
+                }
+            }
+            Reaction reaction = reactionService.addOrUpdateReaction(postId, userId, reactionType);
+            return ResponseEntity.ok(reaction);
+//        }catch (Exception ex){
+//            return ResponseEntity.ok("ERR_SERVER");
+//        }
+       
     }
 
     @DeleteMapping("/reactions/{reactionId}")
@@ -85,10 +94,12 @@ public class ApiReactionController {
     
     
     @GetMapping("/reactions/{postId}/user")
-    public void getReactionUserByPost(
+    public ResponseEntity<Reaction> getReactionUserByPost(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable(value = "postId") Long postId) {
-
+        String username = this.PostComponents.authorization(authorizationHeader);
+        Long userId = this.userService.getUserByUsername(username).getId();
+        return new ResponseEntity(this.reactionService.findByPostIdAndUserId(postId, userId), HttpStatus.OK);
     }
     
     @GetMapping("/liked/{postId}")

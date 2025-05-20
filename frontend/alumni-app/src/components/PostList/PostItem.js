@@ -9,6 +9,8 @@ import {
   FaRegCommentDots,
   FaShare,
   FaChartBar,
+  FaLaugh,
+  FaHeart,
 } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
 import SurveyStatsModal from "../survey/SurveyStatsModal";
@@ -23,6 +25,7 @@ import CountReaction from "../Reaction/CountReaction";
 import ReactionOfPost from "../Reaction/ReactionOfPost";
 import { useSelector } from "react-redux";
 import CountComment from "../Comment/CountComment";
+import FindReaction from "../Reaction/FindReaction";
 
 moment.locale("vi");
 
@@ -36,6 +39,7 @@ const PostItem = ({ post }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [reactionType, setReactionType] = useState(null);
 
   const MAX_CONTENT_LENGTH = 300;
 
@@ -48,6 +52,18 @@ const PostItem = ({ post }) => {
       setLikeCount(count);
     };
 
+    const fetchReactionUser = async () => {
+      const reaction = await FindReaction(post.id);
+      if (reaction !== "" || reaction !== null) {
+        setReactionType(reaction.reaction);
+        // setIsLiked(true);
+        // console.log(typeof(reaction));
+        // console.log(reactionType);
+        // console.log(isLiked);
+      }
+
+    }
+
     const fetchCommentByPost = async () => {
       const countC = await CountComment(post.id);
       setCommentCount(countC);
@@ -55,27 +71,51 @@ const PostItem = ({ post }) => {
 
     fetchReactions();
     fetchCommentByPost();
+    fetchReactionUser();
   }, [post.id]);
 
   const toggleComments = () => {
     setShowComment(!showComment);
   };
 
-  const toggleLike = async () => {
-    const newLiked = !isLiked;
-    setIsLiked(newLiked);
+  const toggleLike = async (typeReaction) => {
+    const wasLiked = !!reactionType;
+    const isSameReaction = reactionType === typeReaction;
 
-    // TODO: Call API to update like status
+    let newLikeCount = likeCount;
+    if (!wasLiked) {
+      newLikeCount += 1;
+    } else if (wasLiked && isSameReaction) {
+      newLikeCount = Math.max(newLikeCount - 1, 0);
+    }
+
+    setLikeCount(newLikeCount);
+    setReactionType(isSameReaction ? null : typeReaction);
+    setIsLiked(!isSameReaction);
+
     try {
-      const res = await addReaction(post.id);
-      if (newLiked) {
-        setLikeCount((prev) => prev + 1);
-      } else {
-        setLikeCount((prev) => Math.max(prev - 1, 0));
-      }
+      await addReaction(post.id, typeReaction);
     } catch (error) {
-      setIsLiked((prev) => !prev);
+      setLikeCount(likeCount);
+      setReactionType(reactionType);
+      setIsLiked(!!reactionType);
       console.error("Failed to toggle like", error);
+    }
+  };
+
+
+  const ReactionIcon = () => {
+    switch (reactionType) {
+      case "LOVE": return <FaHeart className={`w-5 h-5 ${isLiked === true ? "fill-red-500" : ""}`} />;
+      case "HAHA": return <FaLaugh className={`w-5 h-5 ${isLiked === true ? "fill-yellow-500" : ""}`} />;
+      default: return <FaThumbsUp className={`w-5 h-5 ${isLiked === true ? "fill-blue-600" : ""}`} />;
+    }
+  };
+  const ReactionLabel = () => {
+    switch (reactionType) {
+      case "LOVE": return "Love";
+      case "HAHA": return "Haha";
+      default: return "Like";
     }
   };
 
@@ -166,19 +206,49 @@ const PostItem = ({ post }) => {
 
 
       {/* Post Actions */}
-      <div className="px-4 py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
+       <div className="px-4 relative group py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
         <button
-          onClick={toggleLike}
-          className={`flex items-center justify-center gap-2 w-full py-2 rounded-md 
+          onClick={() => toggleLike("LIKE")}
+          className={`relative flex group items-center justify-center gap-2 w-full py-2 rounded-md 
                 transition-all duration-150 ease-in-out 
-                ${isLiked
-              ? "text-blue-600 font-semibold"
-              : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
-            }`}
+                ${reactionType === "LOVE"
+              ? "text-red-500/80 font-semibold"
+              : reactionType === "HAHA"
+                ? "text-yellow-500/80 font-semibold"
+                : reactionType === "LIKE"
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
+            }`
+          }
         >
-          <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
-          Like
+          {/* <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
+          Like */}
+          <ReactionIcon />
+          <ReactionLabel />
         </button>
+        {/* <div className="relative inline-block group w-max"> */}
+
+        {/* Menu reaction (hiện khi hover) */}
+        <div className="absolute -top-10 left-20 translate-x-2 flex space-x-2 p-1 bg-white rounded-full shadow-lg
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                    transition-all duration-200">
+          <button onClick={() => toggleLike("LIKE")}
+            className="p-1 rounded-full hover:bg-gray-300">
+            <FaThumbsUp className="w-6 h-6 text-blue-600" />
+          </button>
+          <button
+            onClick={() => toggleLike("LOVE")}
+            className="p-1 rounded-full hover:bg-gray-300">
+            <FaHeart className="w-6 h-6 text-red-500" />
+          </button>
+          <button
+            onClick={() => toggleLike("HAHA")}
+            className="p-1 rounded-full hover:bg-gray-300">
+            <FaLaugh className="w-6 h-6 text-yellow-500" />
+          </button>
+        </div>
+
+
 
         <button
           onClick={toggleComments}
@@ -217,8 +287,8 @@ const PostItem = ({ post }) => {
       {/* Comments Section */}
       {showComment && (
         <div className="bg-gray-50 p-4 border-t border-gray-100">
-          <CommentList post={post} />
-          <CommentCreated post={post} />
+          <CommentList post={post} showComment={setShowComment} setCountComment={setCommentCount} />
+          {/* <CommentCreated post={post} /> */}
         </div>
       )}
       {isEditModalOpen && (

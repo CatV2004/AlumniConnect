@@ -56,20 +56,18 @@ public class ReactionRepositoryImpl implements ReactionRepository {
     
     @Override
     public Long countLikesByPostId(Long postId) {
-        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.reaction = :type";
+        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId";
         Query<Long> query = getSession().createQuery(hql, Long.class);
         query.setParameter("postId", postId);
-        query.setParameter("type", "LIKE");
         return query.uniqueResult();
     }
     
     @Override
     public boolean hasUserLikedPost(Long postId, Long userId) {
-        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId AND r.reaction = :type";
+        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId";
         Query<Long> query = getSession().createQuery(hql, Long.class);
         query.setParameter("postId", postId);
         query.setParameter("userId", userId);
-        query.setParameter("type", "LIKE");
         Long count = query.uniqueResult();
         return count != null && count > 0;
     }
@@ -86,7 +84,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
 
     @Override
     public Reaction findByPostIdAndUserId(Long postId, Long userId) {
-        String sql = "From Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId AND r.postId.active = true ORDER BY r.id DESC";
+        String sql = "From Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId AND r.postId.active = true";
         Query q = getSession().createQuery(sql, Reaction.class);
         q.setParameter("postId", postId);
         q.setParameter("userId", userId);
