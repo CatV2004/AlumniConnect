@@ -10,7 +10,6 @@ const CountReaction = async (postId) => {
             }
         });
         return res.data
-        console.log("So luogn like:", res.data);
     } catch (err) {
         console.error("Lỗi khi thêm phản ứng:", err);
     }
