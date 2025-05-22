@@ -40,6 +40,7 @@ const PostItem = ({ post }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
   const [reactionType, setReactionType] = useState(null);
+  const [reactionPost, setReactionPost] = useState([]);
 
   const MAX_CONTENT_LENGTH = 300;
 
@@ -47,19 +48,21 @@ const PostItem = ({ post }) => {
   useEffect(() => {
     const fetchReactions = async () => {
       const liked = await ReactionOfPost(post.id);
-      const count = await CountReaction(post.id);
+      const reactions = await CountReaction(post.id);
       setIsLiked(liked);
-      setLikeCount(count);
+      const totalCount = Object.values(reactions).reduce((sum, count) => sum + count, 0);
+      const types = Object.entries(reactions)
+        .filter(([_, count]) => count > 0)
+        .map(([type, _]) => type);
+      setLikeCount(totalCount);
+      setReactionPost(types);
+      console.log(types);
     };
 
     const fetchReactionUser = async () => {
       const reaction = await FindReaction(post.id);
       if (reaction !== "" || reaction !== null) {
         setReactionType(reaction.reaction);
-        // setIsLiked(true);
-        // console.log(typeof(reaction));
-        // console.log(reactionType);
-        // console.log(isLiked);
       }
 
     }
@@ -83,15 +86,29 @@ const PostItem = ({ post }) => {
     const isSameReaction = reactionType === typeReaction;
 
     let newLikeCount = likeCount;
+    let newReactionPost = [...(reactionPost || [])];
+
     if (!wasLiked) {
       newLikeCount += 1;
     } else if (wasLiked && isSameReaction) {
       newLikeCount = Math.max(newLikeCount - 1, 0);
+
+      if (likeCount === 1) {
+        newReactionPost = newReactionPost.filter(r => r !== typeReaction);
+      }
     }
+    
+    if (!newReactionPost.includes(typeReaction)) {
+      newReactionPost.push(typeReaction);
+    }
+
+
 
     setLikeCount(newLikeCount);
     setReactionType(isSameReaction ? null : typeReaction);
     setIsLiked(!isSameReaction);
+    setReactionPost(newReactionPost);
+
 
     try {
       await addReaction(post.id, typeReaction);
@@ -103,14 +120,28 @@ const PostItem = ({ post }) => {
     }
   };
 
-
-  const ReactionIcon = () => {
-    switch (reactionType) {
-      case "LOVE": return <FaHeart className={`w-5 h-5 ${isLiked === true ? "fill-red-500" : ""}`} />;
-      case "HAHA": return <FaLaugh className={`w-5 h-5 ${isLiked === true ? "fill-yellow-500" : ""}`} />;
-      default: return <FaThumbsUp className={`w-5 h-5 ${isLiked === true ? "fill-blue-600" : ""}`} />;
+  const ReactionIcon = ({ reaction }) => {
+    switch (reaction) {
+      case "LOVE":
+        return <FaHeart className="w-5 h-5 fill-red-500" />;
+      case "HAHA":
+        return <FaLaugh className="w-5 h-5 fill-yellow-500" />;
+      default:
+        return <FaThumbsUp className="w-5 h-5 fill-blue-600" />;
     }
   };
+  const CurrentUserReactionIcon = () => {
+    switch (reactionType) {
+      case "LOVE":
+        return <FaHeart className={`w-5 h-5 ${isLiked ? "fill-red-500" : ""}`} />;
+      case "HAHA":
+        return <FaLaugh className={`w-5 h-5 ${isLiked ? "fill-yellow-500" : ""}`} />;
+      default:
+        return <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />;
+    }
+  };
+
+
   const ReactionLabel = () => {
     switch (reactionType) {
       case "LOVE": return "Love";
@@ -199,14 +230,20 @@ const PostItem = ({ post }) => {
       {/* Post Stats */}
       <div className="px-4 pt-2 pb-1 border-t border-gray-100">
         <div className="flex justify-between text-sm text-gray-500">
-          <span>{likeCount} likes</span>
+          <span className="flex items-center gap-1">
+            {likeCount}
+            {reactionPost && reactionPost.map((r, idx) => (
+              <ReactionIcon key={idx} reaction={r} />
+            ))}
+            {reactionPost.length === 0 && " reaction"}
+          </span>
           <span>{commentCount} comments</span>
         </div>
       </div>
 
 
       {/* Post Actions */}
-       <div className="px-4 relative group py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
+      <div className="px-4 relative group py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
         <button
           onClick={() => toggleLike("LIKE")}
           className={`relative flex group items-center justify-center gap-2 w-full py-2 rounded-md 
@@ -223,7 +260,7 @@ const PostItem = ({ post }) => {
         >
           {/* <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
           Like */}
-          <ReactionIcon />
+          <CurrentUserReactionIcon />
           <ReactionLabel />
         </button>
         {/* <div className="relative inline-block group w-max"> */}
