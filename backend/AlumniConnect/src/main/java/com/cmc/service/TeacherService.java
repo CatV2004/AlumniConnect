@@ -6,6 +6,7 @@ package com.cmc.service;
 
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.pojo.Teacher;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -24,4 +25,6 @@ public interface TeacherService {
     List<Teacher> getTeachers(Map<String, String> params);
 
     Long countTeachers();
+    
+    void lockExpiredAccounts(LocalDateTime dateTime);
 }

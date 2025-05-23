@@ -10,6 +10,7 @@ import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
 import com.cmc.service.MailServices;
 import com.cmc.service.TeacherService;
+import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ public class TeacherServiceImpl implements TeacherService {
     private TeacherRepository teacherRepository;
     @Autowired
     private MailServices mailServices;
+    
+    @Autowired
+    private UserService userService;
 
     @Override
     public boolean createTeacherAccount(TeacherDTO teacherDTO) {
@@ -76,5 +80,19 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public Long countTeachers() {
         return this.teacherRepository.countTeachers();
+    }
+    
+    @Override
+    public void lockExpiredAccounts(LocalDateTime dateTime){
+        List<Teacher> expiredTeachers = this.teacherRepository.findAllByMustChangePassword(dateTime);
+        for (Teacher teacher : expiredTeachers) {
+            User user = teacher.getUserId();
+            if (Boolean.TRUE.equals(user.getActive())) {
+                teacher.setMustChangePassword(Boolean.FALSE);
+                user.setActive(Boolean.FALSE);
+                this.teacherRepository.saveOrUpdate(teacher);
+                this.userService.Save(user);
+            }
+    }
     }
 }

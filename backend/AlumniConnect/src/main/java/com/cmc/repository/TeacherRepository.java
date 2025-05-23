@@ -8,6 +8,7 @@ import com.cmc.dtos.TeacherDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -31,4 +32,5 @@ public interface TeacherRepository {
     
     Teacher getTeacherById(Long id);
     
+    List<Teacher> findAllByMustChangePassword(LocalDateTime deadline);
 }
