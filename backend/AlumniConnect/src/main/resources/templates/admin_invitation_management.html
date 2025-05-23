@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Quản lý Lời mời</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container {
+            z-index: 1060 !important;
+        }
+        .select2-dropdown {
+            z-index: 1061 !important;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 0.75rem 1.25rem;
+        }
+
+        .selected-groups-list, .selected-users-list {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .badge .btn-close {
+            font-size: 0.6rem;
+            padding: 0.25rem;
+            opacity: 0.8;
+        }
+
+        .badge .btn-close:hover {
+            opacity: 1;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;
+            min-height: 38px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            color: #495057;
+        }
+        /* Progress steps styling */
+        .progress-steps {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .step.active .step-number {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .step.active .step-title {
+            color: #0d6efd;
+            font-weight: 500;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .step-title {
+            color: #6c757d;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #dee2e6;
+            margin: 0 10px;
+            position: relative;
+            top: -15px;
+        }
+
+        /* Member list items */
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .member-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .member-item.selected {
+            background-color: #e7f1ff;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .member-info {
+            flex-grow: 1;
+        }
+
+        .member-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .member-email {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        /* Selected members preview */
+        .selected-member-preview {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e7f1ff;
+            border-radius: 20px;
+            padding: 3px 10px 3px 5px;
+            margin: 2px;
+        }
+
+        .selected-member-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 5px;
+        }
+
+        .selected-member-name {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="container mt-5">
+        <div class="card shadow-sm rounded-4 border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-primary"><i class="bi bi-envelope-check-fill me-2"></i>Quản lý sự kiện</h2>
+                    <button class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#createInvitationModal">
+                        <i class="bi bi-plus-lg me-2"></i>Tạo lời mời mới
+                    </button>
+                </div>
+
+                <!-- Form tìm kiếm -->
+                <form th:action="@{/admin/invitations}" method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="eventName" 
+                               th:value="${eventName}" placeholder="🔍 Tìm theo tên sự kiện">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i> Tìm
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Bảng danh sách lời mời -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên sự kiện</th>
+                                <th>Thời gian</th>
+                                <th>Người/Nhóm mời</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="invitation, iterStat : ${invitations}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td>
+                                    <a href="#" class="text-decoration-none" 
+                                       th:onclick="'viewInvitationDetail(\'' + ${invitation.id} + '\')'"
+                                       th:text="${invitation.eventName}"></a>
+                                </td>
+                                <td th:text="${#temporals.format(invitation.eventTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span class="badge bg-primary me-1" 
+                                          th:text="${invitation.userSet.size()} + ' người'"></span>
+                                    <span class="badge bg-info" 
+                                          th:text="${invitation.ugroupSet.size()} + ' nhóm'"></span>
+                                </td>
+                                <td>
+                                    <span th:class="${invitation.post.active} ? 'badge bg-success' : 'badge bg-secondary'"
+                                          th:text="${invitation.post.active} ? 'Hoạt động' : 'Đã đóng'"></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-outline-info btn-sm rounded-pill"
+                                                th:onclick="'viewInvitationDetail(\'' + ${invitation.id} + '\')'">
+                                            <i class="bi bi-eye"></i> Xem
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill"
+                                                th:onclick="'openEditInvitationModal(\'' + ${invitation.id} + '\')'">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </button>
+                                        <button th:if="${invitation.post.active}"
+                                                class="btn btn-outline-danger btn-sm rounded-pill"
+                                                th:onclick="'toggleInvitationStatus(\'' + ${invitation.id} + '\', false)'">
+                                            <i class="bi bi-x-circle"></i> Vô hiệu
+                                        </button>
+                                        <button th:if="${!invitation.post.active}"
+                                                class="btn btn-outline-success btn-sm rounded-pill"
+                                                th:onclick="'toggleInvitationStatus(\'' + ${invitation.id} + '\', true)'">
+                                            <i class="bi bi-check-circle"></i> Kích hoạt
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill"
+                                                th:onclick="'deleteInvitationPermanently(' + ${invitation.id} + ')'">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Phân trang -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li th:class="${currentPage > 1} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/invitations(page=${currentPage - 1}, size=${size}, eventName=${eventName})}">
+                                <i class="bi bi-chevron-left"></i> Trước
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}"></span>
+                        </li>
+                        <li th:class="${currentPage < totalPages} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/invitations(page=${currentPage + 1}, size=${size}, eventName=${eventName})}">
+                                Tiếp <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal tạo lời mời mới -->
+    <div class="modal fade" id="createInvitationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">📩 Tạo lời mời mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <form id="createInvitationForm" class="needs-validation" novalidate>
+                    <div class="modal-body px-4 py-3">
+                        <div class="row g-4">
+                            <!-- Left: Thông tin sự kiện -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="eventName" class="form-label fw-semibold">Tên sự kiện <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Nhập tên sự kiện" required>
+                                    <div class="invalid-feedback">Vui lòng nhập tên sự kiện.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="eventTime" class="form-label fw-semibold">Thời gian sự kiện <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="eventTime" name="eventTime" required>
+                                    <div class="invalid-feedback">Vui lòng chọn thời gian hợp lệ.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Khoá bình luận</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="lockComment" name="lockComment">
+                                        <label class="form-check-label" for="lockComment">Không cho phép người khác bình luận</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Nội dung & hình ảnh -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="invitationContent" class="form-label fw-semibold">Nội dung <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="invitationContent" name="content" rows="6" placeholder="Nội dung chi tiết lời mời..." required></textarea>
+                                    <div class="invalid-feedback">Vui lòng nhập nội dung.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mời nhóm và người dùng -->
+                        <div class="row g-4 mt-1">
+                            <!-- Phần mời nhóm -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                        <h6 class="mb-0">🎯 Mời theo nhóm</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                data-bs-toggle="modal" data-bs-target="#integratedGroupModal">
+                                            <i class="bi bi-plus-lg"></i> Tạo nhóm mới
+                                        </button>
+
+                                    </div>
+                                    <div class="card-body">
+                                        <select class="form-select select2-groups" name="groups" multiple="multiple">
+                                            <option th:each="group : ${allGroups}" 
+                                                    th:value="${group.id}" 
+                                                    th:text="${group.groupName}"></option>
+                                        </select>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Chọn từ danh sách nhóm có sẵn hoặc tạo nhóm mới</small>
+                                        </div>
+
+                                        <!-- Hiển thị các nhóm đã chọn -->
+                                        <div class="selected-groups-container mt-3">
+                                            <div class="d-flex flex-wrap gap-2 selected-groups-list">
+                                                <!-- Các nhóm đã chọn sẽ hiển thị ở đây -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phần mời thành viên -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">👥 Mời thành viên cụ thể</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <select class="form-select select2-users" name="users" multiple="multiple">
+                                            <option th:each="user : ${allUsers}" 
+                                                    th:value="${user.id}" 
+                                                    th:text="${user.firstName + ' ' + user.lastName + ' (' + user.email + ')'}">
+                                            </option>
+                                        </select>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Tìm kiếm thành viên theo tên hoặc email</small>
+                                        </div>
+
+                                        <!-- Hiển thị các thành viên đã chọn -->
+                                        <div class="selected-users-container mt-3">
+                                            <div class="d-flex flex-wrap gap-2 selected-users-list">
+                                                <!-- Các thành viên đã chọn sẽ hiển thị ở đây -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ảnh đính kèm -->
+                        <div class="mt-4">
+                            <label for="invitationImages" class="form-label fw-semibold">📷 Hình ảnh đính kèm (tối đa 5 ảnh)</label>
+                            <input type="file" class="form-control" id="invitationImages" name="images" multiple accept="image/*">
+                            <div class="preview-images mt-3 d-flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Huỷ
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Gửi lời mời
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal tạo nhóm và thêm thành viên tích hợp -->
+    <div class="modal fade" id="integratedGroupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-people-fill me-2"></i>Tạo nhóm mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <!-- Progress steps indicator -->
+                <div class="progress-steps px-4 pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="step active" data-step="1">
+                            <span class="step-number">1</span>
+                            <span class="step-title">Thông tin nhóm</span>
+                        </div>
+                        <div class="step-divider"></div>
+                        <div class="step" data-step="2">
+                            <span class="step-number">2</span>
+                            <span class="step-title">Thành viên</span>
+                        </div>
+                        <div class="step-divider"></div>
+                        <div class="step" data-step="3">
+                            <span class="step-number">3</span>
+                            <span class="step-title">Hoàn tất</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="integratedGroupForm">
+                    <!-- Step 1: Group Info -->
+                    <div class="modal-body step-content" data-step="1">
+                        <div class="mb-3">
+                            <label for="groupName" class="form-label">Tên nhóm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="groupName" name="groupName" required>
+                            <div class="invalid-feedback">Vui lòng nhập tên nhóm</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="groupDescription" class="form-label">Mô tả nhóm</label>
+                            <textarea class="form-control" id="groupDescription" name="description" rows="3" placeholder="Mô tả mục đích của nhóm..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary next-step" data-next="2">Tiếp theo <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Add Members -->
+                    <div class="modal-body step-content d-none" data-step="2">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold">Thêm thành viên</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAllMembers">
+                                    <label class="form-check-label" for="selectAllMembers">Chọn tất cả</label>
+                                </div>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" id="memberSearch" placeholder="Tìm kiếm thành viên...">
+                            </div>
+
+                            <div id="membersList" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary prev-step" data-prev="1"><i class="bi bi-arrow-left me-1"></i> Quay lại</button>
+                            <button type="button" class="btn btn-primary next-step" data-next="3">Tiếp theo <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Review & Complete -->
+                    <div class="modal-body step-content d-none" data-step="3">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">Xác nhận tạo nhóm</h5>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Thông tin nhóm</h6>
+                                <div class="mb-2">
+                                    <strong>Tên nhóm:</strong> <span id="reviewGroupName" class="text-primary"></span>
+                                </div>
+                                <div>
+                                    <strong>Mô tả:</strong> <span id="reviewGroupDescription" class="text-muted"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Thành viên đã chọn (<span id="selectedMembersCount">0</span>)</h6>
+                                <div id="selectedMembersPreview" class="d-flex flex-wrap gap-2 mt-2">
+                                    <div class="text-muted">Không có thành viên nào được chọn</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-secondary prev-step" data-prev="2"><i class="bi bi-arrow-left me-1"></i> Quay lại</button>
+                            <button type="submit" class="btn btn-success">Hoàn tất <i class="bi bi-check-lg ms-1"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa lời mời -->
+    <div class="modal fade" id="editInvitationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">✏️ Chỉnh sửa lời mời</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+
+                <form id="editInvitationForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="editInvitationId" name="id">
+                    <div class="modal-body px-4 py-3">
+                        <div class="row g-4">
+                            <!-- Left: Thông tin sự kiện -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editEventName" class="form-label fw-semibold">Tên sự kiện <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="editEventName" name="eventName" required>
+                                    <div class="invalid-feedback">Vui lòng nhập tên sự kiện.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editEventTime" class="form-label fw-semibold">Thời gian sự kiện <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="editEventTime" name="eventTime" required>
+                                    <div class="invalid-feedback">Vui lòng chọn thời gian hợp lệ.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Khoá bình luận</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="editLockComment" name="lockComment">
+                                        <label class="form-check-label" for="editLockComment">Không cho phép người khác bình luận</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Nội dung & hình ảnh -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editInvitationContent" class="form-label fw-semibold">Nội dung <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="editInvitationContent" name="content" rows="6" placeholder="Nội dung chi tiết lời mời..." required></textarea>
+                                    <div class="invalid-feedback">Vui lòng nhập nội dung.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mời nhóm và người dùng -->
+                        <div class="row g-4 mt-1">
+                            <!-- Phần mời nhóm -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                        <h6 class="mb-0">🎯 Mời theo nhóm</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                                            <i class="bi bi-plus-lg"></i> Tạo nhóm mới
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <select class="form-select select2-groups-edit" name="groups" multiple="multiple">
+                                            <option th:each="group : ${allGroups}" 
+                                                    th:value="${group.id}" 
+                                                    th:text="${group.groupName}"></option>
+                                        </select>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Chọn từ danh sách nhóm có sẵn hoặc tạo nhóm mới</small>
+                                        </div>
+
+                                        <!-- Hiển thị các nhóm đã chọn -->
+                                        <div class="selected-groups-container mt-3">
+                                            <div class="d-flex flex-wrap gap-2 selected-groups-list-edit">
+                                                <!-- Các nhóm đã chọn sẽ hiển thị ở đây -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Phần mời thành viên -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">👥 Mời thành viên cụ thể</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <select class="form-select select2-users-edit" name="users" multiple="multiple">
+                                            <option th:each="user : ${allUsers}" 
+                                                    th:value="${user.id}" 
+                                                    th:text="${user.firstName + ' ' + user.lastName + ' (' + user.email + ')'}"></option>
+                                        </select>
+                                        <div class="mt-2">
+                                            <small class="text-muted">Tìm kiếm thành viên theo tên hoặc email</small>
+                                        </div>
+
+                                        <!-- Hiển thị các thành viên đã chọn -->
+                                        <div class="selected-users-container mt-3">
+                                            <div class="d-flex flex-wrap gap-2 selected-users-list-edit">
+                                                <!-- Các thành viên đã chọn sẽ hiển thị ở đây -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ảnh đính kèm -->
+                        <div class="mt-4">
+                            <label for="editInvitationImages" class="form-label fw-semibold">📷 Hình ảnh đính kèm (tối đa 5 ảnh)</label>
+                            <input type="file" class="form-control" id="editInvitationImages" name="images" multiple accept="image/*">
+                            <div class="edit-preview-images mt-3 d-flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Huỷ
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal xem chi tiết lời mời -->
+    <div class="modal fade" id="viewInvitationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết lời mời</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h3 id="detailEventName" class="text-primary"></h3>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-clock"></i> 
+                                    <span id="detailEventTime"></span>
+                                </span>
+                                <span id="detailInvitationStatus" class="badge"></span>
+                            </div>
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-card-text"></i> Nội dung</h6>
+                                    <p id="detailInvitationContent" class="card-text mt-2"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-person"></i> Người tạo</h6>
+                                    <div id="creatorInfo" class="d-flex align-items-center mt-3">
+                                        <!-- Thông tin người tạo -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-people"></i> Nhóm được mời</h6>
+                                    <div id="invitedGroupsList" class="mt-3">
+                                        <!-- Danh sách nhóm -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-person-lines-fill"></i> Thành viên được mời</h6>
+                                    <div id="invitedUsersList" class="mt-3">
+                                        <!-- Danh sách thành viên -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3" id="invitationImagesGallery">
+                        <!-- Gallery hình ảnh -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/group-management.js}"></script>
+
+    <script th:src="@{/js/invitation-management.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+//        $(document).ready(function () {
+//            // Hàm khởi tạo Select2 không gây giật
+//            function initSmoothSelect2(selector, placeholder) {
+//                $(selector).each(function () {
+//                    // Tạo một bản sao ẩn của select element
+//                    const originalSelect = $(this);
+//                    const hiddenSelect = originalSelect.clone()
+//                            .removeAttr('id')
+//                            .addClass('select2-hidden')
+//                            .insertAfter(originalSelect);
+//
+//                    // Ẩn select gốc nhưng vẫn giữ layout
+//                    originalSelect.addClass('select2-original').css({
+//                        'position': 'absolute',
+//                        'opacity': 0,
+//                        'height': '100%',
+//                        'width': '100%'
+//                    });
+//
+//                    // Khởi tạo Select2 trên bản sao ẩn
+//                    hiddenSelect.select2({
+//                        placeholder: placeholder,
+//                        width: '100%',
+//                        dropdownParent: originalSelect.closest('.modal'),
+//                        minimumResultsForSearch: 5
+//                    });
+//
+//                    // Đồng bộ giá trị giữa select gốc và select2
+//                    hiddenSelect.on('change', function () {
+//                        originalSelect.val($(this).val()).trigger('change');
+//                    });
+//                });
+//            }
+//
+//            // Xử lý modal
+//            $('#createInvitationModal, #editInvitationModal').on('shown.bs.modal', function () {
+//                // Khởi tạo Select2 mượt mà
+//                if ($(this).attr('id') === 'createInvitationModal') {
+//                    initSmoothSelect2('.select2-groups', "Chọn nhóm...");
+//                    initSmoothSelect2('.select2-users', "Chọn thành viên...");
+//                } else {
+//                    initSmoothSelect2('.select2-groups-edit', "Chọn nhóm...");
+//                    initSmoothSelect2('.select2-users-edit', "Chọn thành viên...");
+//                }
+//            }).on('hidden.bs.modal', function () {
+//                // Dọn dẹp khi đóng modal
+//                $(this).find('.select2-hidden').select2('destroy').remove();
+//                $(this).find('.select2-original').removeClass('select2-original').css({
+//                    'position': '',
+//                    'opacity': '',
+//                    'height': '',
+//                    'width': ''
+//                });
+//            });
+//
+//            // Thêm CSS để ẩn select gốc
+//            const select2Style = document.createElement('style');
+//            select2Style.textContent = `
+//            .select2-hidden { display: none; }
+//            .select2-original { 
+//                position: absolute !important;
+//                opacity: 0 !important;
+//                height: 100% !important;
+//                width: 100% !important;
+//                z-index: 1 !important;
+//            }
+//        `;
+//            document.head.appendChild(select2Style);
+//
+//            // Xử lý preview ảnh (giữ nguyên)
+//            $('#invitationImages, #editInvitationImages').change(function () {
+//                const isEdit = $(this).attr('id') === 'editInvitationImages';
+//                const preview = $(this).siblings(isEdit ? '.edit-preview-images' : '.preview-images');
+//                preview.empty();
+//
+//                if (this.files.length > 5) {
+//                    alert('Chỉ được chọn tối đa 5 ảnh');
+//                    this.value = '';
+//                    return;
+//                }
+//
+//                Array.from(this.files).forEach(file => {
+//                    const reader = new FileReader();
+//                    reader.onload = (e) => {
+//                        preview.append(`<img src="${e.target.result}" class="img-thumbnail" width="100">`);
+//                    };
+//                    reader.readAsDataURL(file);
+//                });
+//            });
+//        });
+        $(document).ready(function () {
+            function initSmoothSelect2(selector, placeholder) {
+                $(selector).each(function () {
+                    const originalSelect = $(this);
+                    if (originalSelect.next('.select2-hidden').length) {
+                        return;
+                    }
+                    const hiddenSelect = originalSelect.clone()
+                            .removeAttr('id')
+                            .addClass('select2-hidden')
+                            .insertAfter(originalSelect);
+
+                    originalSelect.addClass('select2-original').css({
+                        'position': 'absolute',
+                        'opacity': 0,
+                        'height': '100%',
+                        'width': '100%'
+                    });
+
+                    hiddenSelect.select2({
+                        placeholder: placeholder,
+                        width: '100%',
+                        dropdownParent: originalSelect.closest('.modal'),
+                        minimumResultsForSearch: 5
+                    });
+
+                    hiddenSelect.on('change', function () {
+                        originalSelect.val($(this).val()).trigger('change');
+                    });
+                });
+            }
+
+            $('#createInvitationModal, #editInvitationModal').on('shown.bs.modal', function () {
+                const isEditModal = $(this).attr('id') === 'editInvitationModal';
+                const groupSelector = isEditModal ? '.select2-groups-edit' : '.select2-groups';
+                const userSelector = isEditModal ? '.select2-users-edit' : '.select2-users';
+
+                initSmoothSelect2(groupSelector, "Chọn nhóm...");
+                initSmoothSelect2(userSelector, "Chọn thành viên...");
+            }).on('hidden.bs.modal', function () {
+                $(this).find('.select2-hidden').select2('destroy').remove();
+                $(this).find('.select2-original').removeClass('select2-original').css({
+                    'position': '',
+                    'opacity': '',
+                    'height': '',
+                    'width': ''
+                });
+            });
+
+            const select2Style = document.createElement('style');
+            select2Style.textContent = `
+        .select2-hidden { display: none; }
+        .select2-original { 
+            position: absolute !important;
+            opacity: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
+            z-index: 1 !important;
+        }
+    `;
+            document.head.appendChild(select2Style);
+
+            $('#invitationImages, #editInvitationImages').change(function () {
+                const previewClass = $(this).attr('id') === 'editInvitationImages' ? '.edit-preview-images' : '.preview-images';
+                const preview = $(this).siblings(previewClass);
+                preview.empty();
+
+                if (this.files.length > 5) {
+                    alert('Chỉ được chọn tối đa 5 ảnh');
+                    this.value = '';
+                    return;
+                }
+
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        preview.append(`<img src="${e.target.result}" class="img-thumbnail" width="100">`);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

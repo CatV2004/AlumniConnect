@@ -4,8 +4,10 @@
  */
 package com.cmc.service;
 
+import com.cmc.dtos.GroupDTO;
 import com.cmc.pojo.Ugroup;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -17,11 +19,17 @@ public interface UgroupService {
 
     Ugroup findById(Long id);
 
-    List<Ugroup> findAllActiveGroups();
+    List<GroupDTO> findGroups(Map<String, String> params);
 
-    List<Ugroup> findAll();
+    List<GroupDTO> findGroups();
+
+    long countGroups(Map<String, String> params);
 
     void addUserToGroup(Long groupId, Long userId);
 
+    void addUsersToGroup(Long groupId, List<Long> userIds);
+
     void removeUserFromGroup(Long groupId, Long userId);
+
+    void deleteById(Long id);
 }

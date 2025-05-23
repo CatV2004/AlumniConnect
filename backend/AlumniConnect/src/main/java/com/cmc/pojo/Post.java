@@ -97,7 +97,7 @@ public class Post implements Serializable {
     @JsonIgnore
     private Set<Reaction> reactionSet;
     
-    @OneToOne(cascade = CascadeType.REMOVE, mappedBy = "post", fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.EAGER)
     @JsonIgnore
     private InvitationPost invitationPost;
     

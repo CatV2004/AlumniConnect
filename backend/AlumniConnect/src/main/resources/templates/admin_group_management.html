@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Quản lý Nhóm</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:insert="~{layout/base :: styleBase}"></th:block>
+    <th:block th:insert="~{layout/base :: scriptBase}"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="container mt-5">
+        <div class="card shadow-sm rounded-4 border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-primary"><i class="bi bi-diagram-3-fill me-2"></i>Quản lý Nhóm</h2>
+                    <button class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                        <i class="bi bi-plus-lg me-2"></i>Tạo nhóm mới
+                    </button>
+                </div>
+
+                <!-- Form tìm kiếm -->
+                <form th:action="@{/admin/groups}" method="get" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="groupName"
+                               th:value="${groupName}" placeholder="🔍 Tìm theo tên nhóm">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i> Tìm
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Bảng danh sách nhóm -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên Nhóm</th>
+                                <!--                                <th>Ngày Tạo</th>-->
+                                <th>Thành viên</th>
+                                <th>Trạng Thái</th>
+                                <th class="text-center">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="group, iterStat : ${groups}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${group.groupName}"></td>
+                                <!--<td th:text="${group.createdDate}"></td>-->
+                                <td>
+                                    <span class="badge bg-primary" 
+                                          th:text="${group.memberCount} + ' thành viên'"></span>
+                                </td>
+                                <td>
+                                    <span th:class="${group.active} ? 'badge bg-success' : 'badge bg-secondary'"
+                                          th:text="${group.active} ? 'Hoạt động' : 'Ngừng hoạt động'"></span>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-outline-info btn-sm rounded-pill"
+                                                th:onclick="'viewGroupDetail(\'' + ${group.id} + '\')'">
+                                            <i class="bi bi-eye"></i> Xem
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm rounded-pill"
+                                                th:onclick="'openAddMembersModal(' + ${group.id} + ')'">
+                                            <i class="bi bi-person-plus"></i> Thêm thành viên
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill"
+                                                th:onclick="'openEditModal(\'' + ${group.id} + '\')'">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </button>
+                                        <button th:if="${group.active}"
+                                                class="btn btn-outline-danger btn-sm rounded-pill"
+                                                th:onclick="'toggleGroupStatus(\'' + ${group.id} + '\', false)'">
+                                            <i class="bi bi-x-circle"></i> Vô hiệu
+                                        </button>
+                                        <button th:if="${!group.active}"
+                                                class="btn btn-outline-success btn-sm rounded-pill"
+                                                th:onclick="'toggleGroupStatus(\'' + ${group.id} + '\', true)'">
+                                            <i class="bi bi-check-circle"></i> Kích hoạt
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill"
+                                                th:onclick="'deleteGroupPermanently(' + ${group.id} + ')'">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Phân trang -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li th:class="${currentPage > 1} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/groups(page=${currentPage - 1}, size=${size}, kw=${groupName})}">
+                                <i class="bi bi-chevron-left"></i> Trước
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link" th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}"></span>
+                        </li>
+                        <li th:class="${currentPage < totalPages} ? 'page-item' : 'page-item disabled'">
+                            <a class="page-link" th:href="@{/admin/groups(page=${currentPage + 1}, size=${size}, kw=${groupName})}">
+                                Tiếp <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal tạo nhóm mới -->
+    <div class="modal fade" id="createGroupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tạo nhóm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="createGroupForm" class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="groupName" class="form-label">Tên nhóm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="groupName" name="groupName" required>
+                            <div class="invalid-feedback">Vui lòng nhập tên nhóm</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="groupDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="groupDescription" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Tạo nhóm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal chỉnh sửa nhóm -->
+    <div class="modal fade" id="editGroupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa nhóm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editGroupForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="editGroupId" name="id">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editGroupName" class="form-label">Tên nhóm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editGroupName" name="groupName" required>
+                            <div class="invalid-feedback">Vui lòng nhập tên nhóm</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editGroupDescription" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="editGroupDescription" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xem chi tiết nhóm -->
+    <div class="modal fade" id="groupDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết nhóm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h4 id="detailGroupName" class="text-primary"></h4>
+                            <p id="detailGroupDescription" class="text-muted"></p>
+                            <div class="d-flex gap-2 mb-2">
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Ngày tạo: <span id="detailCreatedDate"></span>
+                                </span>
+                                <span id="detailGroupStatus" class="badge"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="bi bi-people-fill me-2"></i>Thành viên</h6>
+                                    <div id="memberList" class="mt-3">
+                                        <!-- Danh sách thành viên sẽ được load bằng JS -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm thành viên vào nhóm -->
+    <div class="modal fade" id="addMembersModal" tabindex="-1" aria-labelledby="addMembersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="addMembersForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMembersModalLabel">Thêm thành viên vào nhóm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="hidden" id="groupId" name="groupId" />
+
+                        <label for="userSelect" class="form-label fw-semibold mb-2">Chọn thành viên</label>
+
+                        <!-- Checkbox chọn tất cả -->
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox" />
+                            <label class="form-check-label" for="selectAllCheckbox">
+                                Chọn tất cả
+                            </label>
+                        </div>
+
+                        <!-- Danh sách checkbox thành viên -->
+                        <div id="userSelect" class="user-checkbox-list border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                            <!-- ... -->
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Thêm thành viên</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+
+    <script th:src="@{/js/group-management.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

@@ -4,15 +4,18 @@
  */
 package com.cmc.controllers;
 
-import com.cmc.components.ResourceNotFoundException;
+import com.cmc.dtos.GroupDTO;
 import com.cmc.dtos.InvitationRequestDTO;
 import com.cmc.dtos.InvitationResponseDTO;
+import com.cmc.dtos.ResponseDTO;
 import com.cmc.pojo.InvitationPost;
-import com.cmc.pojo.Post;
 import com.cmc.pojo.Ugroup;
 import com.cmc.pojo.User;
+import com.cmc.repository.UserRepository;
 import com.cmc.service.InvitationService;
-import com.cmc.service.PostService;
+import com.cmc.service.UgroupService;
+import com.cmc.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -24,7 +27,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,75 +36,99 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.Optional;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 /**
  *
  * @author FPTSHOP
  */
-@RestController
-@RequestMapping("/api/invitations")
-public class ApiInvitationController {
+@Controller
+@RequestMapping("/admin/invitations")
+public class AdminInvitationController {
 
     @Autowired
     private InvitationService invitationService;
     @Autowired
-    private PostService postService;
+    private UserRepository userRepo;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private UgroupService groupSerice;
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("")
+    public String invitationsView(@RequestParam Map<String, String> params, Model model) {
+        params.putIfAbsent("page", "1");
+        params.putIfAbsent("size", "5");
+
+        int page = Integer.parseInt(params.get("page"));
+        int size = Integer.parseInt(params.get("size"));
+
+        List<InvitationPost> invitations = invitationService.findInvitationPosts(params);
+        long totalItems = invitationService.countInvitationPosts(params);
+        int totalPages = (int) Math.ceil((double) totalItems / size);
+
+        List<User> allUsers = userService.getUsers();
+
+        List<GroupDTO> allGroups = groupSerice.findGroups();
+        
+        allGroups.forEach(g -> System.out.println("groupname: " + g.getGroupName()));
+
+        model.addAttribute("invitations", invitations);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("size", size);
+        model.addAttribute("allUsers", allUsers); 
+        model.addAttribute("allGroups", allGroups);
+                
+
+        return "admin_invitation_management";
+    }
 
     @PostMapping
-    public ResponseEntity<InvitationResponseDTO> createInvitation(
+    public ResponseEntity<?> createInvitation(
             @Valid @RequestBody InvitationRequestDTO invitationRequest,
             Principal principal) {
 
-        Post post = new Post();
-        post.setContent(invitationRequest.getContent());
-        post.setCreatedDate(LocalDateTime.now());
-        post.setActive(true);
+        String username = principal.getName();
+        User user = userRepo.getUserByUsername(username);
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ResponseDTO.failure(401, "Không xác định được người dùng đăng nhập."));
+        }
+        try {
+            invitationRequest.setUser(user);
 
-        Post savedPost = postService.addOrUpdatePost(post, null, null, true);
+            invitationService.createInvitation(invitationRequest);
 
-        invitationService.createInvitation(
-                savedPost,
-                invitationRequest.getEventName(),
-                invitationRequest.getEventTime(),
-                invitationRequest.getGroupIds(),
-                invitationRequest.getUserIds(),
-                invitationRequest.isSendToAll()
-        );
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ResponseDTO.success("Tạo lời mời thành công"));
 
-        InvitationResponseDTO response = modelMapper.map(savedPost, InvitationResponseDTO.class);
-        response.setPostId(savedPost.getId());
-        response.setEventName(invitationRequest.getEventName());
-        response.setEventTime(invitationRequest.getEventTime());
-        response.setInvitedGroupIds(invitationRequest.getGroupIds());
-        response.setInvitedUserIds(invitationRequest.getUserIds());
-        response.setSentToAll(invitationRequest.isSendToAll());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseDTO.failure(400, e.getMessage()));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseDTO.failure(400, e.getMessage()));
+
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseDTO.failure(500, "Tạo lời mời thất bại. Vui lòng thử lại sau."));
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<InvitationResponseDTO> getInvitationDetails(@PathVariable Long id) {
-        InvitationPost invitation = invitationService.findById(id);
-        InvitationResponseDTO response = modelMapper.map(invitation, InvitationResponseDTO.class);
-        response.setPostId(invitation.getId());
-        response.setEventName(invitation.getEventName());
-
-        if (invitation.getUgroupSet() != null) {
-            response.setInvitedGroupIds(invitation.getUgroupSet().stream()
-                    .map(Ugroup::getId)
-                    .collect(Collectors.toSet()));
-        }
-
-        if (invitation.getUserSet() != null) {
-            response.setInvitedUserIds(invitation.getUserSet().stream()
-                    .map(User::getId)
-                    .collect(Collectors.toSet()));
-        }
-
+        InvitationResponseDTO response = invitationService.findById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -165,10 +191,5 @@ public class ApiInvitationController {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

@@ -21,7 +21,6 @@
 </head>
 
 <body>
-
     <!-- Header -->
     <header th:fragment="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -32,19 +31,52 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav" th:if="${session.user != null}">
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/alumnis}">Quản lý Cựu sinh viên</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/teachers}">Quản lý Giảng viên</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/posts}">Quản lý Bài viết</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/surveys}">Quản lý Khảo sát</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/notifications}">Thông báo & Sự kiện</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/admin/statistics}">Thống kê</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/dashboard'} ? 'active' : '']]" 
+                               th:href="@{/admin/dashboard}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/alumnis'} ? 'active' : '']]" 
+                               th:href="@{/admin/alumnis}">Quản lý Cựu sinh viên</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/teachers'} ? 'active' : '']]" 
+                               th:href="@{/admin/teachers}">Quản lý Giảng viên</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/posts'} ? 'active' : '']]" 
+                               th:href="@{/admin/posts}">Quản lý Bài viết</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/surveys'} ? 'active' : '']]" 
+                               th:href="@{/admin/surveys}">Quản lý Khảo sát</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/groups'} ? 'active' : '']]" 
+                               th:href="@{/admin/groups}">Quản lý Nhóm</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/invitations'} ? 'active' : '']]" 
+                               th:href="@{/admin/invitations}">Quản lý Sự kiện</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/notifications'} ? 'active' : '']]" 
+                               th:href="@{/admin/notifications}">Thông báo & Sự kiện</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/statistics'} ? 'active' : '']]" 
+                               th:href="@{/admin/statistics}">Thống kê</a>
+                        </li>
                     </ul>
+
 
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item dropdown" th:if="${session.user != null}">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <img src="/img/avatar.png" class="rounded-circle" width="30">
+                                <img th:src="${session.user.avatar}" class="rounded-circle" width="30" height="30">
                                 <span th:text="${session.user}"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -64,7 +96,6 @@
     <main class="container mt-4" th:replace="main"></main>
 
     <!-- Footer -->
-
     <footer th:fragment="footer" class="bg-dark text-white text-center py-3">
         <p>&copy; 2025 - Hệ thống Cựu sinh viên | Quản trị viên</p>
     </footer>

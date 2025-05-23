@@ -14,16 +14,51 @@ import java.util.Set;
 public class InvitationResponseDTO {
 
     private Long postId;
+    private PostResponseDTO post;
     private String eventName;
     private LocalDateTime eventTime;
     private String content;
     private LocalDateTime createdDate;
     private Set<Long> invitedGroupIds;
     private Set<Long> invitedUserIds;
+    private Set<GroupDTO> ugroupSet; 
+    private Set<UserSimpleDTO> userSet;
+    private Boolean lockComment;
     private boolean sentToAll;
+    
+    
 
+    public PostResponseDTO getPost() {
+        return post;
+    }
 
+    public void setPost(PostResponseDTO post) {
+        this.post = post;
+    }
 
+    public Set<GroupDTO> getUgroupSet() {
+        return ugroupSet;
+    }
+
+    public void setUgroupSet(Set<GroupDTO> ugroupSet) {
+        this.ugroupSet = ugroupSet;
+    }
+
+    public Set<UserSimpleDTO> getUserSet() {
+        return userSet;
+    }
+
+    public void setUserSet(Set<UserSimpleDTO> userSet) {
+        this.userSet = userSet;
+    }
+
+    public Boolean getLockComment() {
+        return lockComment;
+    }
+
+    public void setLockComment(Boolean lockComment) {
+        this.lockComment = lockComment;
+    }
 
     public Long getPostId() {
         return postId;

@@ -100,10 +100,10 @@ public class ApiPostController {
     public ResponseEntity<Post> createPost(
             @RequestParam("content") String content,
             @RequestParam(name = "lockComment", required = false) Boolean lockComment,
-            @RequestHeader("Authorization") String authorizationHeader,
+            Principal principal,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
 
-        String username = this.postComponents.authorization(authorizationHeader);
+        String username = principal.getName();
 
         Post post = new Post();
         post.setContent(content);

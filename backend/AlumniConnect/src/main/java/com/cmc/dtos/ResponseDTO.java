@@ -27,6 +27,10 @@ public class ResponseDTO<T> {
         return new ResponseDTO<>(200, message, data);
     }
 
+    public static <T> ResponseDTO<T> success(String message) {
+        return new ResponseDTO<>(200, message, null);
+    }
+
     public static <T> ResponseDTO<T> failure(int status, String message) {
         return new ResponseDTO<>(status, message, null);
     }

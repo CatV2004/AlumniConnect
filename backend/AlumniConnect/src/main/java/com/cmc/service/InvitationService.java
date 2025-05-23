@@ -4,6 +4,8 @@
  */
 package com.cmc.service;
 
+import com.cmc.dtos.InvitationRequestDTO;
+import com.cmc.dtos.InvitationResponseDTO;
 import com.cmc.pojo.InvitationPost;
 import com.cmc.pojo.Post;
 import com.cmc.repository.InvitationPostRepository;
@@ -11,6 +13,7 @@ import com.cmc.repository.UgroupRepository;
 import com.cmc.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,11 +22,16 @@ import java.util.Set;
  */
 public interface InvitationService {
 
-    void createInvitation(Post post, String eventName, LocalDateTime eventTime, Set<Long> groupIds, Set<Long> userIds, boolean sendToAll);
+    void createInvitation(InvitationRequestDTO invitationRequestDTO);
 
-    InvitationPost findById(Long id);
+    InvitationResponseDTO findById(Long id);
 
     List<InvitationPost> findByInvitedUserId(Long userId);
     
     List<InvitationPost> findByGroupId(Long groupId);
+    
+    List<InvitationPost> findInvitationPosts(Map<String, String> params);
+
+    long countInvitationPosts(Map<String, String> params);
+
 }

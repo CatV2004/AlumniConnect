@@ -6,6 +6,7 @@ package com.cmc.repository;
 
 import com.cmc.pojo.Ugroup;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,9 +20,11 @@ public interface UgroupRepository {
 
     Ugroup findByGroupName(String groupName);
 
-    List<Ugroup> findAllActiveGroups();
+    List<Ugroup> findGroups(Map<String, String> params);
+    
+    List<Ugroup> findGroups();
 
-    List<Ugroup> findAll();
+    long countGroups(Map<String, String> params);
 
     void addUserToGroup(Long groupId, Long userId);
 
@@ -30,5 +33,8 @@ public interface UgroupRepository {
     boolean existsById(Long id);
 
     boolean isUserInGroup(Long userId, Long groupId);
-    
+
+    long countUsersInGroup(Long groupId);
+
+    void deleteById(Long id);
 }

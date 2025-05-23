@@ -17,6 +17,12 @@ public class UserSimpleDTO {
     private String lastName;
     private String avatar;
 
+    @Override
+    public String toString() {
+        String s = String.format("%s\n%s\n%s\n", this.firstName, this.lastName, this.username);
+        return s;
+    }
+
     public Long getId() {
         return id;
     }

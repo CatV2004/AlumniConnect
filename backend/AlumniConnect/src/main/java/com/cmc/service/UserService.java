@@ -32,5 +32,9 @@ public interface UserService extends UserDetailsService {
     public PageResponse<ResponseUserDTO> getAllUsers(Map<String, Object> params);
 
     public void updateCurrentUser(String username, String email, String phone, MultipartFile avatar, MultipartFile cover);
+    
+    List<User> findUsersNotInGroup(Long groupId);
+    
+    List<User> findUsersInGroup(Long groupId);
 
 }

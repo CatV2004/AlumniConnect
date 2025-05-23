@@ -105,7 +105,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getUsers() {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createQuery("FROM User", User.class);
+        Query<User> q = s.createQuery("FROM User WHERE active = true", User.class);
         return q.getResultList();
     }
 
@@ -194,12 +194,17 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findUsersNotInGroup(Long groupId) {
         Session session = this.factory.getObject().getCurrentSession();
+
         Query<User> query = session.createQuery(
-                "FROM User u WHERE u.active = true AND NOT EXISTS "
-                + "(SELECT 1 FROM u.ugroupSet ug WHERE ug.id = :groupId)",
-                User.class);
+                "SELECT u FROM User u "
+                + "WHERE u.active = true AND u.id NOT IN ("
+                + "SELECT u2.id FROM Ugroup g JOIN g.userSet u2 WHERE g.id = :groupId"
+                + ")",
+                User.class
+        );
+
         query.setParameter("groupId", groupId);
-        return query.list();
+        return query.getResultList();
     }
 
 }

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToOne;
@@ -20,6 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -36,7 +38,7 @@ public class InvitationPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
+//    @Basic(optional = false)
     @NotNull
     @Column(name = "id")
     private Long id;
@@ -45,20 +47,23 @@ public class InvitationPost implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "event_name")
     private String eventName;
+    @Column(name = "event_time")
+    private LocalDateTime eventTime;
     @JoinTable(name = "invitation_post_group", joinColumns = {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "group_id", referencedColumnName = "id")})
     @ManyToMany
     @JsonIgnore
     private Set<Ugroup> ugroupSet;
-    
+
     @JoinTable(name = "invitation_post_user", joinColumns = {
         @JoinColumn(name = "invitation_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "id")})
     @ManyToMany
     private Set<User> userSet;
-    
+
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId
     @OneToOne(optional = false)
     private Post post;
 
@@ -121,6 +126,14 @@ public class InvitationPost implements Serializable {
         return hash;
     }
 
+    public LocalDateTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(LocalDateTime eventTime) {
+        this.eventTime = eventTime;
+    }
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -138,5 +151,5 @@ public class InvitationPost implements Serializable {
     public String toString() {
         return "com.cmc.pojo.InvitationPost[ id=" + id + " ]";
     }
-    
+
 }

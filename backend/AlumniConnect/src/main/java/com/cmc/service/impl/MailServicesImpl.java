@@ -71,12 +71,12 @@ public class MailServicesImpl implements MailServices {
 
     @Async
     @Override
-    public void sendInvitationEmail(String recipientEmail, String eventName, String eventDetails, LocalDateTime eventTime) {
+    public void sendInvitationEmail(String recipientEmail, String recipientName, String eventName, String eventDetails, LocalDateTime eventTime) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String formattedEventTime = eventTime.format(dateFormatter);
 
         String subject = "Thư mời tham dự sự kiện: " + eventName;
-        String body = "Kính gửi Anh/Chị,\n\n"
+        String body = "Kính gửi Anh/Chị " + recipientName + ",\n\n"
                 + "Chúng tôi trân trọng mời Anh/Chị tham dự sự kiện:\n\n"
                 + "📌 Tên sự kiện: " + eventName + "\n"
                 + "🕒 Thời gian: " + formattedEventTime + "\n"

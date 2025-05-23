@@ -6,7 +6,15 @@ package com.cmc.repository.impl;
 
 import com.cmc.pojo.InvitationPost;
 import com.cmc.repository.InvitationPostRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +47,7 @@ public class InvitationPostRepositoryImpl implements InvitationPostRepository {
         Session session = this.getSession();
         if (invitationPost.getId() == null) {
             session.persist(invitationPost);
-        }
-        else {
+        } else {
             session.merge(invitationPost);
         }
     }
@@ -75,5 +82,80 @@ public class InvitationPostRepositoryImpl implements InvitationPostRepository {
         if (invitationPost != null) {
             getSession().remove(invitationPost);
         }
+    }
+
+    @Override
+    public List<InvitationPost> findInvitationPosts(Map<String, String> params) {
+        Session session = this.getSession();
+
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<InvitationPost> cq = cb.createQuery(InvitationPost.class);
+        Root<InvitationPost> root = cq.from(InvitationPost.class);
+
+        root.fetch("ugroupSet", JoinType.LEFT);
+        root.fetch("userSet", JoinType.LEFT);
+        root.fetch("post", JoinType.INNER);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params.containsKey("eventName")) {
+            String keyword = "%" + params.get("eventName").trim().toLowerCase() + "%";
+            predicates.add(cb.like(cb.lower(root.get("eventName")), keyword));
+        }
+
+        if (params.containsKey("fromTime")) {
+            LocalDateTime fromTime = LocalDateTime.parse(params.get("fromTime"));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("eventTime"), fromTime));
+        }
+
+        if (params.containsKey("toTime")) {
+            LocalDateTime toTime = LocalDateTime.parse(params.get("toTime"));
+            predicates.add(cb.lessThanOrEqualTo(root.get("eventTime"), toTime));
+        }
+
+        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        cq.orderBy(cb.desc(root.get("eventTime")));
+        cq.distinct(true);
+
+        Query<InvitationPost> query = session.createQuery(cq);
+
+        int page = Integer.parseInt(params.getOrDefault("page", "1"));
+        int size = Integer.parseInt(params.getOrDefault("size", "10"));
+        int offset = (page - 1) * size;
+
+        query.setFirstResult(offset);
+        query.setMaxResults(size);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public long countInvitationPosts(Map<String, String> params) {
+        Session session = this.getSession();
+
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<InvitationPost> root = cq.from(InvitationPost.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (params.containsKey("eventName")) {
+            String keyword = "%" + params.get("eventName").trim().toLowerCase() + "%";
+            predicates.add(cb.like(cb.lower(root.get("eventName")), keyword));
+        }
+
+        if (params.containsKey("fromTime")) {
+            LocalDateTime fromTime = LocalDateTime.parse(params.get("fromTime"));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("eventTime"), fromTime));
+        }
+
+        if (params.containsKey("toTime")) {
+            LocalDateTime toTime = LocalDateTime.parse(params.get("toTime"));
+            predicates.add(cb.lessThanOrEqualTo(root.get("eventTime"), toTime));
+        }
+
+        cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
+
+        return session.createQuery(cq).getSingleResult();
     }
 }

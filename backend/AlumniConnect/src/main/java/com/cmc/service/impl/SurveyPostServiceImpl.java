@@ -64,8 +64,6 @@ public class SurveyPostServiceImpl implements SurveyPostService {
             Post post = new Post();
             post.setContent(dto.getContent());
             post.setLockComment(Boolean.FALSE);
-            post.setCreatedDate(LocalDateTime.now());
-            post.setActive(Boolean.TRUE);
             User u = userService.getUserById(dto.getUserId().getId());
             post.setUserId(u);
 

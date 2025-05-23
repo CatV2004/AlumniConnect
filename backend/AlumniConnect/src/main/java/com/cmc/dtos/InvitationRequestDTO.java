@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import com.cmc.pojo.User;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,13 +28,30 @@ public class InvitationRequestDTO {
 
     @NotBlank(message = "Content cannot be blank")
     private String content;
+    private User user;
+    private Boolean lockComment;
 
     private Set<Long> groupIds;
     private Set<Long> userIds;
     private boolean sendToAll;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
     
     
-    
+
+    public Boolean getLockComment() {
+        return lockComment;
+    }
+
+    public void setLockComment(Boolean lockComment) {
+        this.lockComment = lockComment;
+    }
 
     public String getEventName() {
         return eventName;

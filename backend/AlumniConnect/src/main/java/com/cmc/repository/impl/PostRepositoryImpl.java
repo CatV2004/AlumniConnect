@@ -97,8 +97,11 @@ public class PostRepositoryImpl implements PostRepository {
         Session s = this.getSession();
         try {
             if (post.getId() == null) {
+                post.setActive(Boolean.TRUE);
+                post.setCreatedDate(LocalDateTime.now());
                 s.persist(post);
             } else {
+                post.setUpdatedDate(LocalDateTime.now());
                 s.merge(post);
             }
         } catch (Exception ex) {
@@ -486,8 +489,8 @@ public class PostRepositoryImpl implements PostRepository {
         List<PostImage> imagesToDelete = session.createQuery(cq).getResultList();
 
         for (PostImage image : imagesToDelete) {
-            post.getPostImageSet().remove(image); 
-            session.remove(image);              
+            post.getPostImageSet().remove(image);
+            session.remove(image);
 
             // TODO: Xóa file khỏi Cloudinary nếu cần
             System.out.println("Đã xóa ảnh có ID: " + image.getId());

@@ -20,7 +20,7 @@ public interface UserRepository {
     User getUserByUsername(String username);
 
     User getUserById(long id);
-
+    
     void saveOrUpdate(User User);
 
     void changePassword(String username, ChangePasswordDTO dto);
@@ -38,5 +38,5 @@ public interface UserRepository {
     List<User> findUsersInGroup(Long groupId);
 
     List<User> findUsersNotInGroup(Long groupId);
-
+    
 }

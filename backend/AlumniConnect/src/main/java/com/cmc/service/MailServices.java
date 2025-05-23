@@ -18,5 +18,5 @@ public interface MailServices {
 
     void notifyTeacherAccountCreation(String teacherEmail, String teacherName, String username, String defaultPassword);
 
-    void sendInvitationEmail(String recipientEmail, String eventName, String eventDetails, LocalDateTime eventTime);
+    void sendInvitationEmail(String recipientName, String recientName, String eventName, String eventDetails, LocalDateTime eventTime);
 }

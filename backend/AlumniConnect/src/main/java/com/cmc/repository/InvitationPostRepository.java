@@ -6,6 +6,7 @@ package com.cmc.repository;
 
 import com.cmc.pojo.InvitationPost;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -24,4 +25,9 @@ public interface InvitationPostRepository {
     List<InvitationPost> findByInvitedUserId(Long userId);
     
     void delete(Long id);
+    
+    List<InvitationPost> findInvitationPosts(Map<String, String> params);
+
+    long countInvitationPosts(Map<String, String> params);
+    
 }
