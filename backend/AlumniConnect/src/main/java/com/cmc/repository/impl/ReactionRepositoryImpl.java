@@ -10,7 +10,9 @@ import com.cmc.pojo.Reaction;
 import com.cmc.repository.ReactionRepository;
 import com.cmc.service.PostService;
 import com.cmc.service.UserService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -53,15 +55,34 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         q.setParameter("postId", postId);
         return q.getResultList();
     }
-    
+
+//    @Override
+//    public Long countLikesByPostId(Long postId) {
+//        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId";
+//        Query<Long> query = getSession().createQuery(hql, Long.class);
+//        query.setParameter("postId", postId);
+//        return query.uniqueResult();
+//    }
+//    
     @Override
-    public Long countLikesByPostId(Long postId) {
-        String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId";
-        Query<Long> query = getSession().createQuery(hql, Long.class);
+    public Map<String, Long> countReactionsByPostId(Long postId) {
+        String hql = "SELECT r.reaction, COUNT(r.id) FROM Reaction r "
+                + "WHERE r.postId.id = :postId GROUP BY r.reaction";
+        Query<Object[]> query = getSession().createQuery(hql, Object[].class);
         query.setParameter("postId", postId);
-        return query.uniqueResult();
+
+        List<Object[]> results = query.getResultList();
+        Map<String, Long> reactionCounts = new HashMap<>();
+
+        for (Object[] row : results) {
+            String type = (String) row[0];
+            Long count = (Long) row[1];
+            reactionCounts.put(type, count);
+        }
+
+        return reactionCounts;
     }
-    
+
     @Override
     public boolean hasUserLikedPost(Long postId, Long userId) {
         String hql = "SELECT COUNT(r.id) FROM Reaction r WHERE r.postId.id = :postId AND r.userId.id = :userId";
@@ -71,8 +92,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         Long count = query.uniqueResult();
         return count != null && count > 0;
     }
-    
-    
+
     @Override
     public List<Reaction> findByReactionType(String reactionType, Long postId) {
         String sql = "From Reaction r WHERE r.reaction = :reactionType AND r.postId.id = :postId Order by -id";

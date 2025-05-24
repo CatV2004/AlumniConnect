@@ -6,6 +6,7 @@ package com.cmc.service;
 
 import com.cmc.pojo.Reaction;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -25,7 +26,7 @@ public interface ReactionService {
 
     boolean hasUserLikedPost(Long postId, Long userId);
 
-    Long countLikesByPost(Long postId);
+    Map<String, Long> countLikesByPost(Long postId);
     
     Reaction findByPostIdAndUserId(Long postId, Long userId);
 }

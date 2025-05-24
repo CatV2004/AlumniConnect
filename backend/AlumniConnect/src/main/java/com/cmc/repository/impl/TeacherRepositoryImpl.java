@@ -138,7 +138,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
             query.where(predicates.toArray(new Predicate[0]));
         }
 
-        query.select(root).orderBy(builder.desc(root.get("id"))); 
+        query.select(root).orderBy(builder.desc(root.get("id")));
 
         Query<Teacher> q = session.createQuery(query);
 
@@ -155,7 +155,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     }
 
     @Override
-    public Long countTeachers() {   
+    public Long countTeachers() {
         Session session = this.getCurrentSession();
         Query<Long> query = session.createQuery("SELECT count(*) FROM Teacher", Long.class);
         return query.uniqueResult();
@@ -180,4 +180,12 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         this.getCurrentSession().merge(teacher);
     }
 
+    @Override
+    public List<Teacher> findAllByMustChangePassword(LocalDateTime deadline) {
+        Session session = this.getCurrentSession();
+        String hql = "FROM Teacher t WHERE t.mustChangePassword = true AND t.passwordResetTime < :deadline";
+        return session.createQuery(hql, Teacher.class)
+                .setParameter("deadline", deadline)
+                .getResultList();
+    }
 }

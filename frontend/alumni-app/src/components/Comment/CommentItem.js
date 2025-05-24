@@ -19,7 +19,7 @@ const DropdownItem = ({ icon, children, onClick }) => (
     </button>
 );
 
-const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdated, showComment, handleDeleteComment, parentComment=null }) => {
+const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdated, showComment, handleDeleteComment, parentComment=null, isComment }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
     const [content, setContent] = useState(comment.content);
@@ -159,7 +159,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
 
                             {replyTo === comment.id && (
                                 <div className="mt-2">
-                                    <CommentCreated post={post} parentComment={comment.id} handleReplies={onCommentAdded} setReplyTo={setReplyTo} />
+                                    {isComment && (<CommentCreated post={post} parentComment={comment.id} handleReplies={onCommentAdded} setReplyTo={setReplyTo} />)}
                                 </div>
                             )}
                         </div>
@@ -180,7 +180,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                             {isOpen && (
                                 <div className="absolute left-10 bottom-2 mb-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                                     <div className="py-1">
-                                        {currentUser && currentUser.id === comment.userId.id && (
+                                        {isComment && currentUser && currentUser.id === comment.userId.id && (
                                             <DropdownItem
                                                 onClick={() => {
                                                     setUpdate(true);
@@ -192,7 +192,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                                 Sửa bình luận
                                             </DropdownItem>
                                         )}
-                                        {currentUser && (currentUser.id === userId || comment.userId.id === currentUser.id) && (
+                                        {isComment && currentUser && (currentUser.id === userId || comment.userId.id === currentUser.id) && (
                                             <DropdownItem icon={<Trash2 className="w-4 h-4" />}
                                                 onClick={deleteComent}>
                                                 Xóa bình luận
@@ -200,9 +200,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                         )}
 
                                         <DropdownItem
-                                            onClick={() => {
-                                                
-                                            }}
+                                            onClick={() => setIsOpen(false)}
                                             icon={<Flag className="w-4 h-4" />}
                                         >
                                             Báo cáo bình luận

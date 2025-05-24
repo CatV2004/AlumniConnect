@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.cmc.components;
-import com.cmc.service.PostService;
+
+import com.cmc.service.TeacherService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,23 +15,14 @@ import org.springframework.stereotype.Component;
  * @author PHAT
  */
 @Component
-public class PostComponents {
-
-    @Autowired
-    private JwtService jwtService;
+public class TeacherComponent {
     
     @Autowired
-    private PostService postService;
-
-    public String authorization(String auth) {
-        String token = auth.replace("Bearer ", "");
-        return jwtService.getUsernameFromToken(token);
-    }
+    private TeacherService teacherService;
     
-    @Scheduled(fixedRate = 86400000)
-    public void autoDeletedPost() {
-        LocalDateTime deadline = LocalDateTime.now().minusDays(30);
-        postService.autoDeletedPost(deadline);
+    @Scheduled(fixedRate = 300000)
+    public void autoLockUnchangedPasswords() {
+        LocalDateTime deadline = LocalDateTime.now().minusHours(24);
+        teacherService.lockExpiredAccounts(deadline);
     }
-
 }

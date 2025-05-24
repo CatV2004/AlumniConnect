@@ -7,10 +7,12 @@ package com.cmc.controllers;
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Teacher;
+import com.cmc.pojo.User;
 import com.cmc.service.AlumniService;
 import com.cmc.service.TeacherService;
 import com.cmc.service.UserService;
 import com.cmc.utils.ResponseMessage;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.modelmapper.ModelMapper;
@@ -22,8 +24,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,9 +55,8 @@ public class TeacherManageController {
 
         int page = Integer.parseInt(params.get("page"));
         int size = Integer.parseInt(params.get("size"));
-        
-        String username = params.get("username");
 
+        String username = params.get("username");
 
         List<Teacher> teachers = teacherService.getTeachers(params);
 
@@ -94,11 +97,11 @@ public class TeacherManageController {
                     .body(new ResponseMessage("Đã có lỗi xảy ra khi tạo tài khoản giảng viên."));
         }
     }
-    
+
     @PostMapping("/teachers/resetPassword/{id}")
     public String updateResetPasswordTime(@PathVariable("id") Long teacherId) {
         teacherService.resetPasswordChangeDeadline(teacherId);
-        return "redirect:/admin/teachers";  
+        return "redirect:/admin/teachers";
     }
 
 }

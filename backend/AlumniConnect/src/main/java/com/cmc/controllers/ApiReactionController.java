@@ -10,6 +10,7 @@ import com.cmc.pojo.Post;
 import com.cmc.pojo.Reaction;
 import com.cmc.service.ReactionService;
 import com.cmc.service.UserService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,9 +114,16 @@ public class ApiReactionController {
     
     
     @GetMapping("/like-count/{postId}")
-    public ResponseEntity<Long> countLikes(@PathVariable(value = "postId") Long postId) {
-        Long count = reactionService.countLikesByPost(postId);
+    public ResponseEntity<?> countLikes(@PathVariable(value = "postId") Long postId) {
+        try{
+            Map<String, Long> count = reactionService.countLikesByPost(postId);
         return ResponseEntity.ok(count);
+        }catch(Exception ex){
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "ERR_SERVER_INTERNAL");
+            return ResponseEntity.ok(error);
+        }
+        
     }
 
     @GetMapping("/reactions/{postId}/type-reaction")

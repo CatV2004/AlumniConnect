@@ -41,13 +41,15 @@ public class Teacher implements Serializable {
     private Long id;
     @Column(name = "must_change_password")
     private Boolean mustChangePassword;
+    
     @Column(name = "password_reset_time")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime passwordResetTime;
+    
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     private User userId;
-
+   
     public Teacher() {
     }
 
@@ -111,5 +113,6 @@ public class Teacher implements Serializable {
     public String toString() {
         return "com.cmc.pojo.Teacher[ id=" + id + " ]";
     }
+
     
 }

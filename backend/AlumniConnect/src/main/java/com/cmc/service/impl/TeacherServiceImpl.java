@@ -36,7 +36,6 @@ public class TeacherServiceImpl implements TeacherService {
     private MailServices mailServices;
     @Autowired
     private UserService userService;
-   
 
     @Override
     public boolean createTeacherAccount(TeacherDTO teacherDTO) {
@@ -89,5 +88,20 @@ public class TeacherServiceImpl implements TeacherService {
         teacher.setMustChangePassword(Boolean.FALSE);
         teacher.setPasswordResetTime(null);
         this.teacherRepository.updateTeacher(teacher);
+    }
+
+    @Override
+    public void lockExpiredAccounts(LocalDateTime dateTime
+    ) {
+        List<Teacher> expiredTeachers = this.teacherRepository.findAllByMustChangePassword(dateTime);
+        for (Teacher teacher : expiredTeachers) {
+            User user = teacher.getUserId();
+            if (Boolean.TRUE.equals(user.getActive())) {
+                teacher.setMustChangePassword(Boolean.FALSE);
+                user.setActive(Boolean.FALSE);
+                this.teacherRepository.saveOrUpdate(teacher);
+                this.userService.Save(user);
+            }
+        }
     }
 }

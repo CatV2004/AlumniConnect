@@ -6,6 +6,7 @@ package com.cmc.repository;
 
 import com.cmc.pojo.Reaction;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -25,7 +26,7 @@ public interface ReactionRepository {
     
     void deleteReaction(Reaction reaction);
     
-    Long countLikesByPostId(Long postId);
+    Map<String, Long> countReactionsByPostId(Long postId);
     
     boolean hasUserLikedPost(Long postId, Long userId);
     

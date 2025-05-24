@@ -195,6 +195,12 @@ public class UserServiceImpl implements UserService {
 
         this.userRepo.saveOrUpdate(user);
     }
+    
+    
+    @Override
+    public void Save(User user){
+        this.userRepo.saveOrUpdate(user);
+    }
 
     @Override
     public List<User> findUsersNotInGroup(Long groupId) {

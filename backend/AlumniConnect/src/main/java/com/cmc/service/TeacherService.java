@@ -8,6 +8,7 @@ import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,8 @@ public interface TeacherService {
     List<Teacher> getTeachers(Map<String, String> params);
 
     Long countTeachers();
-    
+
     void updatePass(Teacher teacher, ChangePasswordDTO dto);
+
+    void lockExpiredAccounts(LocalDateTime dateTime);
 }

@@ -26,39 +26,40 @@ import org.springframework.stereotype.Service;
  * @author PHAT
  */
 @Service
-public class CommentServiceImpl implements CommentService{
+public class CommentServiceImpl implements CommentService {
+
     @Autowired
     private CommentRepository commentRepo;
 
     @Autowired
     private PostRepository postRepo;
-    
+
     @Autowired
     private UserRepository userRepo;
-    
-    
+
     @Override
-    public Comment createComment(Map<String, String> pagram, String file, String username){
+    public Comment createComment(Map<String, String> pagram, String file, String username) {
         String content = pagram.get("content");
         User userId = this.userRepo.getUserByUsername(username);
         Post postId = this.postRepo.getPostId(Long.valueOf(pagram.get("postId")));
         String parentId = pagram.get("parentId");
-        
+
         Comment comment = new Comment();
         comment.setContent(content);
-        if (file != null)
+        if (file != null) {
             comment.setImage(file);
-        if(parentId != null )
+        }
+        if (parentId != null) {
             comment.setParentId(Long.valueOf(parentId));
+        }
         comment.setCreatedDate(LocalDateTime.now());
         comment.setUpdatedDate(LocalDateTime.now());
         comment.setUserId(userId);
         comment.setPostId(postId);
         comment.setActive(Boolean.TRUE);
-        
+
         return this.commentRepo.saveOrUpdate(comment);
     }
-    
 
     @Override
     public Comment updateComment(Long commentId, Long userId, String newContent, String pathFile) {
@@ -71,38 +72,64 @@ public class CommentServiceImpl implements CommentService{
         cmt.setUpdatedDate(LocalDateTime.now());
         return commentRepo.saveOrUpdate(cmt);
     }
-    
-    
+
     @Override
-    public Comment getCommentById(Long id){
+    public Comment getCommentById(Long id) {
         return this.commentRepo.getCommentById(id);
     }
 
-    @Override
     public boolean deleteComment(Long commentId, Long currentUserId) {
         Comment cmt = commentRepo.getCommentById(commentId);
-        if (cmt == null) return false;
+        if (cmt == null) {
+            return false;
+        }
 
         Long postOwnerId = cmt.getPostId().getUserId().getId();
         Long commentAuthorId = cmt.getUserId().getId();
 
         if (currentUserId.equals(postOwnerId) || currentUserId.equals(commentAuthorId)) {
-            cmt.setActive(false);
-            cmt.setDeletedDate(LocalDateTime.now());
-            commentRepo.saveOrUpdate(cmt);
-            
-            List<Comment> replies = commentRepo.getRepliesByParentId(commentId);
-
-            for (Comment reply : replies) {
-                reply.setActive(false);
-                reply.setDeletedDate(LocalDateTime.now());
-                commentRepo.saveOrUpdate(reply);
-            }
+            deleteCommentRecursively(cmt);
             return true;
         }
+
         return false;
     }
 
+    private void deleteCommentRecursively(Comment comment) {
+        comment.setActive(false);
+        comment.setDeletedDate(LocalDateTime.now());
+        commentRepo.saveOrUpdate(comment);
+
+        List<Comment> replies = commentRepo.getRepliesByParentId(comment.getId());
+        for (Comment reply : replies) {
+            deleteCommentRecursively(reply);
+        }
+    }
+
+//    @Override
+//    public boolean deleteComment(Long commentId, Long currentUserId) {
+//        Comment cmt = commentRepo.getCommentById(commentId);
+//        if (cmt == null) return false;
+//
+//        Long postOwnerId = cmt.getPostId().getUserId().getId();
+//        Long commentAuthorId = cmt.getUserId().getId();
+//
+//        if (currentUserId.equals(postOwnerId) || currentUserId.equals(commentAuthorId)) {
+//            cmt.setActive(false);
+//            cmt.setDeletedDate(LocalDateTime.now());
+//            commentRepo.saveOrUpdate(cmt);
+//            
+//            List<Comment> replies = commentRepo.getRepliesByParentId(commentId);
+//
+//            for (Comment reply : replies) {
+//                reply.setActive(false);
+//                reply.setDeletedDate(LocalDateTime.now());
+//                commentRepo.saveOrUpdate(reply);
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
     @Override
     public Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -110,12 +137,12 @@ public class CommentServiceImpl implements CommentService{
         long totalCommentByPost = this.commentRepo.totalCommentByPost(postId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
     }
-    
+
     @Override
-    public Long totalCommentByPost(Long postId){
+    public Long totalCommentByPost(Long postId) {
         return this.commentRepo.countByPostId(postId);
     }
-    
+
     @Override
     public Page<Comment> getCommentByComments(Long parentId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);

@@ -13,6 +13,7 @@ import com.cmc.service.ReactionService;
 import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,8 +59,8 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public Long countLikesByPost(Long postId) {
-        return this.reactionRepo.countLikesByPostId(postId);
+    public Map<String, Long> countLikesByPost(Long postId) {
+        return this.reactionRepo.countReactionsByPostId(postId);
     }
 
     @Override
