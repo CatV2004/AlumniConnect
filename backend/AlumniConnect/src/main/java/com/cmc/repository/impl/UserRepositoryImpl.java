@@ -69,13 +69,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void changePassword(String username, ChangePasswordDTO dto) {
-        User user = this.getUserByUsername(username);
-
-        if (user != null) {
-            user.setPassword(passEncoder.encode(dto.getNewPassword()));
-            getCurrentSession().flush();
-        }
+    public void changePassword(User user) {
+        getCurrentSession().merge(user);
+        getCurrentSession().flush();
     }
 
     @Override

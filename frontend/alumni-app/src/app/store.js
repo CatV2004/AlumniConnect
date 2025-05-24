@@ -3,6 +3,8 @@ import postReducer from '../features/posts/postSlice';
 import authReducer from '../features/auth/authSlice';
 import userReducer  from '../features/users/userSlice';
 import chatReducer  from '../features/chat/chatSlice';
+import notificationReducer  from '../features/notifications/notificationSlice';
+
 
 
 const store = configureStore({
@@ -11,6 +13,7 @@ const store = configureStore({
     posts: postReducer,
     users: userReducer,
     chat: chatReducer,
+    notifications: notificationReducer,
   },
 });
 

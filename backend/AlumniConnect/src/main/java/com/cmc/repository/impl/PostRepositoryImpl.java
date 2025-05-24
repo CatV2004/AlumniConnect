@@ -137,22 +137,34 @@ public class PostRepositoryImpl implements PostRepository {
         return false;
     }
 
+//    @Override
+//    public boolean deletePostPermanently(Long postId) {
+//        Session session = getSession();
+//        CriteriaBuilder cb = session.getCriteriaBuilder();
+//
+//        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
+//        Root<Post> root = cq.from(Post.class);
+//        cq.select(root).where(
+//                cb.and(
+//                        cb.equal(root.get("id"), postId),
+//                        cb.isFalse(root.get("active")),
+//                        cb.isNotNull(root.get("deletedDate"))
+//                )
+//        );
+//
+//        Post post = session.createQuery(cq).uniqueResult();
+//
+//        if (post != null) {
+//            session.remove(post);
+//            return true;
+//        }
+//
+//        return false;
+//    }
     @Override
     public boolean deletePostPermanently(Long postId) {
         Session session = getSession();
-        CriteriaBuilder cb = session.getCriteriaBuilder();
-
-        CriteriaQuery<Post> cq = cb.createQuery(Post.class);
-        Root<Post> root = cq.from(Post.class);
-        cq.select(root).where(
-                cb.and(
-                        cb.equal(root.get("id"), postId),
-                        cb.isFalse(root.get("active")),
-                        cb.isNotNull(root.get("deletedDate"))
-                )
-        );
-
-        Post post = session.createQuery(cq).uniqueResult();
+        Post post = session.get(Post.class, postId);
 
         if (post != null) {
             session.remove(post);
@@ -161,7 +173,7 @@ public class PostRepositoryImpl implements PostRepository {
 
         return false;
     }
-
+    
     @Override
     public int updateContent(Long id, String content) {
         Query q = getSession().createQuery("UPDATE Post p SET p.content = :content WHERE p.id = :id");

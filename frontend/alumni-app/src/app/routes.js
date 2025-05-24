@@ -15,6 +15,7 @@ import SurveyPage from "../pages/SurveyPage";
 import SurveyDetailPage from "../pages/SurveyDetailPage";
 import SurveyStatsPage from "../pages/SurveyStatsPage";
 import PrivateRoute from "../components/routing/PrivateRoute";
+import ChangePasswordPage from "../pages/ChangePasswordPage";
 
 const RoutesConfig = () => (
   <Router>
@@ -27,6 +28,7 @@ const RoutesConfig = () => (
         <Route path="/survey/:postId" element={<SurveyDetailPage />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/deleted-posts" element={<DeletedPostsPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route
           path="/surveys/stats/:surveyPostId"
           element={

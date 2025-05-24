@@ -23,7 +23,7 @@ public interface UserRepository {
     
     void saveOrUpdate(User User);
 
-    void changePassword(String username, ChangePasswordDTO dto);
+    void changePassword(User user);
 
     boolean authUser(String username, String password, String role);
 

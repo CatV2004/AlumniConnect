@@ -122,7 +122,7 @@ const PostItem = ({ post }) => {
 
       {/* Post Actions */}
       <div className="px-4 py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
-        <button
+        {/* <button
           onClick={toggleLike}
           className={`flex items-center justify-center gap-2 w-full py-2 rounded-md 
                 transition-all duration-150 ease-in-out 
@@ -153,7 +153,7 @@ const PostItem = ({ post }) => {
         >
           <FaShare className="w-5 h-5" />
           Share
-        </button>
+        </button> */}
       </div>
 
     </div>

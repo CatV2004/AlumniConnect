@@ -1,6 +1,30 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:8080/AlumniConnect/api";
 
+export const changePassword = async (token, oldPassword, newPassword) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/users/password`,
+      {
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("Đã xảy ra lỗi khi đổi mật khẩu");
+    }
+  }
+};
+
 export const getUserProfile = async (userId, token) => {
   try {
     const response = await axios.get(`${BASE_URL}/users/${userId}`, {

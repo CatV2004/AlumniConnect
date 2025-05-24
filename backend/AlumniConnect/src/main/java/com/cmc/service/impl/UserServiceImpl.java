@@ -5,6 +5,7 @@
 package com.cmc.service.impl;
 
 import com.cmc.components.CloudinaryService;
+import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.PageResponse;
 import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
@@ -70,12 +71,12 @@ public class UserServiceImpl implements UserService {
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        
+
         String role = user.getRole();
         if (role == null || role.isEmpty()) {
             throw new UsernameNotFoundException("User role is missing for: " + username);
         }
-        
+
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
 
         return new org.springframework.security.core.userdetails.User(
@@ -199,10 +200,21 @@ public class UserServiceImpl implements UserService {
     public List<User> findUsersNotInGroup(Long groupId) {
         return this.userRepo.findUsersNotInGroup(groupId);
     }
-    
+
     @Override
     public List<User> findUsersInGroup(Long groupId) {
         return this.userRepo.findUsersInGroup(groupId);
+    }
+
+    @Override
+    public void changePassword(User user, ChangePasswordDTO dto) {
+        user.setPassword(passEncoder.encode(dto.getNewPassword()));
+        if (user.getTeacher() != null) {
+            Teacher teacher = user.getTeacher();
+            teacher.setMustChangePassword(Boolean.FALSE);
+            teacher.setPasswordResetTime(null);
+        }
+        this.userRepo.changePassword(user);
     }
 
 }

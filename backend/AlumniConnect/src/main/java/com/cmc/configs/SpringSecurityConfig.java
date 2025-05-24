@@ -70,8 +70,10 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/survey-posts/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/statistics/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/js/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

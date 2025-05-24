@@ -175,4 +175,9 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         return query.uniqueResult();
     }
 
+    @Override
+    public void updateTeacher(Teacher teacher) {
+        this.getCurrentSession().merge(teacher);
+    }
+
 }

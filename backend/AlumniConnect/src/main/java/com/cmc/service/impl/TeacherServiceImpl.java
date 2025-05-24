@@ -4,12 +4,14 @@
  */
 package com.cmc.service.impl;
 
+import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.TeacherDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
 import com.cmc.repository.TeacherRepository;
 import com.cmc.service.MailServices;
 import com.cmc.service.TeacherService;
+import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,9 @@ public class TeacherServiceImpl implements TeacherService {
     private TeacherRepository teacherRepository;
     @Autowired
     private MailServices mailServices;
+    @Autowired
+    private UserService userService;
+   
 
     @Override
     public boolean createTeacherAccount(TeacherDTO teacherDTO) {
@@ -76,5 +81,13 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public Long countTeachers() {
         return this.teacherRepository.countTeachers();
+    }
+
+    @Override
+    public void updatePass(Teacher teacher, ChangePasswordDTO dto) {
+        this.userService.changePassword(teacher.getUserId(), dto);
+        teacher.setMustChangePassword(Boolean.FALSE);
+        teacher.setPasswordResetTime(null);
+        this.teacherRepository.updateTeacher(teacher);
     }
 }

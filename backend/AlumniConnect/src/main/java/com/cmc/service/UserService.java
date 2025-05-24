@@ -4,6 +4,7 @@
  */
 package com.cmc.service;
 
+import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.PageResponse;
 import com.cmc.dtos.ResponseUserDTO;
 import com.cmc.dtos.UserDTO;
@@ -36,5 +37,7 @@ public interface UserService extends UserDetailsService {
     List<User> findUsersNotInGroup(Long groupId);
     
     List<User> findUsersInGroup(Long groupId);
+    
+    void changePassword(User user, ChangePasswordDTO dto);
 
 }

@@ -1,21 +1,20 @@
-import React from 'react';
-import moment from 'moment';
-import 'moment/locale/vi';
+import React from "react";
+import moment from "moment";
+import "moment/locale/vi";
 import {
   Calendar as CalendarIcon,
   MapPin as LocationIcon,
   Users as UsersIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
-moment.locale('vi');
+moment.locale("vi");
 
 const InvitationPost = ({ invitation }) => {
   if (!invitation) return null;
-
   const formatDate = (dateArray) => {
-    if (!dateArray) return '';
+    if (!dateArray) return "";
     const date = new Date(...dateArray);
-    return moment(date).format('llll');
+    return moment(date).format("llll");
   };
 
   return (
@@ -37,7 +36,7 @@ const InvitationPost = ({ invitation }) => {
           <CalendarIcon className="w-5 h-5 mt-1 text-gray-500 hover:text-blue-600 transition-colors" />
           <div>
             <p className="font-medium">Event Time</p>
-            <p>{formatDate(invitation.startTime)}</p>
+            <p>{formatDate(invitation.eventTime)}</p>
             {invitation.endTime && <p>to {formatDate(invitation.endTime)}</p>}
           </div>
         </div>
@@ -57,7 +56,7 @@ const InvitationPost = ({ invitation }) => {
             <UsersIcon className="w-5 h-5 mt-1 text-gray-500 hover:text-blue-600 transition-colors" />
             <div>
               <p className="font-medium">Participants</p>
-              <p>{invitation.participants.join(', ')}</p>
+              <p>{invitation.participants.join(", ")}</p>
             </div>
           </div>
         )}

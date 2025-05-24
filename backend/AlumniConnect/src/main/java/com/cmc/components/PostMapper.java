@@ -20,7 +20,6 @@ import com.cmc.pojo.PostImage;
 import com.cmc.pojo.SurveyPost;
 import com.cmc.pojo.SurveyQuestion;
 import com.cmc.pojo.User;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -75,6 +74,7 @@ public class PostMapper {
 
         InvitationDTO dto = new InvitationDTO();
         dto.setEventName(invitation.getEventName());
+        dto.setEventTime(invitation.getEventTime());
         List<Long> invitedIds = invitation.getUserSet().stream()
                 .map(User::getId)
                 .collect(Collectors.toList());

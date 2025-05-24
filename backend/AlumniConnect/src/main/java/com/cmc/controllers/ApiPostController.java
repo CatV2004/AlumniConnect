@@ -266,15 +266,22 @@ public class ApiPostController {
     public ResponseEntity<String> forceDeletePost(
             @PathVariable("postId") Long postId,
             Principal principal) {
-        
-        String username = principal.getName();
-        Post post = postService.getPostIdOfDL(postId);
-        User user = userService.getUserByUsername(username);
 
-        if (post == null || user == null) {
-            return ResponseEntity.badRequest().body("Bài viết hoặc người dùng không tồn tại.");
+        Post post = new Post();
+        String username = principal.getName();
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không tồn tại.");
         }
 
+        post = user.getRole().equalsIgnoreCase("ADMIN")
+                ? postService.getPostById(postId)
+                : postService.getPostIdOfDL(postId);
+        
+        if (post == null) {
+            System.out.println("Không có bài post");
+            return ResponseEntity.badRequest().body("Bài viết không tồn tại hoặc không đủ điều kiện để xóa.");
+        }
         boolean isOwner = post.getUserId().getUsername().equals(username);
         boolean isAdmin = user.getRole().equalsIgnoreCase("ADMIN");
 

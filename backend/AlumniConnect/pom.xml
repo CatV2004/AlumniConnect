@@ -206,6 +206,18 @@
             <version>6.2.5</version>
         </dependency>
         
+        <!--websocket-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>6.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>6.2.5</version>
+        </dependency>
+        
     </dependencies>
     
     <build>

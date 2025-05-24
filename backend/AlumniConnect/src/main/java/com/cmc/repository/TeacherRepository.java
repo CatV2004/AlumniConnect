@@ -31,4 +31,6 @@ public interface TeacherRepository {
     
     Teacher getTeacherById(Long id);
     
+    void updateTeacher(Teacher teacher);
+    
 }

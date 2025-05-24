@@ -20,8 +20,10 @@ import com.cmc.repository.UgroupRepository;
 import com.cmc.repository.UserRepository;
 import com.cmc.service.InvitationService;
 import com.cmc.service.MailServices;
+import com.cmc.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,62 +57,168 @@ public class InvitationServiceImpl implements InvitationService {
     @Autowired
     private InvitationPostRepository invitationPostRepo;
 
-    @Override
-    public void createInvitation(InvitationRequestDTO invitationRequestDTO) {
-        try {
-            if (invitationRequestDTO.getContent() == null
-                    || invitationRequestDTO.getEventName() == null
-                    || invitationRequestDTO.getEventTime() == null) {
-                throw new IllegalArgumentException("Post, event name and event time cannot be null");
-            }
+    @Autowired
+    private NotificationService notificationService;
 
-            System.out.println("✅ Content: " + invitationRequestDTO.getContent());
-            System.out.println("✅ Username: " + (invitationRequestDTO.getUser() != null ? invitationRequestDTO.getUser().getUsername() : "null"));
-            System.out.println("✅ Event Name: " + invitationRequestDTO.getEventName());
-            System.out.println("✅ Event Time: " + invitationRequestDTO.getEventTime());
-            System.out.println("✅ Target Users: " + invitationRequestDTO.getUserIds());
-            System.out.println("✅ Target Groups: " + invitationRequestDTO.getGroupIds());
+//    @Override
+//    public void createInvitation(InvitationRequestDTO invitationRequestDTO) {
+//        try {
+//            if (invitationRequestDTO.getContent() == null
+//                    || invitationRequestDTO.getEventName() == null
+//                    || invitationRequestDTO.getEventTime() == null) {
+//                throw new IllegalArgumentException("Post, event name and event time cannot be null");
+//            }
+//
+//            System.out.println("✅ Content: " + invitationRequestDTO.getContent());
+//            System.out.println("✅ Username: " + (invitationRequestDTO.getUser() != null ? invitationRequestDTO.getUser().getUsername() : "null"));
+//            System.out.println("✅ Event Name: " + invitationRequestDTO.getEventName());
+//            System.out.println("✅ Event Time: " + invitationRequestDTO.getEventTime());
+//            System.out.println("✅ Target Users: " + invitationRequestDTO.getUserIds());
+//            System.out.println("✅ Target Groups: " + invitationRequestDTO.getGroupIds());
+//
+//            Post post = new Post();
+//            post.setContent(invitationRequestDTO.getContent());
+//            post.setLockComment(invitationRequestDTO.getLockComment());
+//            post.setUserId(invitationRequestDTO.getUser());
+//
+//            Post savedPost = postRepo.addPost(post);
+//
+//            InvitationPost invitation = new InvitationPost();
+//            invitation.setEventName(invitationRequestDTO.getEventName());
+//            invitation.setEventTime(invitationRequestDTO.getEventTime());
+//            invitation.setPost(savedPost);
+//            savedPost.setInvitationPost(invitation);
+//
+//            if (invitationRequestDTO.getGroupIds() != null && !invitationRequestDTO.getGroupIds().isEmpty()) {
+//                Set<Ugroup> groups = new HashSet<>();
+//                for (Long groupId : invitationRequestDTO.getGroupIds()) {
+//                    System.out.println("👉 Fetching group by ID: " + groupId);
+//                    Ugroup group = ugroupRepo.findById(groupId);
+//                    if (group == null) {
+//                        throw new EntityNotFoundException("Group not found with id: " + groupId);
+//                    }
+//                    groups.add(group);
+//                }
+//                invitation.setUgroupSet(groups);
+//            }
+//
+//            if (invitationRequestDTO.getUserIds() != null && !invitationRequestDTO.getUserIds().isEmpty()) {
+//                Set<User> users = new HashSet<>();
+//                for (Long userId : invitationRequestDTO.getUserIds()) {
+//                    User user = userRepo.getUserById(userId);
+//                    if (user == null) {
+//                        throw new EntityNotFoundException("User not found with id: " + userId);
+//                    }
+//                    users.add(user);
+//                }
+//                invitation.setUserSet(users);
+//            }
+//            invitationPostRepo.save(invitation);
+//
+//            sendInvitationEmails(invitation, invitationRequestDTO.getEventTime());
+//            sendInvitationNotifications(invitation, invitationRequestDTO.getUser());
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw e;
+//        }
+//    }
+//
+//    private void sendInvitationNotifications(InvitationPost invitation, User sender) {
+//        Set<User> allInvitedUsers = new HashSet<>();
+//
+//        if (invitation.getUserSet() != null) {
+//            allInvitedUsers.addAll(invitation.getUserSet());
+//        }
+//
+//        if (invitation.getUgroupSet() != null) {
+//            for (Ugroup group : invitation.getUgroupSet()) {
+//                allInvitedUsers.addAll(group.getUserSet());
+//            }
+//        }
+//
+//        for (User recipient : allInvitedUsers) {
+//            String message = String.format("Bạn được mời tham dự sự kiện '%s' vào lúc %s",
+//                    invitation.getEventName(),
+//                    invitation.getEventTime().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")));
+//
+//            String link = "/invitations/" + invitation.getId();
+//
+//            notificationService.createNotification(
+//                    recipient,
+//                    sender,
+//                    message,
+//                    link,
+//                    "INVITATION");
+//        }
+//    }
+//
+//    private void sendInvitationEmails(InvitationPost invitation, LocalDateTime eventTime) {
+//        Set<User> recipients = new HashSet<>();
+//
+//        if (invitation.getUgroupSet() != null) {
+//            for (Ugroup group : invitation.getUgroupSet()) {
+//                List<User> groupUsers = userRepo.findUsersInGroup(group.getId());
+//                if (groupUsers != null) {
+//                    recipients.addAll(groupUsers);
+//                }
+//            }
+//        }
+//
+//        if (invitation.getUserSet() != null) {
+//            recipients.addAll(invitation.getUserSet());
+//        }
+//
+//        recipients.stream()
+//                .filter(user -> user.getEmail() != null && !user.getEmail().isEmpty())
+//                .forEach(user -> {
+//                    mailService.sendInvitationEmail(
+//                            user.getEmail(),
+//                            user.getFirstName() + " " + user.getLastName(),
+//                            invitation.getEventName(),
+//                            invitation.getPost().getContent(),
+//                            eventTime
+//                    );
+//                });
+//    }
+    @Override
+    public void createInvitation(InvitationRequestDTO dto) {
+        try {
+            validateInvitationRequest(dto);
 
             Post post = new Post();
-            post.setContent(invitationRequestDTO.getContent());
-            post.setLockComment(invitationRequestDTO.getLockComment());
-            post.setUserId(invitationRequestDTO.getUser());
+            post.setContent(dto.getContent());
+            post.setLockComment(dto.getLockComment());
+            post.setUserId(dto.getUser());
 
             Post savedPost = postRepo.addPost(post);
 
             InvitationPost invitation = new InvitationPost();
-            invitation.setEventName(invitationRequestDTO.getEventName());
-            invitation.setEventTime(invitationRequestDTO.getEventTime());
+            invitation.setEventName(dto.getEventName());
+            invitation.setEventTime(dto.getEventTime());
             invitation.setPost(savedPost);
             savedPost.setInvitationPost(invitation);
 
-            if (invitationRequestDTO.getGroupIds() != null && !invitationRequestDTO.getGroupIds().isEmpty()) {
-                Set<Ugroup> groups = new HashSet<>();
-                for (Long groupId : invitationRequestDTO.getGroupIds()) {
-                    System.out.println("👉 Fetching group by ID: " + groupId);
-                    Ugroup group = ugroupRepo.findById(groupId);
-                    if (group == null) {
-                        throw new EntityNotFoundException("Group not found with id: " + groupId);
-                    }
-                    groups.add(group);
-                }
+            if (dto.getGroupIds() != null) {
+                Set<Ugroup> groups = dto.getGroupIds().stream()
+                        .map(this::getGroupById)
+                        .collect(Collectors.toSet());
                 invitation.setUgroupSet(groups);
             }
 
-            if (invitationRequestDTO.getUserIds() != null && !invitationRequestDTO.getUserIds().isEmpty()) {
-                Set<User> users = new HashSet<>();
-                for (Long userId : invitationRequestDTO.getUserIds()) {
-                    User user = userRepo.getUserById(userId);
-                    if (user == null) {
-                        throw new EntityNotFoundException("User not found with id: " + userId);
-                    }
-                    users.add(user);
-                }
+            if (dto.getUserIds() != null) {
+                Set<User> users = dto.getUserIds().stream()
+                        .map(this::getUserById)
+                        .collect(Collectors.toSet());
                 invitation.setUserSet(users);
             }
+
             invitationPostRepo.save(invitation);
 
-            sendInvitationEmails(invitation, invitationRequestDTO.getEventTime());
+            Set<User> invitedUsers = getAllInvitedUsers(invitation);
+
+            sendInvitationEmails(invitedUsers, invitation, dto.getEventTime());
+            sendInvitationNotifications(invitedUsers, invitation, dto.getUser());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,33 +226,67 @@ public class InvitationServiceImpl implements InvitationService {
         }
     }
 
-    private void sendInvitationEmails(InvitationPost invitation, LocalDateTime eventTime) {
-        Set<User> recipients = new HashSet<>();
+    private void validateInvitationRequest(InvitationRequestDTO dto) {
+        if (dto.getContent() == null || dto.getEventName() == null || dto.getEventTime() == null) {
+            throw new IllegalArgumentException("Post, event name and event time cannot be null");
+        }
+    }
+
+    private Ugroup getGroupById(Long groupId) {
+        Ugroup group = ugroupRepo.findById(groupId);
+        if (group == null) {
+            throw new EntityNotFoundException("Group not found with id: " + groupId);
+        }
+        return group;
+    }
+
+    private User getUserById(Long userId) {
+        User user = userRepo.getUserById(userId);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+        return user;
+    }
+
+    private Set<User> getAllInvitedUsers(InvitationPost invitation) {
+        Set<User> allUsers = new HashSet<>();
+
+        if (invitation.getUserSet() != null) {
+            allUsers.addAll(invitation.getUserSet());
+        }
 
         if (invitation.getUgroupSet() != null) {
             for (Ugroup group : invitation.getUgroupSet()) {
-                List<User> groupUsers = userRepo.findUsersInGroup(group.getId());
-                if (groupUsers != null) {
-                    recipients.addAll(groupUsers);
-                }
+                allUsers.addAll(userRepo.findUsersInGroup(group.getId()));
             }
         }
 
-        if (invitation.getUserSet() != null) {
-            recipients.addAll(invitation.getUserSet());
-        }
+        return allUsers;
+    }
 
+    private void sendInvitationNotifications(Set<User> recipients, InvitationPost invitation, User sender) {
+        String message = String.format(
+                "Bạn được mời tham dự sự kiện '%s' vào lúc %s",
+                invitation.getEventName(),
+                invitation.getEventTime().format(DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"))
+        );
+        String link = "/invitations/" + invitation.getId();
+
+        recipients.forEach(user -> notificationService.createNotification(
+                user, sender, message, link, "INVITATION"
+        ));
+    }
+
+    private void sendInvitationEmails(Set<User> recipients, InvitationPost invitation, LocalDateTime eventTime) {
         recipients.stream()
                 .filter(user -> user.getEmail() != null && !user.getEmail().isEmpty())
-                .forEach(user -> {
-                    mailService.sendInvitationEmail(
-                            user.getEmail(),
-                            user.getFirstName() + " " + user.getLastName(),
-                            invitation.getEventName(),
-                            invitation.getPost().getContent(),
-                            eventTime
-                    );
-                });
+                .forEach(user -> mailService.sendInvitationEmail(
+                user.getEmail(),
+                user.getFirstName() + " " + user.getLastName(),
+                invitation.getEventName(),
+                invitation.getPost().getContent(),
+                eventTime
+        ));
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.cmc.components.JwtService;
 import com.cmc.dtos.AlumniDTO;
 import com.cmc.dtos.AlumniRegisterDTO;
 import com.cmc.dtos.AlumniResponseDTO;
+import com.cmc.dtos.ChangePasswordDTO;
 import com.cmc.dtos.ErrorResponseDTO;
 import com.cmc.dtos.LoginRequestDTO;
 import com.cmc.dtos.PageResponse;
@@ -31,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -63,6 +65,8 @@ public class ApiUserController {
     private AlumniService alumniService;
     @Autowired
     private PostService postService;
+    @Autowired
+    private PasswordEncoder passEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginDTO) {
@@ -79,6 +83,31 @@ public class ApiUserController {
 
         response.put("message", "Tên đăng nhập hoặc mật khẩu không đúng!");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @PutMapping("/users/password")
+    public ResponseEntity<Map<String, Object>> changePassword(
+            @RequestBody ChangePasswordDTO dto,
+            Principal principal) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        User user = userService.getUserByUsername(principal.getName());
+
+        if (user == null) {
+            response.put("message", "Người dùng không tồn tại");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        if (!passEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            response.put("message", "Mật khẩu cũ không đúng");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        userService.changePassword(user, dto);
+
+        response.put("message", "Đổi mật khẩu thành công");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(path = "/users",

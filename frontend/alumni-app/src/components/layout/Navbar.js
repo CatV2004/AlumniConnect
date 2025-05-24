@@ -4,27 +4,70 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
 import MessengerDropdown from "../Message/MessengerDropdown";
 import NotificationDropdown from "../Notification/NotificationDropdown";
-import { Home, BarChart2, Calendar } from "lucide-react";
+import { Home, BarChart2, Calendar, Search } from "lucide-react";
 import { ChatService } from "../../services/chatService";
 import { db } from "../../app/firebaseConfig";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { useNotifications } from "../../hooks/useNotifications";
+import { markAsRead } from "../../features/notifications/notificationSlice";
 
 const Navbar = ({ onOpenChat }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { notifications, handleMarkAsRead } = useNotifications();
   const [showMessenger, setShowMessenger] = useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  useEffect(() => {
+    console.log("Notification state updated:", notifications);
+  }, [notifications]);
 
-  const notifications = [
-    { id: 1, text: "Bạn có 1 lời mời tham gia sự kiện", time: "2 giờ trước" },
-    { id: 2, text: "3 cựu học sinh mới đăng ký", time: "5 giờ trước" },
-  ];
+  // const notifications = [
+  //   { id: 1, text: "Bạn có 1 lời mời tham gia sự kiện", time: "2 giờ trước" },
+  //   { id: 2, text: "3 cựu học sinh mới đăng ký", time: "5 giờ trước" },
+  // ];
+
+  // Hàm xử lý tìm kiếm
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setShowSearchResults(false);
+    }
+  };
+
+  // Hàm xử lý thay đổi input search
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value) {
+      setShowSearchResults(true);
+    } else {
+      setShowSearchResults(false);
+    }
+  };
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (isSearchFocused && !searchQuery) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isSearchFocused, searchQuery]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -32,7 +75,6 @@ const Navbar = ({ onOpenChat }) => {
 
     const fetchUnreadCount = async () => {
       const result = await ChatService.getTotalUnreadCount(user.id.toString());
-      console.log("UnreadMessageCount: ", result);
 
       if (result.success) {
         setUnreadMessageCount(result.count);
@@ -82,6 +124,10 @@ const Navbar = ({ onOpenChat }) => {
   const handleMarkAllAsRead = () => {
     setShowNotifications(false);
   };
+  const handleMarkAsReaded = (notificationId) => {
+    console.log("Đánh dấu đã đọc notification:", notificationId);
+    dispatch(markAsRead(notificationId));
+  };
 
   const closeAllDropdowns = () => {
     setShowMenu(false);
@@ -91,16 +137,75 @@ const Navbar = ({ onOpenChat }) => {
 
   return (
     <nav className="bg-white shadow px-6 py-3 fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         {/* Logo */}
-        <div>
-          <Link to="/" className="text-2xl font-bold text-blue-600">
+        <div className="flex items-center space-x-4 w-1/3">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-2xl font-bold text-blue-600 whitespace-nowrap"
+          >
             AlumniConnect
           </Link>
+
+          {/* Thanh tìm kiếm */}
+          <div className="hidden md:flex flex-1 relative">
+            <form onSubmit={handleSearch} className="w-full">
+              <div className="relative w-full">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="w-5 h-5 text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  className="bg-gray-100 border-none text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-2"
+                  placeholder="Tìm kiếm trên AlumniConnect..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => {
+                    setIsSearchFocused(true);
+                    if (searchQuery) setShowSearchResults(true);
+                  }}
+                  onBlur={() => setIsSearchFocused(false)}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setShowSearchResults(false);
+                    }}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </form>
+
+            {/* Dropdown kết quả tìm kiếm */}
+            {showSearchResults && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                <div className="p-4 text-center text-gray-500">
+                  <p>Nhập để tìm kiếm cựu học sinh, bài viết, sự kiện...</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Menu giữa */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
           <Link
             to="/home"
             className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all ${
@@ -183,12 +288,10 @@ const Navbar = ({ onOpenChat }) => {
                 )}
               </div>
 
-              {/* Notification Icon */}
               <div className="relative">
                 <button
                   onClick={() => {
                     setShowNotifications(!showNotifications);
-                    setShowMessenger(false);
                   }}
                   className={`p-2 rounded-full transition-colors duration-200 relative ${
                     showNotifications
@@ -210,18 +313,19 @@ const Navbar = ({ onOpenChat }) => {
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                     />
                   </svg>
-                  {notifications.length > 0 && (
+                  {notifications.unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                      {notifications.length}
+                      {notifications.unreadCount}
                     </span>
                   )}
                 </button>
 
                 {showNotifications && (
                   <NotificationDropdown
-                    notifications={notifications}
+                    notifications={notifications.list}
                     onClose={closeAllDropdowns}
                     onMarkAllAsRead={handleMarkAllAsRead}
+                    onMarkAsRead={handleMarkAsReaded}
                   />
                 )}
               </div>
@@ -259,6 +363,16 @@ const Navbar = ({ onOpenChat }) => {
                     >
                       Trang cá nhân
                     </Link>
+                    <button
+                      onClick={() => {
+                        closeAllDropdowns();
+                        navigate("/change-password");
+                      }}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                    >
+                      Đổi mật khẩu
+                    </button>
+
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"

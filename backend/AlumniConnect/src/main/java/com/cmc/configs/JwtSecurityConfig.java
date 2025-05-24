@@ -50,14 +50,14 @@ public class JwtSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                //.requestMatchers("/api/login/**").permitAll()
-
                 .requestMatchers("/api/current-user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/posts").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/users/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/update").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/current-user").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/survey-posts/**").hasRole("ADMIN")
-                //.requestMatchers("/api/admin/**").hasRole("ADMIN")
-                //.requestMatchers("/api/users/**").hasAnyRole("ALUMNI", "TEACHER")
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 )

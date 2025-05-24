@@ -31,7 +31,7 @@ moment.locale("vi");
 
 const PostItem = ({ post }) => {
   const role = useSelector((state) => state.auth.role);
-
+  // console.log("post: ", post);
   const [showComment, setShowComment] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);

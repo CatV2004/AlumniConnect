@@ -13,8 +13,17 @@ import java.util.List;
  */
 public class InvitationDTO {
     private String eventName;
+    private LocalDateTime eventTime;
     private List<Long> invitedUserIds;
 
+    public LocalDateTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(LocalDateTime eventTime) {
+        this.eventTime = eventTime;
+    }
+    
     public String getEventName() {
         return eventName;
     }
