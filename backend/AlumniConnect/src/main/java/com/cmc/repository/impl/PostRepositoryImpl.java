@@ -384,7 +384,7 @@ public class PostRepositoryImpl implements PostRepository {
                 .setParameter("id", id)
                 .uniqueResult();
     }
-
+    
     @Override
     public List<Post> getDeletedPostsByUser(Map<String, Object> params) {
         Session session = getSession();
@@ -491,6 +491,24 @@ public class PostRepositoryImpl implements PostRepository {
 
             // TODO: Xóa file khỏi Cloudinary nếu cần
             System.out.println("Đã xóa ảnh có ID: " + image.getId());
+        }
+    }
+    
+    
+    @Override
+    public List<Post> getPostsDelete(LocalDateTime dateTime) {
+        Session session = getSession();
+        String hql = "FROM Post p WHERE p.active = false AND p.deletedDate < :dateTime";
+        return session.createQuery(hql, Post.class)
+                .setParameter("dateTime", dateTime)
+                .getResultList();
+    }
+    
+    @Override
+    public void deletePost(Post p){
+        Session s = getSession();
+        if(p != null){
+            s.remove(p);
         }
     }
 

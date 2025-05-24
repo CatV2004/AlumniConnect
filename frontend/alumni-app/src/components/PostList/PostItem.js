@@ -31,6 +31,8 @@ moment.locale("vi");
 
 const PostItem = ({ post }) => {
   const role = useSelector((state) => state.auth.role);
+  const user = useSelector((state) => state.auth);
+
 
   const [showComment, setShowComment] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
@@ -60,11 +62,17 @@ const PostItem = ({ post }) => {
     };
 
     const fetchReactionUser = async () => {
-      const reaction = await FindReaction(post.id);
-      if (reaction !== "" || reaction !== null) {
-        setReactionType(reaction.reaction);
+      try {
+        const reaction = await FindReaction(post.id);
+        if (reaction && reaction.reaction) {
+          setReactionType(reaction.reaction);
+        } else {
+          setReactionType(null);
+        }
+      } catch (err) {
+        console.error("Lỗi khi fetch reaction của user:", err);
+        setReactionType(null);
       }
-
     }
 
     const fetchCommentByPost = async () => {
@@ -72,9 +80,11 @@ const PostItem = ({ post }) => {
       setCommentCount(countC);
     }
 
-    fetchReactions();
-    fetchCommentByPost();
-    fetchReactionUser();
+    if (user !== null) {
+      fetchReactions();
+      fetchCommentByPost();
+      fetchReactionUser();
+    }
   }, [post.id]);
 
   const toggleComments = () => {
@@ -97,7 +107,7 @@ const PostItem = ({ post }) => {
         newReactionPost = newReactionPost.filter(r => r !== typeReaction);
       }
     }
-    
+
     if (!newReactionPost.includes(typeReaction)) {
       newReactionPost.push(typeReaction);
     }

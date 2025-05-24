@@ -7,6 +7,7 @@ package com.cmc.repository;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import com.cmc.pojo.SurveyPost;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Pageable;
@@ -66,5 +67,8 @@ public interface PostRepository {
     void deleteImagesByPost(Post post);
     
     void deleteImagesNotInList(Post post, List<Long> keepImageIds);
-
+    
+    List<Post> getPostsDelete(LocalDateTime dateTime);
+    
+    void deletePost(Post p);
 }

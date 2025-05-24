@@ -15,6 +15,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
     const [page, setPage] = useState(0);
     const [size] = useState(5);
     const [hasMore, setHasMore] = useState(true);
+    const [isComment, setIsComment] = useState(post.lockComment || false)
 
 
     useEffect(() => {
@@ -30,9 +31,9 @@ const CommentList = ({ post, showComment, setCountComment }) => {
     }, [page]);
 
 
-    useEffect(()=> {
+    useEffect(() => {
         fetchCommentByPost();
-    },[comments])
+    }, [comments])
 
     const fetchComments = async () => {
         try {
@@ -61,7 +62,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
         }
     };
 
-     const fetchCommentByPost = async () => {
+    const fetchCommentByPost = async () => {
         const countC = await CountComment(post.id);
         setCountComment(countC);
     }
@@ -181,6 +182,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
                         handleCommentUpdated={handleCommentUpdated}
                         showComment={showComment}
                         handleDeleteComment={handleDeleteComment}
+                        isComment={isComment}
                     />
                 </div>
 
@@ -214,11 +216,11 @@ const CommentList = ({ post, showComment, setCountComment }) => {
             {hasMore && (
                 <CommentHasmore setPage={setPage} />
             )}
-
-            <CommentCreated
+            {isComment && (<CommentCreated
                 post={post}
                 onCommentAdded={handleNewComment}
-            />
+            />)}
+
         </div>
     );
 };

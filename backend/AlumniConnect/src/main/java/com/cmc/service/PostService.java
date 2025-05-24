@@ -8,6 +8,7 @@ import com.cmc.dtos.PageResponse;
 import com.cmc.dtos.PostResponseDTO;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -63,5 +64,5 @@ public interface PostService {
     
     void createImagePost(Long postId, List<MultipartFile> files);
     
-    
+    void autoDeletedPost(LocalDateTime dateTime);
 }
