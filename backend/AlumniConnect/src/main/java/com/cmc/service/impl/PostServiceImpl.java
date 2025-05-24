@@ -255,4 +255,14 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Override
+    public void autoDeletedPost(LocalDateTime dateTime) {
+        List<Post> posts = this.postRepository.getPostsDelete(dateTime);
+        if (posts != null && !posts.isEmpty()) {
+            for (Post post : posts) {
+                this.postRepository.deletePost(post);
+            }
+        }
+    }
+
 }
