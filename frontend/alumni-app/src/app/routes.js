@@ -16,6 +16,7 @@ import SurveyDetailPage from "../pages/SurveyDetailPage";
 import SurveyStatsPage from "../pages/SurveyStatsPage";
 import PrivateRoute from "../components/routing/PrivateRoute";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
+import InvitationDetailPage from "../pages/InvitationDetailPage";
 
 const RoutesConfig = () => (
   <Router>
@@ -25,6 +26,7 @@ const RoutesConfig = () => (
         <Route index element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/survey" element={<SurveyPage />} />
+        <Route path="//invitations/:id" element={<InvitationDetailPage />} />
         <Route path="/survey/:postId" element={<SurveyDetailPage />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/deleted-posts" element={<DeletedPostsPage />} />

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -43,23 +44,31 @@ public class NotificationServiceImpl implements NotificationService {
             notification.setType(type);
             notificationRepo.save(notification);
 
-            System.out.println("recipient.getId().toString(): " + recipient.getId().toString());
             System.out.println("username: " + recipient.getUsername());
 
-            messagingTemplate.convertAndSendToUser(
-                    recipient.getUsername(),
-                    "/queue/notifications",
-                    new NotificationDTO(
-                            notification.getId(),
-                            message,
-                            link,
-                            sender.getUsername(),
-                            sender.getAvatar(),
-                            LocalDateTime.now().toString(),
-                            false,
-                            type
-                    )
-            );
+            try {
+                messagingTemplate.convertAndSendToUser(
+                        recipient.getUsername(),
+                        "/queue/notifications",
+                        new NotificationDTO(
+                                notification.getId(),
+                                message,
+                                link,
+                                sender.getUsername(),
+                                sender.getAvatar(),
+                                LocalDateTime.now().toString(),
+                                false,
+                                type
+                        )
+                );
+            } catch (MessagingException e) {
+                System.err.println("Failed to send notification via WebSocket");
+                System.err.println("Error details: " + e.getMessage());
+                if (e.getCause() != null) {
+                    System.err.println("Root cause: " + e.getCause().getMessage());
+                }
+                throw e;
+            }
         } catch (Exception e) {
             System.err.println("Error while creating notification: " + e.getMessage());
             e.printStackTrace();
@@ -67,7 +76,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationDTO> getUserNotifications(Long userId) {
+    public List<NotificationDTO> getUserNotifications(Long userId
+    ) {
         List<Notification> notifications = notificationRepo.findByRecipientId(userId);
         return notifications.stream()
                 .map(this::convertToDTO)
@@ -75,17 +85,20 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<Notification> getUnreadNotifications(Long userId) {
+    public List<Notification> getUnreadNotifications(Long userId
+    ) {
         return notificationRepo.findUnreadByRecipientId(userId);
     }
 
     @Override
-    public void markNotificationAsRead(Long notificationId) {
+    public void markNotificationAsRead(Long notificationId
+    ) {
         notificationRepo.markAsRead(notificationId);
     }
 
     @Override
-    public void markAllNotificationsAsRead(Long userId) {
+    public void markAllNotificationsAsRead(Long userId
+    ) {
         notificationRepo.markAllAsRead(userId);
     }
 

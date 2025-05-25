@@ -8,15 +8,13 @@ import { Home, BarChart2, Calendar, Search } from "lucide-react";
 import { ChatService } from "../../services/chatService";
 import { db } from "../../app/firebaseConfig";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { useNotifications } from "../../hooks/useNotifications";
-import { markAsRead } from "../../features/notifications/notificationSlice";
+import useNotifications from "../../hooks/useNotifications";
 
 const Navbar = ({ onOpenChat }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const { notifications, handleMarkAsRead } = useNotifications();
   const [showMessenger, setShowMessenger] = useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,15 +24,10 @@ const Navbar = ({ onOpenChat }) => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const currentPath = location.pathname;
-  
-  useEffect(() => {
-    console.log("Notification state updated:", notifications);
-  }, [notifications]);
 
-  // const notifications = [
-  //   { id: 1, text: "Bạn có 1 lời mời tham gia sự kiện", time: "2 giờ trước" },
-  //   { id: 2, text: "3 cựu học sinh mới đăng ký", time: "5 giờ trước" },
-  // ];
+  // Sử dụng hook useNotifications đã được cập nhật
+  const { notifications, handleMarkAsRead, handleMarkAllAsRead } =
+    useNotifications();
 
   // Hàm xử lý tìm kiếm
   const handleSearch = (e) => {
@@ -84,7 +77,6 @@ const Navbar = ({ onOpenChat }) => {
     fetchUnreadCount();
 
     // Thêm listener realtime
-
     const setupChatListener = async () => {
       const chatsRef = collection(db, "chats");
       const q = query(
@@ -119,14 +111,6 @@ const Navbar = ({ onOpenChat }) => {
     } catch (err) {
       console.error("Logout failed", err);
     }
-  };
-
-  const handleMarkAllAsRead = () => {
-    setShowNotifications(false);
-  };
-  const handleMarkAsReaded = (notificationId) => {
-    console.log("Đánh dấu đã đọc notification:", notificationId);
-    dispatch(markAsRead(notificationId));
   };
 
   const closeAllDropdowns = () => {
@@ -288,10 +272,12 @@ const Navbar = ({ onOpenChat }) => {
                 )}
               </div>
 
+              {/* Notification Icon */}
               <div className="relative">
                 <button
                   onClick={() => {
                     setShowNotifications(!showNotifications);
+                    setShowMessenger(false);
                   }}
                   className={`p-2 rounded-full transition-colors duration-200 relative ${
                     showNotifications
@@ -325,7 +311,7 @@ const Navbar = ({ onOpenChat }) => {
                     notifications={notifications.list}
                     onClose={closeAllDropdowns}
                     onMarkAllAsRead={handleMarkAllAsRead}
-                    onMarkAsRead={handleMarkAsReaded}
+                    onMarkAsRead={handleMarkAsRead}
                   />
                 )}
               </div>

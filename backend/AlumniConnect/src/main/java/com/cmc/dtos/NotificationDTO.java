@@ -4,12 +4,14 @@
  */
 package com.cmc.dtos;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 
 /**
  *
  * @author FPTSHOP
  */
+@JsonSerialize
 public class NotificationDTO implements Serializable {
 
     private Long id;
