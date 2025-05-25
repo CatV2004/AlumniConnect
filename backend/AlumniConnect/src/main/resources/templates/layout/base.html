@@ -48,11 +48,6 @@
                                th:href="@{/admin/posts}">Quản lý Bài viết</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/surveys'} ? 'active' : '']]" 
-                               th:href="@{/admin/surveys}">Quản lý Khảo sát</a>
-                        </li>
-
-                        <li class="nav-item">
                             <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/groups'} ? 'active' : '']]" 
                                th:href="@{/admin/groups}">Quản lý Nhóm</a>
                         </li>
@@ -61,11 +56,6 @@
                                th:href="@{/admin/invitations}">Quản lý Sự kiện</a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/notifications'} ? 'active' : '']]" 
-                               th:href="@{/admin/notifications}">Thông báo & Sự kiện</a>
-
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link [[${#httpServletRequest.requestURI == '/AlumniConnect/admin/statistics'} ? 'active' : '']]" 
                                th:href="@{/admin/statistics}">Thống kê</a>
