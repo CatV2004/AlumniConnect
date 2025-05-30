@@ -108,14 +108,4 @@ public class NotificationController {
         }
     }
 
-    @MessageMapping("/test-notification")
-    public void sendTestNotification(@Payload Map<String, Object> payload) {
-        Integer userId = (Integer) payload.get("userId");
-        System.out.println("Sending to user: " + userId);
-        messagingTemplate.convertAndSendToUser(
-                String.valueOf(userId),
-                "/queue/notifications",
-                "This is a test message!"
-        );
-    }
 }

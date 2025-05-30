@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import defaultAvatar from "../../assets/image/default-user.png";
-import { createPost, getPostById, updatePost } from "../../services/postService";
+import {
+  createPost,
+  getPostById,
+  updatePost,
+} from "../../services/postService";
 import { toast } from "react-toastify";
 import {
   FaTimes,
@@ -32,16 +36,18 @@ const PostForm = ({ onClose, user, postId = null }) => {
         setIsLoadingPost(true);
         try {
           const postData = await getPostById(postId);
-          
+
           setContent(postData.content || "");
           setLockComment(postData.lockComment || false);
           setPrivacy(postData.privacy || "public");
-          
+
           if (postData.postImageSet && postData.postImageSet.length > 0) {
-            setExistingImages(postData.postImageSet.map(img => ({
-              id: img.id,
-              imageUrl: img.image
-            })));
+            setExistingImages(
+              postData.postImageSet.map((img) => ({
+                id: img.id,
+                imageUrl: img.image,
+              }))
+            );
           }
         } catch (error) {
           toast.error("Failed to load post data");
@@ -50,7 +56,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
           setIsLoadingPost(false);
         }
       };
-      
+
       loadPostData();
     }
   }, [postId]);
@@ -97,10 +103,10 @@ const PostForm = ({ onClose, user, postId = null }) => {
     formData.append("content", content);
     formData.append("lockComment", lockComment);
     formData.append("privacy", privacy);
-    
+
     // Append new images
     images.forEach((img) => formData.append("images", img));
-    
+
     // Append existing image IDs to keep
     existingImages.forEach((img) => {
       formData.append("existingImages", img.id);
@@ -108,7 +114,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
 
     try {
       setLoading(true);
-      
+
       if (postId) {
         // Update existing post
         await updatePost(postId, formData, localStorage.getItem("token"));
@@ -118,7 +124,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
         await createPost(formData, localStorage.getItem("token"));
         toast.success("Post created successfully!");
       }
-      
+
       dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
       onClose();
     } catch (err) {
@@ -146,7 +152,10 @@ const PostForm = ({ onClose, user, postId = null }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+      style={{ margin: "auto" }}
+    >
       <div
         className="bg-white rounded-lg w-full max-w-2xl mx-4 shadow-xl overflow-hidden flex flex-col"
         style={{ maxHeight: "90vh" }}
@@ -268,9 +277,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
 
             {/* Add to post */}
             <div className="mt-4 border border-gray-200 rounded-lg p-3">
-              <div className="text-sm font-semibold mb-2">
-                Add to your post
-              </div>
+              <div className="text-sm font-semibold mb-2">Add to your post</div>
               <div className="flex items-center gap-4">
                 <button
                   type="button"
@@ -342,15 +349,26 @@ const PostForm = ({ onClose, user, postId = null }) => {
                 ? "bg-blue-300 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
             } ${
-              !content.trim() && images.length === 0 && existingImages.length === 0
+              !content.trim() &&
+              images.length === 0 &&
+              existingImages.length === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
-            disabled={loading || (!content.trim() && images.length === 0 && existingImages.length === 0)}
+            disabled={
+              loading ||
+              (!content.trim() &&
+                images.length === 0 &&
+                existingImages.length === 0)
+            }
           >
-            {loading 
-              ? (postId ? "Updating..." : "Posting...") 
-              : (postId ? "Update" : "Post")}
+            {loading
+              ? postId
+                ? "Updating..."
+                : "Posting..."
+              : postId
+              ? "Update"
+              : "Post"}
           </button>
         </div>
       </div>

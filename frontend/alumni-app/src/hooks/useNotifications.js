@@ -1,47 +1,51 @@
-import { useCallback, useEffect } from "react";
-import {
-  connectWebSocket,
-  disconnectWebSocket,
-} from "../services/websocketService";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addNotification,
-  markAsRead,
-} from "../features/notifications/notificationSlice";
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  setNotifications, 
+  markAsRead as markAsReadAction,
+  markAllAsRead as markAllAsReadAction
+} from '../features/notifications/notificationSlice';
+import { 
+  connectNotificationSocket, 
+  disconnectNotificationSocket 
+} from '../services/notificationSocket';
+import NotificationService from '../services/notificationService';
 
-export const useNotifications = () => {
+const useNotifications = () => {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.auth.user);
-  const notifications = useSelector((state) => state.notifications.list);
-
-  const handleNewNotification = useCallback(
-    (notification) => {
-      dispatch(addNotification(notification));
-      if (!notification.read) {
-        const audio = new Audio("/notification-sound.wav");
-        audio.play().catch((e) => console.log("Audio play error:", e));
-      }
-    },
-    [dispatch]
-  );
+  const { user, token } = useSelector(state => state.auth);
+  const notifications = useSelector(state => state.notifications);
 
   useEffect(() => {
-    if (!currentUser?.id) return;
+    if (user) {
+      // Load initial notifications
+      NotificationService.getUserNotifications()
+        .then(data => dispatch(setNotifications(data)));
+      
+      // Connect to WebSocket
+      connectNotificationSocket(dispatch, token);
+      
+      return () => {
+        disconnectNotificationSocket();
+      };
+    }
+  }, [user, dispatch]);
 
-    connectWebSocket(currentUser.id, handleNewNotification);
+  const handleMarkAsRead = (id) => {
+    NotificationService.markAsRead(id)
+      .then(() => dispatch(markAsReadAction(id)));
+  };
 
-    return () => {
-      disconnectWebSocket(handleNewNotification);
-    };
-  }, [currentUser?.id, handleNewNotification]);
-
-
-  const handleMarkAsRead = (notificationId) => {
-    dispatch(markAsRead(notificationId));
+  const handleMarkAllAsRead = () => {
+    NotificationService.markAllAsRead()
+      .then(() => dispatch(markAllAsReadAction()));
   };
 
   return {
     notifications,
     handleMarkAsRead,
+    handleMarkAllAsRead,
   };
 };
+
+export default useNotifications;

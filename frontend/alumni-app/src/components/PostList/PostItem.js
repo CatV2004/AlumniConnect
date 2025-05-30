@@ -59,7 +59,6 @@ const PostItem = ({ post }) => {
         .map(([type, _]) => type);
       setLikeCount(totalCount);
       setReactionPost(types);
-      console.log(types);
     };
 
     const fetchReactionUser = async () => {
@@ -235,7 +234,7 @@ const PostItem = ({ post }) => {
 
       {/* Invitation Post */}
       {post.invitationPost && (
-        <InvitationPost invitation={post.invitationPost} />
+        <InvitationPost invitation={post.invitationPost} postId ={post.id} />
       )}
 
       {/* Post Stats */}

@@ -6,10 +6,12 @@ import {
   MapPin as LocationIcon,
   Users as UsersIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 moment.locale("vi");
 
-const InvitationPost = ({ invitation }) => {
+const InvitationPost = ({ invitation, postId }) => {
+  console.log("invitation: ", invitation);
   if (!invitation) return null;
   const formatDate = (dateArray) => {
     if (!dateArray) return "";
@@ -28,7 +30,14 @@ const InvitationPost = ({ invitation }) => {
 
       <div className="space-y-3">
         <div>
-          <h4 className="font-medium text-lg">{invitation.eventName}</h4>
+          <h4 className="font-medium text-lg">
+            <Link
+              to={`/invitations/${postId}`}
+              className="hover:underline"
+            >
+              {invitation.eventName}
+            </Link>
+          </h4>
           <p className="text-gray-600">{invitation.description}</p>
         </div>
 
