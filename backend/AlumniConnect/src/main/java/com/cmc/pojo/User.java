@@ -20,7 +20,10 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -63,8 +66,8 @@ public class User implements Serializable {
     private String username;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 255)
     @Column(name = "password")
+//    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt")
     private String password;
     @Size(max = 45)
     @Column(name = "last_name")
@@ -72,11 +75,9 @@ public class User implements Serializable {
     @Size(max = 45)
     @Column(name = "first_name")
     private String firstName;
-    // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 45)
     @Column(name = "phone")
     private String phone;
-    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)

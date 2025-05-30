@@ -123,7 +123,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean authUser(String username, String password, String role) {
         User u = this.getUserByUsername(username);
-        return u.getActive() && this.userRepo.authUser(username, password, role);
+        if (u != null)
+            return u.getActive() && this.userRepo.authUser(username, password, role);
+        
+        return false;
     }
 
     @Override
@@ -222,5 +225,19 @@ public class UserServiceImpl implements UserService {
         }
         this.userRepo.changePassword(user);
     }
-
+    
+    @Override
+    public boolean existsByEmail(String email){
+        return this.userRepo.existsByEmail(email);
+    }
+    
+    @Override
+    public boolean existsByStudentCode(String code){
+        return this.userRepo.existsByStudentCode(code);
+    }
+    
+    @Override
+    public boolean existsByUsername(String username){
+        return this.userRepo.existsByUsername(username);
+    }
 }

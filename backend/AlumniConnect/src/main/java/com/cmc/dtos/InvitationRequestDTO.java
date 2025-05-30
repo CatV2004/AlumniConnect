@@ -18,15 +18,15 @@ import java.util.Set;
  */
 public class InvitationRequestDTO {
 
-    @NotBlank(message = "Event name cannot be blank")
-    @Size(max = 255, message = "Event name must be less than 255 characters")
+    @NotBlank(message = "Tên sự kiện không được để trống")
+    @Size(max = 255, message = "Tên sự kiện không quá 255 ký tự")
     private String eventName;
 
-    @NotNull(message = "Event time cannot be null")
-    @Future(message = "Event time must be in the future")
+    @NotNull(message = "Thời gian diễn ra không được để trống")
+    @Future(message = "Thời gian sự kiện phải nằm trong tương lai")
     private LocalDateTime eventTime;
 
-    @NotBlank(message = "Content cannot be blank")
+    @NotBlank(message = "Nội dung không được để trống")
     private String content;
     private User user;
     private Boolean lockComment;
@@ -42,8 +42,6 @@ public class InvitationRequestDTO {
     public void setUser(User user) {
         this.user = user;
     }
-    
-    
 
     public Boolean getLockComment() {
         return lockComment;

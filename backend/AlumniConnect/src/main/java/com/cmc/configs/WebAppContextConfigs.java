@@ -34,7 +34,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     "com.cmc.repository",
     "com.cmc.service",
     "com.cmc.configs",
-    "com.cmc.components",})
+    "com.cmc.components",
+    "com.cmc.validator"})
 public class WebAppContextConfigs implements WebMvcConfigurer {
 
     @Override

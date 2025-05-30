@@ -97,15 +97,18 @@ public class ApiPostController {
     }
 
     @PostMapping(path = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Post> createPost(
+    public ResponseEntity<?> createPost(
             @RequestParam("content") String content,
             @RequestParam(name = "lockComment", required = false) Boolean lockComment,
             Principal principal,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
-
+        
         String username = principal.getName();
-
         Post post = new Post();
+        if (content == null || "".equals(content)){
+            return new ResponseEntity<>(post, HttpStatus.BAD_REQUEST);
+        }
+        
         post.setContent(content);
         post.setLockComment(lockComment != null ? lockComment : false);
 
@@ -183,18 +186,9 @@ public class ApiPostController {
 
     @PatchMapping("/posts/{postId}/toggle-comment")
     public ResponseEntity<String> updateLockComment(
-            @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long postId) {
-
-        String username = this.postComponents.authorization(authorizationHeader);
-
-        User u = this.userService.getUserByUsername(username);
         Post p = this.postService.getPostById(postId);
-
-        if (!p.getUserId().getUsername().equals(username) && !u.getRole().equals("ADMIN")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bạn không có quyền Khóa comment bài viết này.");
-        }
-
+        
         int updated = postService.lockComment(postId);
         return updated > 0 ? ResponseEntity.ok("Cập nhật thành công!") : ResponseEntity.badRequest().body("Cập nhật thất bại!");
     }

@@ -202,5 +202,25 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("groupId", groupId);
         return query.getResultList();
     }
+    
+    @Override
+    public boolean existsByEmail(String email) {
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT count(u.id) FROM User u WHERE u.email = :email";
+        Long count = (Long) session.createQuery(hql)
+            .setParameter("email", email)
+            .uniqueResult();
+        return count != null && count > 0;
+    }
+    
+    @Override
+    public boolean existsByStudentCode(String code){
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT count(u.id) FROM Alumni u WHERE u.studentCode = :code";
+        Long count = (Long) session.createQuery(hql)
+            .setParameter("code", code)
+            .uniqueResult();
+        return count != null && count > 0;
+    }
 
 }

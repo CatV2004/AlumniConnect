@@ -4,6 +4,7 @@
  */
 package com.cmc.service.impl;
 
+import com.cmc.dtos.CommentDTO;
 import com.cmc.pojo.Comment;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.User;
@@ -38,11 +39,11 @@ public class CommentServiceImpl implements CommentService {
     private UserRepository userRepo;
 
     @Override
-    public Comment createComment(Map<String, String> pagram, String file, String username) {
-        String content = pagram.get("content");
+    public Comment createComment(CommentDTO commentDTO, String file, String username) {
+        String content = commentDTO.getContent();
         User userId = this.userRepo.getUserByUsername(username);
-        Post postId = this.postRepo.getPostId(Long.valueOf(pagram.get("postId")));
-        String parentId = pagram.get("parentId");
+        Post postId = this.postRepo.getPostId(commentDTO.getPostId());
+        Long parentId = commentDTO.getParentId();
 
         Comment comment = new Comment();
         comment.setContent(content);
@@ -50,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
             comment.setImage(file);
         }
         if (parentId != null) {
-            comment.setParentId(Long.valueOf(parentId));
+            comment.setParentId(parentId);
         }
         comment.setCreatedDate(LocalDateTime.now());
         comment.setUpdatedDate(LocalDateTime.now());
@@ -149,5 +150,10 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> comments = this.commentRepo.getCommentByComment(parentId, page, size);
         long totalCommentByPost = this.commentRepo.totalCommentByComment(parentId);
         return new PageImpl<>(comments, pageable, totalCommentByPost);
+    }
+    
+    @Override
+    public List<Comment> getUnlabeledComments(){
+        return this.commentRepo.getUnlabeledComments();
     }
 }

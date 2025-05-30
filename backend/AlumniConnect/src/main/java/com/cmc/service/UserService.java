@@ -41,5 +41,10 @@ public interface UserService extends UserDetailsService {
     List<User> findUsersInGroup(Long groupId);
     
     void changePassword(User user, ChangePasswordDTO dto);
+    
+    boolean existsByEmail(String email);
+    
+    boolean existsByStudentCode(String code);
 
+    boolean existsByUsername(String username);
 }

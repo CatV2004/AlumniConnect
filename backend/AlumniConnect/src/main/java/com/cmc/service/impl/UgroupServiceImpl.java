@@ -134,5 +134,9 @@ public class UgroupServiceImpl implements UgroupService {
                 })
                 .collect(Collectors.toList());
     }
-
+    
+    @Override
+    public boolean isByGroupName(String name){
+        return this.ugroupRepo.isByGroupName(name);
+    }
 }

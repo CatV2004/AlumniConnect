@@ -11,6 +11,7 @@ import com.cmc.pojo.Ugroup;
 import com.cmc.pojo.User;
 import com.cmc.service.UgroupService;
 import com.cmc.service.UserService;
+import com.cmc.validator.GroupValidator;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,12 +20,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,11 +50,28 @@ public class AdminUgroupController {
     private UgroupService ugroupService;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired 
+    @Autowired
     private UserService userService;
 
+    @Autowired
+    private GroupValidator groupValidator;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.addValidators(groupValidator);
+    }
+
     @PostMapping("")
-    public ResponseEntity<GroupDTO> createGroup(@Valid @RequestBody GroupDTO ugroupDTO) {
+    public ResponseEntity<?> createGroup(@Valid @RequestBody GroupDTO ugroupDTO, BindingResult result) {
+        if (result.hasErrors()) {
+            String errorMessage = result.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining("\n")); 
+            Map<String, String> error = new  HashMap<>();
+            error.put("message", errorMessage);
+
+            return ResponseEntity.badRequest().body(error);
+        }
         Ugroup ugroup = modelMapper.map(ugroupDTO, Ugroup.class);
         Ugroup savedUgroup = ugroupService.save(ugroup);
         GroupDTO response = modelMapper.map(savedUgroup, GroupDTO.class);
@@ -91,8 +113,8 @@ public class AdminUgroupController {
 
         return ResponseEntity.ok(response);
     }
-    
-     @GetMapping("/{groupId}/available-users")
+
+    @GetMapping("/{groupId}/available-users")
     public ResponseEntity<List<User>> getUsersNotInGroup(@PathVariable Long groupId) {
         List<User> users = userService.findUsersNotInGroup(groupId);
         users.forEach(u -> {

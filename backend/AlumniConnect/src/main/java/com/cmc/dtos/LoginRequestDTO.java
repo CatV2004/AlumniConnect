@@ -4,13 +4,21 @@
  */
 package com.cmc.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 /**
  *
  * @author FPTSHOP
  */
 public class LoginRequestDTO {
+    @NotBlank(message = "Username là bắt buộc")
     private String username;
+    @NotBlank(message = "Password là bắt buộc")
+    @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
     private String password;
+    @NotBlank(message = "Vai tro là bắt buộc")
     private String role;
 
     // Getters & Setters

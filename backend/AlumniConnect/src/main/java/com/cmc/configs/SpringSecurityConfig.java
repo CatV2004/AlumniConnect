@@ -27,6 +27,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
@@ -109,6 +110,11 @@ public class SpringSecurityConfig {
                 "api_secret", env.getProperty("cloudinary.api_secret"),
                 "secure", true
         ));
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 }

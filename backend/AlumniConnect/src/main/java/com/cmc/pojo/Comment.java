@@ -81,6 +81,10 @@ public class Comment implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User userId;
+    
+    @JoinColumn(name = "label")
+    @JsonIgnore
+    private String label;
 
     public Comment() {
     }
@@ -197,6 +201,20 @@ public class Comment implements Serializable {
     @Override
     public String toString() {
         return "com.cmc.pojo.Comment[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(String label) {
+        this.label = label;
     }
     
 }

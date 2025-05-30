@@ -4,7 +4,9 @@
  */
 package com.cmc.service;
 
+import com.cmc.dtos.CommentDTO;
 import com.cmc.pojo.Comment;
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 
@@ -18,7 +20,7 @@ public interface CommentService {
 
     Comment updateComment(Long commentId, Long userId, String newContent, String pathFile);
 
-    Comment createComment(Map<String, String> pagram, String file, String username);
+    Comment createComment(CommentDTO commentDTO, String file, String username);
 
     Page<Comment> getCommentByPosts(Long postId, Integer page, Integer size);
 
@@ -27,4 +29,6 @@ public interface CommentService {
     Long totalCommentByPost(Long postId);
     
     public Comment getCommentById(Long id);
+    
+    List<Comment> getUnlabeledComments();
 }

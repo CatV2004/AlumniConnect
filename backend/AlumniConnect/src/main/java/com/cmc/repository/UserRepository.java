@@ -39,4 +39,8 @@ public interface UserRepository {
 
     List<User> findUsersNotInGroup(Long groupId);
     
+    boolean existsByEmail(String email);
+    
+    boolean existsByStudentCode(String code);
+    
 }

@@ -32,4 +32,6 @@ public interface UgroupService {
     void removeUserFromGroup(Long groupId, Long userId);
 
     void deleteById(Long id);
+    
+    boolean isByGroupName(String name);
 }

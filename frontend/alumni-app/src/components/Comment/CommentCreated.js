@@ -22,33 +22,41 @@ const CommentCreated = ({ post, parentComment = null, onCommentAdded, handleRepl
 
         setIsSubmitting(true);
         const formData = new FormData();
-        formData.append("content", content);
-        formData.append("postId", post.id);
-        if (parentId) formData.append("parentId", parentId);
+        const dto = {
+            content: content,
+            postId: post.id,
+            parentId: parentId || null
+        };
+
+        formData.append("data", new Blob([JSON.stringify(dto)], { type: "application/json" }));
         if (file) formData.append("file", file);
 
         try {
             const response = await axios.post(`${BASE_URL}/comment`, formData, {
                 headers: {
-                    "Authorization": localStorage.getItem('token') || null
+                    "Authorization": localStorage.getItem('token') || null,
+                    "Content-Type": "multipart/form-data"
                 }
             });
+
             if (response.status === 201) {
                 const result = response.data;
                 toast.success("Bình luận thành công");
-                if(parentId !== null){
+                if (parentId !== null) {
                     setReplyTo(null);
-                    handleReplies(response.data, parentId);
+                    handleReplies(result, parentId);
+                } else {
+                    onCommentAdded(result);
                 }
-                else onCommentAdded(result);
                 setFile(null);
                 setContent('');
-                setFile(null);
             } else {
                 alert('Lỗi khi gửi bình luận');
             }
         } catch (error) {
-            console.error('Lỗi:', JSON.stringify(error));
+            console.error('Lỗi:', error.response?.data || error.message);
+            toast.success('Lỗi:', error.response?.data || error.message);
+
         } finally {
             setIsSubmitting(false);
         }
