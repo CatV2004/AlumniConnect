@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class CommentRepositoryImpl  implements CommentRepository  {
+public class CommentRepositoryImpl implements CommentRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
@@ -36,7 +36,7 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         q.setMaxResults(size);
         return q.getResultList();
     }
-    
+
     @Override
     public long totalCommentByPost(Long postId) {
         Session s = this.factory.getObject().getCurrentSession();
@@ -45,7 +45,7 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         query.setParameter("postId", postId);
         return (long) query.getSingleResult();
     }
-    
+
     @Override
     public long totalCommentByComment(Long parentId) {
         Session s = this.factory.getObject().getCurrentSession();
@@ -54,8 +54,7 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         query.setParameter("parentId", parentId);
         return (long) query.getSingleResult();
     }
-    
-    
+
     @Override
     public List<Comment> getCommentByComment(Long parentId, Integer page, Integer size) {
         Session s = this.factory.getObject().getCurrentSession();
@@ -67,7 +66,6 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         query.setMaxResults(size);
         return query.getResultList();
     }
-    
 
     @Override
     public List<Comment> findByUserId(Long userId) {
@@ -86,31 +84,48 @@ public class CommentRepositoryImpl  implements CommentRepository  {
         query.setParameter("postId", postId);
         return (long) query.getSingleResult();
     }
-    
-    
+
     @Override
-    public Comment saveOrUpdate(Comment c){
+    public Comment saveOrUpdate(Comment c) {
         Session s = this.factory.getObject().getCurrentSession();
-        if (c.getId() == null)
+        if (c.getId() == null) {
             s.persist(c);
-        
+        }
+
         s.merge(c);
         s.refresh(c);
         return c;
     }
-    
+
     @Override
-    public Comment getCommentById(Long id){
+    public Comment getCommentById(Long id) {
         Session s = this.factory.getObject().getCurrentSession();
         return s.createNamedQuery("Comment.findById", Comment.class).setParameter("id", id).getSingleResult();
     }
-    
+
     @Override
     public List<Comment> getRepliesByParentId(Long parentId) {
         String hql = "FROM Comment c WHERE c.parentId = :parentId AND c.active = TRUE";
         return this.factory.getObject().getCurrentSession()
-            .createQuery(hql, Comment.class)
-            .setParameter("parentId", parentId)
-            .getResultList();
-}
+                .createQuery(hql, Comment.class)
+                .setParameter("parentId", parentId)
+                .getResultList();
+    }
+    
+    @Override
+    public List<Comment> getUnlabeledComments(){
+        Session ss = this.factory.getObject().getCurrentSession();
+        String hql = "FROM Comment c WHERE c.label IS NULL";
+        return ss.createQuery(hql, Comment.class).getResultList();
+    }
+    
+    @Override
+    public Long countByPostIdAndLabel(Long postId, String label){
+        Session ss = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT COUNT(*) FROM Comment c WHERE c.label = :label AND c.postId = :postId";
+        Query query = ss.createQuery(hql, Long.class);
+        query.setParameter("postId", postId);
+        query.setParameter("label", label);
+        return (Long) query.getSingleResultOrNull();
+    }
 }

@@ -30,4 +30,8 @@ public interface CommentRepository {
     Comment getCommentById(Long id);
     
     List<Comment> getRepliesByParentId(Long parentId);
+    
+    List<Comment> getUnlabeledComments();
+    
+    Long countByPostIdAndLabel(Long postId, String label);
 }

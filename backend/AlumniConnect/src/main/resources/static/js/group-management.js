@@ -16,9 +16,10 @@ document.getElementById('createGroupForm')?.addEventListener('submit', function 
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(formData)
     })
-            .then(response => {
+            .then(async response => {
+                const data = await response.json();
                 if (!response.ok)
-                    throw new Error('Network response was not ok');
+                    throw new Error(data.message || 'Đã có lỗi xảy ra');
                 return response.json();
             })
             .then(data => {

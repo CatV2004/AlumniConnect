@@ -5,6 +5,10 @@
 package com.cmc.dtos;
 
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,16 +17,27 @@ import org.springframework.web.multipart.MultipartFile;
  * @author FPTSHOP
  */
 public class UserDTO {
-
+    
     private Long id;
+    @NotBlank(message = "Username là bắt buộc")
     private String username;
+    @NotBlank(message = "Password là bắt buộc")
+    @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
+    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Password phải có ký tự đặc biệt")
     private String password;
     private String avatar;
     private String cover;
+    @NotBlank(message = "Họ là bắt buộc")
     private String firstName;
+    @NotBlank(message = "Tên là bắt buộc")
     private String lastName;
+    @NotBlank(message = "Email là bắt buộc")
+    @Email(message = "Email không đúng định dạng")
     private String email;
+    @NotBlank(message = "Số điện thoại là bắt buộc")
+    @Pattern(regexp = "^[0-9]{10,11}$", message = "Số điện thoại không hợp lệ")
     private String phone;
+    @NotBlank(message = "Vai trò không được để trống")
     private String role;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
@@ -59,22 +74,6 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    public void setCover(String cover) {
-        this.cover = cover;
     }
 
     public String getFirstName() {
@@ -155,6 +154,34 @@ public class UserDTO {
 
     public void setDeletedDate(LocalDateTime deletedDate) {
         this.deletedDate = deletedDate;
+    }
+
+    /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    /**
+     * @return the cover
+     */
+    public String getCover() {
+        return cover;
+    }
+
+    /**
+     * @param cover the cover to set
+     */
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
 }

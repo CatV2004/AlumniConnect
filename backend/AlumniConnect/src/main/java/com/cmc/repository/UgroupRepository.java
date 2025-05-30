@@ -37,4 +37,6 @@ public interface UgroupRepository {
     long countUsersInGroup(Long groupId);
 
     void deleteById(Long id);
+    
+    boolean isByGroupName(String name);
 }

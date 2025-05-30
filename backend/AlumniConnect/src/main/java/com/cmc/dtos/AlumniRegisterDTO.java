@@ -5,6 +5,10 @@
 package com.cmc.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -12,15 +16,26 @@ import org.springframework.web.multipart.MultipartFile;
  * @author FPTSHOP
  */
 public class AlumniRegisterDTO {
-
+    
+    @NotBlank(message = "Username là bắt buộc")
     private String username;
+    @NotBlank(message = "Password là bắt buộc")
+    @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
+    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Password phải có ký tự đặc biệt")
     private String password;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
     private MultipartFile avatar;
     private MultipartFile cover;
+    @NotBlank(message = "Họ là bắt buộc")
+    private String firstName;
+    @NotBlank(message = "Tên là bắt buộc")
+    private String lastName;
+    @NotBlank(message = "Email là bắt buộc")
+    @Email(message = "Email không đúng định dạng")
+    private String email;
+    @NotBlank(message = "Số điện thoại là bắt buộc")
+    @Pattern(regexp = "^[0-9]{10,11}$", message = "Số điện thoại không hợp lệ")
+    private String phone;
+    @NotBlank(message = "Mã sinh viên không được để trống")
     private String studentCode;
 
     public String getUsername() {

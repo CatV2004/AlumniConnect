@@ -4,12 +4,21 @@
  */
 package com.cmc.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 /**
  *
  * @author FPTSHOP
  */
 public class ChangePasswordDTO {
+    @NotBlank(message = "Bắt Buộc nhập password cũ")
+    @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
     private String oldPassword;
+    @NotBlank(message = "Password mới là bắt buộc")
+    @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
+    @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Password phải có ký tự đặc biệt")
     private String newPassword;
 
     public ChangePasswordDTO() {

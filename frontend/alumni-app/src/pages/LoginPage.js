@@ -19,6 +19,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { error } = useSelector((state) => state.auth);
+  const [valid, setValid] = useState(null);
 
   useEffect(() => {
     document.title = "Đăng nhập | Hệ thống";
@@ -50,7 +51,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    console.log(error)
     try {
       await dispatch(loginUser(formData)).unwrap();
       
@@ -66,6 +67,7 @@ const LoginPage = () => {
       navigate('/home');
     } catch (err) {
       console.error("Login failed:", err);
+      setValid(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -139,6 +141,7 @@ const LoginPage = () => {
                       required
                     />
                   </div>
+                  {valid && valid.username && <div className="text-red-500 text-sm italic mt-1">{valid.username}</div>}
                 </div>
 
                 {/* Mật khẩu */}
@@ -165,6 +168,7 @@ const LoginPage = () => {
                       {showPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
+                  {valid && valid.password && <div className="text-red-500 text-sm italic mt-1">{valid.password}</div>}
                 </div>
 
                 {/* Vai trò */}

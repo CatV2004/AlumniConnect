@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -13,6 +14,7 @@ import java.util.List;
 public class SurveyQuestionDTO {
 
     private Long id;
+    @NotBlank(message = "Nội dung không được để trống")
     private String question;
     private Boolean multiChoice;
     private List<SurveyOptionDTO> options;

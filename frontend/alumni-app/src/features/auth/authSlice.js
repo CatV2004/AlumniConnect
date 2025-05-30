@@ -7,6 +7,11 @@ export const loginUser = createAsyncThunk(
     try {
       return await login({ username, password, role });
     } catch (error) {
+      // if (error.response?.status === 400) {
+      //   return rejectWithValue(
+      //     error.response?.data || { message: "Đăng nhập thất bại!" }
+      //   );
+      // }
       return rejectWithValue(
         error.response?.data || { message: "Đăng nhập thất bại!" }
       );

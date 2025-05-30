@@ -43,9 +43,9 @@
                     <td th:text="${post.createdDate != null} ? ${#temporals.format(post.createdDate, 'dd/MM/yyyy HH:mm')} : '---'"></td>
                     <td class="text-center">
                         <button th:id="'status-' + ${post.id}"
-                                th:class="${!post.lockComment} ? 'btn btn-outline-danger btn-sm' : 'btn btn-outline-success btn-sm'"
-                                th:text="${!post.lockComment} ? 'Khóa' : 'Mở khóa'"
-                                th:attr="onclick='toggleCommentStatus(' + ${post.id} + ', ' + ${!post.lockComment} + ')'">
+                                th:class="${post.lockComment} ? 'btn btn-outline-danger btn-sm' : 'btn btn-outline-success btn-sm'"
+                                th:text="${post.lockComment} ? 'Khóa' : 'Mở khóa'"
+                                th:attr="onclick='toggleCommentStatus(' + ${post.id} + ', ' + ${post.lockComment} + ')'">
                         </button>
                     </td>
                     <td class="text-center">
@@ -92,7 +92,7 @@
 
             function restorePost(postId) {
                 if (confirm('Bạn có chắc chắn muốn khôi phục bài viết này!!!')) {
-                    fetch(`/AlumniConnect/api/posts/${postId}/restore-posts`, {
+                    fetch(`/AlumniConnect/api/posts/${postId}/restore`, {
                         method: "PATCH"
                     })
                             .then(response => {
@@ -125,12 +125,12 @@
                                     statusElement.textContent = "Khóa bình luận";
                                     statusElement.classList.remove("btn-success");
                                     statusElement.classList.add("btn-danger");
-                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, true)`);
+                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, false)`);
                                 } else {
                                     statusElement.textContent = "Mở khóa bình luận";
                                     statusElement.classList.remove("btn-danger");
                                     statusElement.classList.add("btn-success");
-                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, false)`);
+                                    statusElement.setAttribute("onclick", `toggleCommentStatus(${postId}, true)`);
                                 }
                             })
                             .catch(error => console.error("Lỗi:", error));

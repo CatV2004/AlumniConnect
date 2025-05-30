@@ -21,20 +21,31 @@ import com.cmc.pojo.User;
 import com.cmc.service.AlumniService;
 import com.cmc.service.PostService;
 import com.cmc.service.UserService;
+import com.cmc.validator.AlumniRegisterValidator;
+import com.cmc.validator.ChangePasswordValidator;
+import com.cmc.validator.LoginValidate;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,9 +79,41 @@ public class ApiUserController {
     @Autowired
     private PasswordEncoder passEncoder;
 
+    @Autowired
+    private ChangePasswordValidator changePasswordValidator;
+
+    @Autowired
+    private AlumniRegisterValidator alumniRegisterValidator;
+    
+    @Autowired
+    private LoginValidate loginValidate;
+
+    @InitBinder("alumniRegisterDTO")
+    public void initBinder(WebDataBinder binder) {
+        binder.addValidators(alumniRegisterValidator);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error
+                -> errors.put(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
+    }
+    @InitBinder("loginDTO")
+    public void initBinderLogin(WebDataBinder binder) {
+        binder.addValidators(loginValidate);    
+    }
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginDTO) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequestDTO loginDTO, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
+
+        if (result.hasErrors()) {
+            result.getFieldErrors().forEach(err
+                    -> response.put(err.getField(), err.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(response);
+        }
 
         if (this.userService.authUser(loginDTO.getUsername(), loginDTO.getPassword(), loginDTO.getRole())) {
             String token = jwtService.generateTokenLogin(loginDTO.getUsername(), loginDTO.getRole());
@@ -84,11 +127,22 @@ public class ApiUserController {
         response.put("message", "Tên đăng nhập hoặc mật khẩu không đúng!");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
-
+    
     @PutMapping("/users/password")
     public ResponseEntity<Map<String, Object>> changePassword(
-            @RequestBody ChangePasswordDTO dto,
+            @Valid @RequestBody ChangePasswordDTO dto,
+            BindingResult result,
             Principal principal) {
+
+        changePasswordValidator.validate(dto, result);
+
+        if (result.hasErrors()) {
+            Map<String, Object> errors = new HashMap<>();
+            result.getFieldErrors().forEach(err
+                    -> errors.put(err.getField(), err.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(errors);
+        }
 
         Map<String, Object> response = new HashMap<>();
 
@@ -113,8 +167,15 @@ public class ApiUserController {
     @PostMapping(path = "/users",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<?> addUser(@ModelAttribute AlumniRegisterDTO alumniRegisterDTO) {
+    public ResponseEntity<?> addUser(@Valid @ModelAttribute AlumniRegisterDTO alumniRegisterDTO, BindingResult result) {
         try {
+            if (result.hasErrors()) {
+                Map<String, Object> errors = new HashMap<>();
+                result.getFieldErrors().forEach(err
+                        -> errors.put(err.getField(), err.getDefaultMessage())
+                );
+                return ResponseEntity.badRequest().body(errors);
+        }
             Alumni alumni = this.alumniService.registerAlumni(alumniRegisterDTO);
             if (alumni != null) {
 //                return new ResponseEntity<>(alumniRegisterDTO, HttpStatus.CREATED);

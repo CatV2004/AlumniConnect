@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,8 @@ import java.util.List;
  */
 public class SurveyDTO {
     private Long id;
-    private String content; 
+    @NotBlank(message = "Không thể bỏ trống nội dung khảo sát!!!")
+    private String content;
     private UserDTO userId;
     private String surveyType;
     private LocalDateTime endTime;

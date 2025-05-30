@@ -20,6 +20,7 @@ import com.cmc.service.SurveyPostService;
 import com.cmc.service.SurveyStatisticService;
 import com.cmc.service.UserService;
 import com.cmc.service.UserSurveyOptionService;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class ApiSurveyPostController {
 
     @PostMapping("/survey-posts")
     public ResponseEntity<ResponseDTO<Void>> createSurveyPost(
-            @RequestBody SurveyDTO surveyDTO,
+            @Valid @RequestBody SurveyDTO surveyDTO,
             Principal principal
     ) {
 

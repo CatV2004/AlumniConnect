@@ -6,9 +6,11 @@ package com.cmc.controllers;
 
 import com.cmc.components.CloudinaryService;
 import com.cmc.components.PostComponents;
+import com.cmc.dtos.CommentDTO;
 import com.cmc.pojo.Comment;
 import com.cmc.service.CommentService;
 import com.cmc.service.UserService;
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,6 +60,7 @@ public class ApiCommentController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String content) {
         try {
+
             String username = this.postComponents.authorization(authorizationHeader);
             Comment c = this.commentService.getCommentById(id);
             if (c == null) {
@@ -77,10 +82,19 @@ public class ApiCommentController {
 
     @PostMapping(value = "/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addComment(
-            @RequestParam Map<String, String> param,
-            @RequestParam(value = "file", required = false) MultipartFile file,
+            @Valid @RequestPart("data") CommentDTO commentDTO,
+            BindingResult result,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestHeader("Authorization") String authorizationHeader) {
         try {
+
+            if (result.hasErrors()) {
+                Map<String, String> errors = new HashMap<>();
+                result.getFieldErrors().forEach(err
+                        -> errors.put(err.getField(), err.getDefaultMessage())
+                );
+                return ResponseEntity.badRequest().body(errors);
+            }
             String username = this.postComponents.authorization(authorizationHeader);
 
             String urlImage = null;
@@ -88,7 +102,7 @@ public class ApiCommentController {
                 urlImage = this.cloudianryService.uploadFile(file);
             }
 
-            Comment created = commentService.createComment(param, urlImage, username);
+            Comment created = commentService.createComment(commentDTO, urlImage, username);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception ex) {
             Map<String, String> error = new HashMap<>();

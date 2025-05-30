@@ -26,6 +26,7 @@ const RegisterPage = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -108,6 +109,7 @@ const RegisterPage = () => {
       }, 1500);
     } catch (err) {
       console.error("Registration failed: ", err);
+      setErrors(err)
     } finally {
       setIsSubmitting(false);
     }
@@ -193,6 +195,7 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
+                  {errors && errors.firstName && <div className="text-red-500 text-sm italic mt-1">{errors.firstName}</div>}
                 </div>
 
                 <div>
@@ -210,6 +213,7 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
+                  {errors && errors.lastName && <div className="text-red-500 text-sm italic mt-1">{errors.lastName}</div>}
                 </div>
 
                 {/* Email và SĐT */}
@@ -229,6 +233,7 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
+                  {errors && errors.email && <div className="text-red-500 text-sm italic mt-1">{errors.email}</div>}
                 </div>
 
                 <div>
@@ -246,6 +251,8 @@ const RegisterPage = () => {
                       onChange={handleChange}
                     />
                   </div>
+                  {errors && errors.phone && <div className="text-red-500 text-sm italic mt-1">{errors.phone}</div>}
+
                 </div>
 
                 {/* Mã sinh viên và Tên đăng nhập */}
@@ -264,6 +271,8 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
+                  {errors && errors.studentCode && <div className="text-red-500 text-sm italic mt-1">{errors.studentCode}</div>}
+
                 </div>
 
                 <div>
@@ -282,6 +291,8 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
+                  {errors && errors.username && <div className="text-red-500 text-sm italic mt-1">{errors.username}</div>}
+
                 </div>
 
                 {/* Mật khẩu */}
@@ -307,6 +318,8 @@ const RegisterPage = () => {
                     >
                       {showPassword.password ? <FiEyeOff /> : <FiEye />}
                     </button>
+                    {errors && errors.password && <div className="text-red-500 text-sm italic mt-1">{errors.password}</div>}
+
                   </div>
                   {formData.password && (
                     <motion.div
@@ -357,6 +370,8 @@ const RegisterPage = () => {
                       {showPassword.confirmPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
+                  {errors && errors.confirmPassword && <div className="text-red-500 text-sm italic mt-1">{errors.confirmPassword}</div>}
+
                 </div>
 
                 {/* Avatar */}
