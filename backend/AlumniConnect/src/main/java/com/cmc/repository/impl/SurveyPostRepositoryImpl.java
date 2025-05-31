@@ -49,5 +49,15 @@ public class SurveyPostRepositoryImpl implements SurveyPostRepository {
         Query<SurveyPost> query = this.getCurrentSession().createQuery(hql, SurveyPost.class);
         return query.getResultList();
     }
+    
+    @Override
+    public boolean exitSurveyContent(String content){
+        Session session = this.factory.getObject().getCurrentSession();
+        String hql = "SELECT count(u.id) FROM Post u WHERE u.content = :content";
+        Long count = (Long) session.createQuery(hql)
+            .setParameter("content", content)
+            .uniqueResult();
+        return count != null && count > 0;
+    }
 
 }

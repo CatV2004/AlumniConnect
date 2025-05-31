@@ -20,7 +20,7 @@ document.getElementById('createGroupForm')?.addEventListener('submit', function 
                 const data = await response.json();
                 if (!response.ok)
                     throw new Error(data.message || 'Đã có lỗi xảy ra');
-                return response.json();
+                return data;
             })
             .then(data => {
                 Swal.fire({

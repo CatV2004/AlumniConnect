@@ -5,6 +5,7 @@
 package com.cmc.controllers;
 
 import com.cmc.dtos.TeacherDTO;
+import com.cmc.dtos.TeacherRequestDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Teacher;
 import com.cmc.pojo.User;
@@ -12,15 +13,20 @@ import com.cmc.service.AlumniService;
 import com.cmc.service.TeacherService;
 import com.cmc.service.UserService;
 import com.cmc.utils.ResponseMessage;
+import com.cmc.validator.TeacherRequestValidator;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,6 +53,9 @@ public class TeacherManageController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private TeacherRequestValidator teacherValidate;
 
     @GetMapping("/teachers")
     public String teachersView(@RequestParam Map<String, String> params, Model model) {
@@ -75,7 +84,18 @@ public class TeacherManageController {
     @PostMapping("/teachers/create")
     @CrossOrigin
     @ResponseBody
-    public ResponseEntity<?> createTeacher(@RequestBody UserDTO user) {
+    public ResponseEntity<?> createTeacher(@Valid @RequestBody TeacherRequestDTO user, BindingResult result) {
+        this.teacherValidate.validate(user, result);
+        if (result.hasErrors()) {
+            String errors = result.getFieldErrors().stream()
+                    .map(err -> err.getDefaultMessage())
+                    .collect(Collectors.joining("\n"));
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
+
         TeacherDTO teacher = new TeacherDTO();
         try {
             if (user != null) {

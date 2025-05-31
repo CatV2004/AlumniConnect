@@ -15,6 +15,7 @@ import com.cmc.repository.UserRepository;
 import com.cmc.service.InvitationService;
 import com.cmc.service.UgroupService;
 import com.cmc.service.UserService;
+import com.cmc.validator.InvitationValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 /**
@@ -59,6 +61,8 @@ public class AdminInvitationController {
     private UgroupService groupSerice;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InvitationValidator invitationValidator;
 
     @GetMapping("")
     public String invitationsView(@RequestParam Map<String, String> params, Model model) {
@@ -93,7 +97,19 @@ public class AdminInvitationController {
     @PostMapping
     public ResponseEntity<?> createInvitation(
             @Valid @RequestBody InvitationRequestDTO invitationRequest,
+            BindingResult result,
             Principal principal) {
+        
+        this.invitationValidator.validate(invitationRequest, result);
+        if (result.hasErrors()){
+            String errors = result.getFieldErrors().stream()
+                    .map(err -> err.getDefaultMessage())
+                    .collect(Collectors.joining("; \n"));
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
 
         String username = principal.getName();
         User user = userRepo.getUserByUsername(username);
