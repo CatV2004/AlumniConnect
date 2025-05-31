@@ -71,4 +71,8 @@ public interface PostRepository {
     List<Post> getPostsDelete(LocalDateTime dateTime);
     
     void deletePost(Post p);
+    
+    boolean updateStatus(long postId, boolean active);
+    
+    Post getPostUnActiveById(Long id);
 }

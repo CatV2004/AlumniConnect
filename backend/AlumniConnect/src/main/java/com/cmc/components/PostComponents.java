@@ -43,7 +43,7 @@ public class PostComponents {
         return jwtService.getUsernameFromToken(token);
     }
     
-    @Scheduled(fixedRate = 60000) //ms
+    @Scheduled(fixedRate = 1000) //ms
     public void updateStatus() {
         this.surveyPostRepository.updateExpiredStatus();
         System.out.println("Auto update survey status at " + LocalDateTime.now());

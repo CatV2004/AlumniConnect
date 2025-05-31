@@ -266,4 +266,15 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Override
+    public boolean updateStatus(long postId, boolean active) {
+        System.out.println("postID in service layer: "+ postId);
+        return this.postRepository.updateStatus(postId, active);
+    }
+
+    @Override
+    public Post getPostUnActiveById(Long id) {
+        return this.postRepository.getPostUnActiveById(id);
+    }
+
 }

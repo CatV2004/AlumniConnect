@@ -277,6 +277,23 @@ public class InvitationServiceImpl implements InvitationService {
         ));
     }
 
+    @Override
+    public void sendStatusChangeNotifications(InvitationPost invitation, User sender, boolean isActive) {
+        String action = isActive ? "kích hoạt" : "hủy";
+        String message = String.format(
+                "Lời mời tham dự sự kiện '%s' đã được %s",
+                invitation.getEventName(),
+                action
+        );
+        String link = "/invitations/" + invitation.getId();
+
+        Set<User> recipients = getAllInvitedUsers(invitation);
+
+        recipients.forEach(user -> notificationService.createNotification(
+                user, sender, message, link, "INVITATION"
+        ));
+    }
+
     private void sendInvitationEmails(Set<User> recipients, InvitationPost invitation, LocalDateTime eventTime) {
         recipients.stream()
                 .filter(user -> user.getEmail() != null && !user.getEmail().isEmpty())

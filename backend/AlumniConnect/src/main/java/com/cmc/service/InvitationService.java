@@ -8,6 +8,7 @@ import com.cmc.dtos.InvitationRequestDTO;
 import com.cmc.dtos.InvitationResponseDTO;
 import com.cmc.pojo.InvitationPost;
 import com.cmc.pojo.Post;
+import com.cmc.pojo.User;
 import com.cmc.repository.InvitationPostRepository;
 import com.cmc.repository.UgroupRepository;
 import com.cmc.repository.UserRepository;
@@ -33,5 +34,6 @@ public interface InvitationService {
     List<InvitationPost> findInvitationPosts(Map<String, String> params);
 
     long countInvitationPosts(Map<String, String> params);
-
+    
+    void sendStatusChangeNotifications(InvitationPost invitation, User sender, boolean isActive);
 }

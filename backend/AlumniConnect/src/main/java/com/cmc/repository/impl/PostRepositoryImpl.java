@@ -359,7 +359,7 @@ public class PostRepositoryImpl implements PostRepository {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.isNull(root.get("deletedDate")));
         predicates.add(cb.isTrue(root.get("active")));
-        
+
         if (params.containsKey("kw")) {
             String kw = params.get("kw").toString();
             if (!kw.isBlank()) {
@@ -528,6 +528,31 @@ public class PostRepositoryImpl implements PostRepository {
         if (p != null) {
             s.remove(p);
         }
+    }
+
+    @Override
+    public boolean updateStatus(long postId, boolean active) {
+        Session session = this.getSession();
+        System.out.println("postId in repo layer: " + postId);
+
+        Post post = session.get(Post.class, postId);
+        if (post == null) {
+            return false;
+        }
+
+        post.setActive(active);
+        System.out.println("post.getActive in repo layer: " + post.getActive());
+
+        return true;
+    }
+
+    @Override
+    public Post getPostUnActiveById(Long id) {
+        String hql = "FROM Post p WHERE p.active = false AND p.id = :id";
+        return getSession()
+                .createQuery(hql, Post.class)
+                .setParameter("id", id)
+                .uniqueResult(); 
     }
 
 }

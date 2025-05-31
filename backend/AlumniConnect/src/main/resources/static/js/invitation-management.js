@@ -379,10 +379,22 @@ function toggleInvitationStatus(invitationId, active) {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire('Thành công', data.message, 'success');
-                            loadInvitations(); // Tải lại danh sách
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: 'Thành công',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                setTimeout(() => {
+                                    loadInvitations();
+                                }, 1600);
+                            }, 500);
                         } else {
-                            throw new Error(data.message);
+                            setTimeout(() => {
+                                Swal.fire('Lỗi', data.message || 'Có lỗi xảy ra', 'error');
+                            }, 500);
                         }
                     })
                     .catch(error => {
@@ -407,7 +419,7 @@ function deleteInvitationPermanently(invitationId) {
                 method: 'DELETE'
             })
                     .then(async response => {
-                        const message = await response.text(); 
+                        const message = await response.text();
                         if (response.ok) {
                             Swal.fire('Đã xóa', message, 'success');
                             loadInvitations();

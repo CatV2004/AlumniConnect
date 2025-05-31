@@ -65,4 +65,8 @@ public interface PostService {
     void createImagePost(Long postId, List<MultipartFile> files);
     
     void autoDeletedPost(LocalDateTime dateTime);
+    
+    boolean updateStatus(long postId, boolean active);
+    
+    Post getPostUnActiveById(Long id);
 }
