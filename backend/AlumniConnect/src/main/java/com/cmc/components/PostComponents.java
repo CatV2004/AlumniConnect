@@ -49,7 +49,7 @@ public class PostComponents {
     if (negativeCount >= 5) {
         Post post = this.postRepo.getPostId(postId);
             if (Boolean.TRUE.equals(post.getLockComment())) {
-                post.setLockComment(Boolean.FALSE);
+                post.setLockComment(Boolean.TRUE);
                 post.setUpdatedDate(LocalDateTime.now());
                 this.postRepo.saveOrUpdate(post);
             }

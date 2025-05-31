@@ -84,7 +84,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                 toast.warning("Không có quyền sửa bình luận!!!")
             }
         } catch (error) {
-            toast.error("Xóa bài viết thất bại: " + error.message);
+            toast.error("Sửa bài viết thất bại: " + error.message);
             setIsOpen(false);
         } finally {
             setUpdate(false);
@@ -147,19 +147,21 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                     </p>
                                 </div>
                                 <div>
-                                    <button
+                                    {!isComment &&(
+                                        <button
                                         className="text-sm text-gray-900 "
                                         onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
                                     ><p className="text-sm text-gray-500 font-bold">Trả lời</p>
 
                                     </button>
+                                    )}
                                 </div>
                             </div>
 
 
                             {replyTo === comment.id && (
                                 <div className="mt-2">
-                                    {isComment && (<CommentCreated post={post} parentComment={comment.id} handleReplies={onCommentAdded} setReplyTo={setReplyTo} />)}
+                                    {!isComment && (<CommentCreated post={post} parentComment={comment.id} handleReplies={onCommentAdded} setReplyTo={setReplyTo} />)}
                                 </div>
                             )}
                         </div>
@@ -180,7 +182,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                             {isOpen && (
                                 <div className="absolute left-10 bottom-2 mb-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                                     <div className="py-1">
-                                        {isComment && currentUser && currentUser.id === comment.userId.id && (
+                                        {!isComment && currentUser && currentUser.id === comment.userId.id && (
                                             <DropdownItem
                                                 onClick={() => {
                                                     setUpdate(true);
@@ -192,7 +194,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                                 Sửa bình luận
                                             </DropdownItem>
                                         )}
-                                        {isComment && currentUser && (currentUser.id === userId || comment.userId.id === currentUser.id) && (
+                                        {!isComment && currentUser && (currentUser.id === userId || comment.userId.id === currentUser.id || currentUser.role === "ADMIN") && (
                                             <DropdownItem icon={<Trash2 className="w-4 h-4" />}
                                                 onClick={deleteComent}>
                                                 Xóa bình luận

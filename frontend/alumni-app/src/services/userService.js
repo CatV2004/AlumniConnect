@@ -17,6 +17,7 @@ export const changePassword = async (token, oldPassword, newPassword) => {
     );
     return response.data;
   } catch (error) {
+    console.log(error)
     if (error.response && error.response.data) {
       throw new Error(error.response.data.message);
     } else {
