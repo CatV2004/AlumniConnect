@@ -56,7 +56,6 @@ const CommentList = ({ post, showComment, setCountComment }) => {
         return [...prev, ...filtered];
       });
 
-      // setComments(prev => [...prev, ...newComments]);
       setHasMore(!response.data.last);
     } catch (error) {
       console.error("Lỗi khi tải bình luận:", error);
@@ -103,14 +102,10 @@ const CommentList = ({ post, showComment, setCountComment }) => {
           Authorization: localStorage.getItem("token") || null,
         },
       });
-      // const newReplies = res.data.content;
-
       const newReplies = res.data.content.map((reply) => ({
         ...reply,
         hasMoreReplies: true,
       }));
-
-      // console.log(!res.data.last);
 
       setComments((prevComments) =>
         updateCommentTree(prevComments, parentId, newReplies, !res.data.last)
@@ -186,7 +181,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
             handleCommentUpdated={handleCommentUpdated}
             showComment={showComment}
             handleDeleteComment={handleDeleteComment}
-            isComment={!post.lockComment}
+            isComment={post.lockComment}
           />
         </div>
 
@@ -216,7 +211,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
       {renderComments(comments)}
 
       {hasMore && <CommentHasmore setPage={setPage} />}
-      {!post.lockComment && (
+      {post.lockComment === false && (
         <CommentCreated post={post} onCommentAdded={handleNewComment} />
       )}
     </div>

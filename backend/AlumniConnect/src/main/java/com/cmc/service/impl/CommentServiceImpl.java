@@ -79,16 +79,19 @@ public class CommentServiceImpl implements CommentService {
         return this.commentRepo.getCommentById(id);
     }
 
+    @Override
     public boolean deleteComment(Long commentId, Long currentUserId) {
         Comment cmt = commentRepo.getCommentById(commentId);
         if (cmt == null) {
             return false;
         }
-
+        User u = this.userRepo.getUserById(currentUserId);
+        if (u == null)
+            return false;
         Long postOwnerId = cmt.getPostId().getUserId().getId();
         Long commentAuthorId = cmt.getUserId().getId();
 
-        if (currentUserId.equals(postOwnerId) || currentUserId.equals(commentAuthorId)) {
+        if (currentUserId.equals(postOwnerId) || currentUserId.equals(commentAuthorId) || u.getRole().equals("ADMIN")) {
             deleteCommentRecursively(cmt);
             return true;
         }

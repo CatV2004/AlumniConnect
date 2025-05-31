@@ -20,9 +20,9 @@ public class TeacherComponent {
     @Autowired
     private TeacherService teacherService;
     
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 3000) //300000
     public void autoLockUnchangedPasswords() {
-        LocalDateTime deadline = LocalDateTime.now().minusHours(24);
+        LocalDateTime deadline = LocalDateTime.now();
         teacherService.lockExpiredAccounts(deadline);
     }
 }
