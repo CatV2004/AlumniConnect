@@ -8,6 +8,8 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -30,11 +32,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "survey_post")
-@NamedQueries({
-    @NamedQuery(name = "SurveyPost.findAll", query = "SELECT s FROM SurveyPost s"),
-    @NamedQuery(name = "SurveyPost.findById", query = "SELECT s FROM SurveyPost s WHERE s.id = :id"),
-    @NamedQuery(name = "SurveyPost.findByEndTime", query = "SELECT s FROM SurveyPost s WHERE s.endTime = :endTime"),
-    @NamedQuery(name = "SurveyPost.findBySurveyType", query = "SELECT s FROM SurveyPost s WHERE s.surveyType = :surveyType")})
 public class SurveyPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,29 +40,33 @@ public class SurveyPost implements Serializable {
     @NotNull
     @Column(name = "id")
     private Long id;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "end_time")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 23)
     @Column(name = "survey_type")
     private String surveyType;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
     private Set<SurveyQuestion> surveyQuestionSet;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "surveyPostId")
     private Set<SurveyDraft> surveyDraftSet;
-    
+
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     @OneToOne(optional = false)
     @MapsId
     private Post post;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private SurveyStatus status = SurveyStatus.ACTIVE;
 
     public SurveyPost() {
     }
@@ -156,11 +157,8 @@ public class SurveyPost implements Serializable {
                 + ", surveyType='" + surveyType + '\''
                 + ", questions=" + (surveyQuestionSet != null
                         ? surveyQuestionSet.stream().map(SurveyQuestion::toString).toList()
-                        : "[]"
-    
-
-) +
-            '}';
+                        : "[]")
+                + '}';
     }
 
 }

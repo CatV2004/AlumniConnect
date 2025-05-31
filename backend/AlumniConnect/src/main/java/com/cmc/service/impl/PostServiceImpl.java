@@ -14,6 +14,7 @@ import com.cmc.pojo.PostImage;
 import com.cmc.repository.PostRepository;
 import com.cmc.service.PostImageService;
 import com.cmc.service.PostService;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;

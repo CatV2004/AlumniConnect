@@ -59,6 +59,7 @@ public class JwtSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/update").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/current-user").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/survey-posts/**").hasRole("ADMIN")
+                .requestMatchers("/api/expired-survey-posts").hasRole("ADMIN")
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 )

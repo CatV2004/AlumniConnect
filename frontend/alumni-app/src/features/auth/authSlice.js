@@ -63,8 +63,8 @@ const authSlice = createSlice({
       state.role = null;
       state.user = null;
       state.error = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      localStorage.clear(); 
+      sessionStorage.clear();
     },
   },
   extraReducers: (builder) => {
@@ -108,7 +108,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.user = null;
-        console.log("error: ", action.payload?.message);
+        state.token = null;
+        state.role = null;
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
       });
   },
 });

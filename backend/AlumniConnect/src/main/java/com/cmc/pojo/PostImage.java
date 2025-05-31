@@ -27,10 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Entity
 @Table(name = "post_image")
-@NamedQueries({
-    @NamedQuery(name = "PostImage.findAll", query = "SELECT p FROM PostImage p"),
-    @NamedQuery(name = "PostImage.findById", query = "SELECT p FROM PostImage p WHERE p.id = :id"),
-    @NamedQuery(name = "PostImage.findByImage", query = "SELECT p FROM PostImage p WHERE p.image = :image")})
 public class PostImage implements Serializable {
 
     private static final long serialVersionUID = 1L;

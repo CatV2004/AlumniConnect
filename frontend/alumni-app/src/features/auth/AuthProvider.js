@@ -5,12 +5,14 @@ import { fetchCurrentUser, logout } from "./authSlice";
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
   const { token, user, loading, error } = useSelector((state) => state.auth);
+  console.log("token in auth provider: ", token);
 
   useEffect(() => {
-    if (token && error?.status === 401) {
+    if (error?.status === 401) {
       dispatch(logout());
+      window.location.href = "/login"; 
     }
-  }, [token, error, dispatch]);
+  }, [error, dispatch]);
 
   useEffect(() => {
     if (token && !user && !loading) {

@@ -23,9 +23,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "survey_draft_answer")
-@NamedQueries({
-    @NamedQuery(name = "SurveyDraftAnswer.findAll", query = "SELECT s FROM SurveyDraftAnswer s"),
-    @NamedQuery(name = "SurveyDraftAnswer.findById", query = "SELECT s FROM SurveyDraftAnswer s WHERE s.id = :id")})
 public class SurveyDraftAnswer implements Serializable {
 
     private static final long serialVersionUID = 1L;

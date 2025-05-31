@@ -101,6 +101,7 @@ function viewGroupDetail(groupId) {
     fetch(`/AlumniConnect/admin/groups/${groupId}`)
             .then(response => response.json())
             .then(data => {
+                console.log("groupId: ", groupId);
                 document.getElementById('detailGroupName').textContent = data.name;
                 document.getElementById('detailGroupDescription').textContent = data.description || 'Không có mô tả';
                 document.getElementById('detailCreatedDate').textContent = new Date(data.createdDate).toLocaleDateString('vi-VN');
@@ -115,23 +116,28 @@ function viewGroupDetail(groupId) {
                 if (data.members?.length > 0) {
                     data.members.forEach(member => {
                         const item = document.createElement('div');
-                        item.className = 'd-flex align-items-center justify-content-between mb-2 p-2 bg-white rounded';
+                        item.className = 'd-flex align-items-center justify-content-between mb-2 p-2 bg-white rounded hover-shadow';
 
                         item.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 me-2">
-                            <img src="${member.avatar || '/images/default-avatar.png'}"
-                                class="rounded-circle" width="40" height="40" alt="${member.firstName} ${member.lastName}">
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">${member.firstName} ${member.lastName}</h6>
-                            <small class="text-muted">${member.email}</small>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-danger remove-member-btn" 
-                            onclick="removeMemberFromGroup(${groupId}, ${member.id}, this)">
-                        <i class="bi bi-trash"></i> Xóa
-                    </button>`;
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <div class="flex-shrink-0 me-2 position-relative">
+                                    <img src="${member.avatar || '/images/default-avatar.png'}"
+                                        class="rounded-circle" width="40" height="40" alt="${member.firstName} ${member.lastName}">
+                                    ${member.isAdmin ? '<span class="position-absolute bottom-0 end-0 badge bg-primary rounded-circle p-1" title="Quản trị viên"><i class="bi bi-star-fill"></i></span>' : ''}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">${member.firstName} ${member.lastName}</h6>
+                                    <small class="text-muted">${member.email}</small>
+                                </div>
+                            </div>
+                            <div>
+                                ${member.isAdmin ? '' : `
+                                <button class="btn btn-sm btn-outline-danger remove-member-btn ms-2" 
+                                        onclick="removeMemberFromGroup(${groupId}, ${member.id}, this)"
+                                        title="Xóa khỏi nhóm">
+                                    <i class="bi bi-trash"></i>
+                                </button>`}
+                            </div>`;
 
                         memberList.appendChild(item);
                     });
@@ -139,8 +145,71 @@ function viewGroupDetail(groupId) {
                     memberList.innerHTML = '<p class="text-muted">Nhóm chưa có thành viên nào</p>';
                 }
 
-                new bootstrap.Modal(document.getElementById('groupDetailModal')).show();
+                const modalEl = document.getElementById('groupDetailModal');
+                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                if (!modalEl.classList.contains('show')) {
+                    modal.show();
+                }
             });
+}
+
+function removeMemberFromGroup(groupId, userId, buttonElement) {
+    Swal.fire({
+        title: 'Xác nhận xóa',
+        text: 'Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            fetch(`/AlumniConnect/admin/groups/${groupId}/members/${userId}`, {
+                method: 'DELETE'
+            })
+                    .then(async response => {
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                        }
+                        if (response.status === 204) {
+                            return null;
+                        }
+                    })
+                    .then(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: 'Đã xóa thành viên khỏi nhóm',
+                            timer: 1500,
+                            showConfirmButton: false,
+                            willClose: () => {
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('groupDetailModal'));
+                                modal.hide();
+
+                                viewGroupDetail(groupId);
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            html: `Không thể xóa thành viên:<br><small>${error.message}</small>`,
+                            confirmButtonText: 'Đã hiểu'
+                        });
+                    })
+                    .finally(() => {
+                        buttonElement.disabled = false;
+                        buttonElement.innerHTML = originalHtml;
+                    });
+        }
+    });
 }
 
 function toggleGroupStatus(groupId, activate) {
@@ -182,53 +251,6 @@ function toggleGroupStatus(groupId, activate) {
     });
 }
 
-function removeMemberFromGroup(groupId, userId, buttonElement) {
-    Swal.fire({
-        title: 'Xác nhận xóa',
-        text: 'Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Hiển thị loading trên nút xóa
-            const originalHtml = buttonElement.innerHTML;
-            buttonElement.disabled = true;
-            buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
-            fetch(`/AlumniConnect/admin/groups/${groupId}/members/${userId}`, {
-                method: 'DELETE'
-            })
-                    .then(response => {
-                        if (!response.ok)
-                            throw new Error('Không thể xóa thành viên');
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Thành công',
-                            text: 'Đã xóa thành viên khỏi nhóm',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            // Làm mới danh sách thành viên
-                            viewGroupDetail(groupId);
-                        });
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lỗi',
-                            text: error.message || 'Đã xảy ra lỗi khi xóa thành viên'
-                        });
-                    })
-                    .finally(() => {
-                        buttonElement.disabled = false;
-                        buttonElement.innerHTML = originalHtml;
-                    });
-        }
-    });
-}
 
 function deleteGroupPermanently(groupId) {
     Swal.fire({
@@ -413,6 +435,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectAllCheckbox.checked = checkedCount === checkboxes.length;
                 selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
             }
+        });
+    }
+
+    const groupDetailModal = document.getElementById('groupDetailModal');
+    if (groupDetailModal) {
+        groupDetailModal.addEventListener('hidden.bs.modal', function () {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.parentNode.removeChild(backdrop);
+            });
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0';
         });
     }
 });

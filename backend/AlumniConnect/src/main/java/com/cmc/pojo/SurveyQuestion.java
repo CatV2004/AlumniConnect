@@ -29,10 +29,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "survey_question")
-@NamedQueries({
-    @NamedQuery(name = "SurveyQuestion.findAll", query = "SELECT s FROM SurveyQuestion s"),
-    @NamedQuery(name = "SurveyQuestion.findById", query = "SELECT s FROM SurveyQuestion s WHERE s.id = :id"),
-    @NamedQuery(name = "SurveyQuestion.findByMultiChoice", query = "SELECT s FROM SurveyQuestion s WHERE s.multiChoice = :multiChoice")})
 public class SurveyQuestion implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -11,7 +11,6 @@ document.getElementById('createInvitationForm')?.addEventListener('submit', asyn
     submitBtn.disabled = true;
 
     try {
-        // Lấy giá trị từ các select gốc (không phải bản sao Select2)
         const groupIds = Array.from($('.select2-groups.select2-original').val() || []).map(Number);
         const userIds = Array.from($('.select2-users.select2-original').val() || []).map(Number);
 
@@ -44,10 +43,8 @@ document.getElementById('createInvitationForm')?.addEventListener('submit', asyn
             showConfirmButton: false
         });
 
-        // Đóng modal trước khi reset form
         $('#createInvitationModal').modal('hide');
 
-        // Delay nhỏ trước khi reset để đảm bảo modal đã đóng hoàn toàn
         setTimeout(() => {
             resetForm();
             loadInvitations();
@@ -186,7 +183,6 @@ function openEditInvitationModal(invitationId) {
 
                 $('#editInvitationModal').modal('show');
 
-                // Đợi modal hiển thị xong thì gán giá trị select2
                 $('#editInvitationModal').one('shown.bs.modal', function () {
                     if (data.ugroupSet && Array.isArray(data.ugroupSet)) {
                         $('.select2-groups-edit').val(data.ugroupSet.map(g => g.id)).trigger('change');
@@ -210,12 +206,10 @@ function openEditInvitationModal(invitationId) {
 
 
 function updateSelectedItems(selectElement, containerClass, isGroup = false) {
-    // Chỉ xử lý nếu là select gốc (không phải bản sao Select2)
     if (!$(selectElement).hasClass('select2-original')) {
         return;
     }
 
-    // Tìm phần tử Select2 tương ứng
     const select2Element = $(selectElement).next('.select2-hidden');
     if (!select2Element.length || !select2Element.hasClass('select2-hidden-accessible')) {
         return;
@@ -247,7 +241,6 @@ function updateSelectedItems(selectElement, containerClass, isGroup = false) {
 }
 
 function loadInvitations(page = 1, eventName = '', size = 5) {
-    // Hiển thị loading
     const tableBody = $('table tbody');
     tableBody.html(`
         <tr>
@@ -407,19 +400,19 @@ function deleteInvitationPermanently(invitationId) {
         showCancelButton: true,
         confirmButtonText: 'Xóa vĩnh viễn',
         cancelButtonText: 'Hủy bỏ',
-        dangerMode: true
+        confirmButtonColor: '#d33'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/AlumniConnect/admin/invitations/${invitationId}`, {
+            fetch(`/AlumniConnect/admin/invitations/${invitationId}/force`, {
                 method: 'DELETE'
             })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Đã xóa', data.message, 'success');
-                            loadInvitations(); // Tải lại danh sách
+                    .then(async response => {
+                        const message = await response.text(); 
+                        if (response.ok) {
+                            Swal.fire('Đã xóa', message, 'success');
+                            loadInvitations();
                         } else {
-                            throw new Error(data.message);
+                            throw new Error(message);
                         }
                     })
                     .catch(error => {
@@ -428,6 +421,7 @@ function deleteInvitationPermanently(invitationId) {
         }
     });
 }
+
 
 // Xử lý hiển thị các nhóm/người đã chọn
 function updateSelectedItems(selectElement, containerClass, isGroup = false) {

@@ -30,14 +30,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "ugroup")
-@NamedQueries({
-    @NamedQuery(name = "Ugroup.findAll", query = "SELECT u FROM Ugroup u"),
-    @NamedQuery(name = "Ugroup.findById", query = "SELECT u FROM Ugroup u WHERE u.id = :id"),
-    @NamedQuery(name = "Ugroup.findByGroupName", query = "SELECT u FROM Ugroup u WHERE u.groupName = :groupName"),
-    @NamedQuery(name = "Ugroup.findByCreatedDate", query = "SELECT u FROM Ugroup u WHERE u.createdDate = :createdDate"),
-    @NamedQuery(name = "Ugroup.findByUpdatedDate", query = "SELECT u FROM Ugroup u WHERE u.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Ugroup.findByDeletedDate", query = "SELECT u FROM Ugroup u WHERE u.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Ugroup.findByActive", query = "SELECT u FROM Ugroup u WHERE u.active = :active")})
 public class Ugroup implements Serializable {
 
     private static final long serialVersionUID = 1L;

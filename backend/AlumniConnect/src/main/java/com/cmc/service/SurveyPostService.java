@@ -5,8 +5,10 @@
 package com.cmc.service;
 
 import com.cmc.dtos.SurveyDTO;
+import com.cmc.pojo.Post;
 import com.cmc.pojo.SurveyPost;
 import java.util.List;
+import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -15,4 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface SurveyPostService {
     boolean saveOrUpdate(SurveyDTO dto);
+    
+    void updateExpiredStatus();
+    
+    List<Post> findExpiredSurveyPosts(Map<String, Object> params);
 }

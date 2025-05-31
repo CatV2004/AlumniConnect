@@ -7,6 +7,7 @@ import com.cmc.pojo.Post;
 import com.cmc.repository.CommentRepository;
 import com.cmc.repository.PostRepository;
 import com.cmc.service.PostService;
+import com.cmc.service.SurveyPostService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,10 +31,19 @@ public class PostComponents {
     
     @Autowired
     private CommentRepository commentRepository;
-
+    
+    @Autowired
+    private SurveyPostService surveyPostService;
+    
     public String authorization(String auth) {
         String token = auth.replace("Bearer ", "");
         return jwtService.getUsernameFromToken(token);
+    }
+    
+    @Scheduled(fixedRate = 60000) //ms
+    public void updateStatus() {
+        surveyPostService.updateExpiredStatus();
+        System.out.println("Auto update survey status at " + LocalDateTime.now());
     }
     
     @Scheduled(fixedRate = 86400000)
@@ -55,6 +65,7 @@ public class PostComponents {
             }
         }
     }
+    
 }
 
 

@@ -32,15 +32,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "comment")
-@NamedQueries({
-    @NamedQuery(name = "Comment.findAll", query = "SELECT c FROM Comment c"),
-    @NamedQuery(name = "Comment.findById", query = "SELECT c FROM Comment c WHERE c.id = :id AND c.active = TRUE"),
-    @NamedQuery(name = "Comment.findByImage", query = "SELECT c FROM Comment c WHERE c.image = :image"),
-    @NamedQuery(name = "Comment.findByParentId", query = "SELECT c FROM Comment c WHERE c.parentId = :parentId AND c.active = TRUE"),
-    @NamedQuery(name = "Comment.findByCreatedDate", query = "SELECT c FROM Comment c WHERE c.createdDate = :createdDate"),
-    @NamedQuery(name = "Comment.findByUpdatedDate", query = "SELECT c FROM Comment c WHERE c.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Comment.findByDeletedDate", query = "SELECT c FROM Comment c WHERE c.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Comment.findByActive", query = "SELECT c FROM Comment c WHERE c.active = :active")})
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -86,8 +86,8 @@ public class UgroupServiceImpl implements UgroupService {
         if (!this.ugroupRepo.existsById(groupId)) {
             throw new EntityNotFoundException("Group not found with id: " + groupId);
         }
-        if (!this.ugroupRepo.existsById(userId)) {
-            throw new EntityNotFoundException("User not found with id: " + userId);
+        if (!this.ugroupRepo.isUserInGroup(userId, groupId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId + " in" +groupId) ;
         }
 
         this.ugroupRepo.removeUserFromGroup(groupId, userId);

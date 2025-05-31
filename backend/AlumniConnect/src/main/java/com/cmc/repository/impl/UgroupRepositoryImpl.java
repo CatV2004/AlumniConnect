@@ -13,6 +13,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -170,13 +171,17 @@ public class UgroupRepositoryImpl implements UgroupRepository {
 
     @Override
     public boolean isUserInGroup(Long userId, Long groupId) {
-        return this.getSession().createQuery(
-                "SELECT count(g) > 0 FROM Ugroup g JOIN g.userSet u "
-                + "WHERE g.id = :groupId AND u.id = :userId",
-                Boolean.class)
+        String sql = "SELECT EXISTS ("
+                + "SELECT 1 FROM group_user gu "
+                + "WHERE gu.group_id = :groupId AND gu.user_id = :userId)";
+
+        Number exists = (Number) this.getSession()
+                .createNativeQuery(sql)
                 .setParameter("groupId", groupId)
                 .setParameter("userId", userId)
-                .uniqueResult();
+                .getSingleResult();
+
+        return exists.intValue() == 1;
     }
 
     @Override
@@ -202,14 +207,14 @@ public class UgroupRepositoryImpl implements UgroupRepository {
             session.remove(ugroup);
         }
     }
-    
+
     @Override
-    public boolean isByGroupName(String name){
+    public boolean isByGroupName(String name) {
         Session session = this.getSession();
         String hql = "SELECT count(u.id) FROM Ugroup u WHERE u.groupName = :name";
         Long count = (Long) session.createQuery(hql)
-            .setParameter("name", name)
-            .uniqueResult();
+                .setParameter("name", name)
+                .uniqueResult();
         return count != null && count > 0;
     }
 
