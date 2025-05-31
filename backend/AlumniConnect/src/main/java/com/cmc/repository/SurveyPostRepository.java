@@ -4,8 +4,10 @@
  */
 package com.cmc.repository;
 
+import com.cmc.pojo.Post;
 import com.cmc.pojo.SurveyPost;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,8 +18,12 @@ public interface SurveyPostRepository {
     void saveOrUpdate(SurveyPost s);
 
     SurveyPost findById(Long id);
-    
+
     List<SurveyPost> findAll();
-    
+
     boolean exitSurveyContent(String content);
+
+    void updateExpiredStatus();
+
+    List<Post> findExpiredSurveyPosts(Map<String, Object> params);
 }

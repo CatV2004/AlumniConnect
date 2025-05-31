@@ -7,10 +7,12 @@ package com.cmc.repository.impl;
 import com.cmc.pojo.Post;
 import com.cmc.pojo.PostImage;
 import com.cmc.pojo.SurveyPost;
+import com.cmc.pojo.SurveyStatus;
 import com.cmc.repository.PostRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -173,7 +175,7 @@ public class PostRepositoryImpl implements PostRepository {
 
         return false;
     }
-    
+
     @Override
     public int updateContent(Long id, String content) {
         Query q = getSession().createQuery("UPDATE Post p SET p.content = :content WHERE p.id = :id");
@@ -352,10 +354,12 @@ public class PostRepositoryImpl implements PostRepository {
         root.fetch("postImageSet", JoinType.LEFT);
         root.fetch("invitationPost", JoinType.LEFT);
 
+        Join<Post, SurveyPost> surveyPostJoin = root.join("surveyPost", JoinType.LEFT);
+
         List<Predicate> predicates = new ArrayList<>();
-
         predicates.add(cb.isNull(root.get("deletedDate")));
-
+        predicates.add(cb.isTrue(root.get("active")));
+        
         if (params.containsKey("kw")) {
             String kw = params.get("kw").toString();
             if (!kw.isBlank()) {
@@ -365,6 +369,7 @@ public class PostRepositoryImpl implements PostRepository {
 
         if (Boolean.TRUE.equals(params.get("hasSurvey"))) {
             predicates.add(cb.isNotNull(root.get("surveyPost")));
+            predicates.add(cb.equal(surveyPostJoin.get("status"), SurveyStatus.ACTIVE));
         }
 
         if (Boolean.TRUE.equals(params.get("hasImage"))) {
@@ -399,7 +404,7 @@ public class PostRepositoryImpl implements PostRepository {
                 .setParameter("id", id)
                 .uniqueResult();
     }
-    
+
     @Override
     public List<Post> getDeletedPostsByUser(Map<String, Object> params) {
         Session session = getSession();
@@ -508,8 +513,7 @@ public class PostRepositoryImpl implements PostRepository {
             System.out.println("Đã xóa ảnh có ID: " + image.getId());
         }
     }
-    
-    
+
     @Override
     public List<Post> getPostsDelete(LocalDateTime dateTime) {
         Session session = getSession();
@@ -518,11 +522,11 @@ public class PostRepositoryImpl implements PostRepository {
                 .setParameter("dateTime", dateTime)
                 .getResultList();
     }
-    
+
     @Override
-    public void deletePost(Post p){
+    public void deletePost(Post p) {
         Session s = getSession();
-        if(p != null){
+        if (p != null) {
             s.remove(p);
         }
     }

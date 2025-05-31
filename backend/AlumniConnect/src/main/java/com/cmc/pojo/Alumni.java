@@ -25,11 +25,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "alumni")
-@NamedQueries({
-    @NamedQuery(name = "Alumni.findAll", query = "SELECT a FROM Alumni a"),
-    @NamedQuery(name = "Alumni.findById", query = "SELECT a FROM Alumni a WHERE a.id = :id"),
-    @NamedQuery(name = "Alumni.findByStudentCode", query = "SELECT a FROM Alumni a WHERE a.studentCode = :studentCode"),
-    @NamedQuery(name = "Alumni.findByIsVerified", query = "SELECT a FROM Alumni a WHERE a.isVerified = :isVerified")})
 public class Alumni implements Serializable {
 
     private static final long serialVersionUID = 1L;

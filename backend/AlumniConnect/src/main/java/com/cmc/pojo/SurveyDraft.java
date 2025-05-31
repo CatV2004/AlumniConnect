@@ -29,10 +29,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "survey_draft")
-@NamedQueries({
-    @NamedQuery(name = "SurveyDraft.findAll", query = "SELECT s FROM SurveyDraft s"),
-    @NamedQuery(name = "SurveyDraft.findById", query = "SELECT s FROM SurveyDraft s WHERE s.id = :id"),
-    @NamedQuery(name = "SurveyDraft.findByDraftedAt", query = "SELECT s FROM SurveyDraft s WHERE s.draftedAt = :draftedAt")})
 public class SurveyDraft implements Serializable {
 
     private static final long serialVersionUID = 1L;

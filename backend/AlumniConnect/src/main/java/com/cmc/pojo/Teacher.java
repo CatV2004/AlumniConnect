@@ -26,11 +26,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "teacher")
-@NamedQueries({
-    @NamedQuery(name = "Teacher.findAll", query = "SELECT t FROM Teacher t"),
-    @NamedQuery(name = "Teacher.findById", query = "SELECT t FROM Teacher t WHERE t.id = :id"),
-    @NamedQuery(name = "Teacher.findByMustChangePassword", query = "SELECT t FROM Teacher t WHERE t.mustChangePassword = :mustChangePassword"),
-    @NamedQuery(name = "Teacher.findByPasswordResetTime", query = "SELECT t FROM Teacher t WHERE t.passwordResetTime = :passwordResetTime")})
 public class Teacher implements Serializable {
 
     private static final long serialVersionUID = 1L;

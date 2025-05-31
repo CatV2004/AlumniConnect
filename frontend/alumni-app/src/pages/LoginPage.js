@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiUser, FiLock, FiEye, FiEyeOff, FiLogIn, FiAlertCircle, FiCheck } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrentUser, loginUser } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  FiUser,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiLogIn,
+  FiAlertCircle,
+  FiCheck,
+} from "react-icons/fi";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    role: 'ALUMNI'
+    username: "",
+    password: "",
+    role: "ALUMNI",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,13 +32,13 @@ const LoginPage = () => {
   useEffect(() => {
     document.title = "Đăng nhập | Hệ thống";
     // Load saved credentials if "Remember me" was checked
-    const savedUsername = localStorage.getItem('username');
-    const savedRole = localStorage.getItem('role');
+    const savedUsername = localStorage.getItem("username");
+    const savedRole = localStorage.getItem("role");
     if (savedUsername && savedRole) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         username: savedUsername,
-        role: savedRole
+        role: savedRole,
       }));
       setRememberMe(true);
     }
@@ -40,7 +48,7 @@ const LoginPage = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -51,20 +59,12 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    console.log(error)
+
     try {
       await dispatch(loginUser(formData)).unwrap();
-      
-      if (rememberMe) {
-        localStorage.setItem('username', formData.username);
-        localStorage.setItem('role', formData.role);
-      } else {
-        localStorage.removeItem('username');
-        localStorage.removeItem('role');
-      }
 
       setLoginSuccess(true);
-      navigate('/home');
+      navigate("/home");
     } catch (err) {
       console.error("Login failed:", err);
       setValid(err);
@@ -105,7 +105,9 @@ const LoginPage = () => {
             >
               <div className="flex items-center">
                 <FiCheck className="mr-2 text-xl" />
-                <span>Đăng nhập thành công! Bạn sẽ được chuyển đến trang chủ.</span>
+                <span>
+                  Đăng nhập thành công! Bạn sẽ được chuyển đến trang chủ.
+                </span>
               </div>
             </motion.div>
           ) : (
@@ -141,7 +143,11 @@ const LoginPage = () => {
                       required
                     />
                   </div>
-                  {valid && valid.username && <div className="text-red-500 text-sm italic mt-1">{valid.username}</div>}
+                  {valid && valid.username && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {valid.username}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mật khẩu */}
@@ -168,7 +174,11 @@ const LoginPage = () => {
                       {showPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
-                  {valid && valid.password && <div className="text-red-500 text-sm italic mt-1">{valid.password}</div>}
+                  {valid && valid.password && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {valid.password}
+                    </div>
+                  )}
                 </div>
 
                 {/* Vai trò */}
@@ -199,13 +209,19 @@ const LoginPage = () => {
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    <label
+                      htmlFor="remember-me"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
                       Ghi nhớ đăng nhập
                     </label>
                   </div>
 
                   <div className="text-sm">
-                    <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                    <a
+                      href="/forgot-password"
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
                       Quên mật khẩu?
                     </a>
                   </div>
@@ -218,13 +234,33 @@ const LoginPage = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${
+                    isSubmitting
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Đang đăng nhập...
                     </span>

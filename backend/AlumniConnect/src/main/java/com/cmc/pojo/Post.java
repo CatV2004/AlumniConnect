@@ -40,16 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Entity
 @Table(name = "post")
-@NamedQueries({
-    @NamedQuery(name = "Post.findAll", query = "SELECT p FROM Post p"),
-    @NamedQuery(name = "Post.findById", query = "SELECT p FROM Post p WHERE p.id = :id"),
-    @NamedQuery(name = "Post.findByLockComment", query = "SELECT p FROM Post p WHERE p.lockComment = :lockComment"),
-    @NamedQuery(name = "Post.findByCreatedDate", query = "SELECT p FROM Post p WHERE p.createdDate = :createdDate"),
-    @NamedQuery(name = "Post.findByUpdatedDate", query = "SELECT p FROM Post p WHERE p.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Post.findByDeletedDate", query = "SELECT p FROM Post p WHERE p.deletedDate = :deletedDate"),
-
-    @NamedQuery(name = "Post.findByActive", query = "SELECT p FROM Post p WHERE p.active = :active")
-})
 @Data
 public class Post implements Serializable {
 

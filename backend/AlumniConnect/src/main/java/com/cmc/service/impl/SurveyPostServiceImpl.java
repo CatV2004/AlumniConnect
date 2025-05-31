@@ -23,6 +23,7 @@ import com.cmc.service.SurveyPostService;
 import com.cmc.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,14 +50,10 @@ public class SurveyPostServiceImpl implements SurveyPostService {
     @Autowired
     private SurveyOptionRepository surveyOptionRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
 
     @Override
     public boolean saveOrUpdate(SurveyDTO dto) {
@@ -105,6 +102,16 @@ public class SurveyPostServiceImpl implements SurveyPostService {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    @Override
+    public void updateExpiredStatus() {
+        this.surveyPostRepository.updateExpiredStatus();
+    }
+
+    @Override
+    public List<Post> findExpiredSurveyPosts(Map<String, Object> params) {
+        return this.surveyPostRepository.findExpiredSurveyPosts(params);
     }
 
 }

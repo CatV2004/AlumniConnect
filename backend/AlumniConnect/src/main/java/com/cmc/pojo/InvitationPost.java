@@ -30,10 +30,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "invitation_post")
-@NamedQueries({
-    @NamedQuery(name = "InvitationPost.findAll", query = "SELECT i FROM InvitationPost i"),
-    @NamedQuery(name = "InvitationPost.findById", query = "SELECT i FROM InvitationPost i WHERE i.id = :id"),
-    @NamedQuery(name = "InvitationPost.findByEventName", query = "SELECT i FROM InvitationPost i WHERE i.eventName = :eventName")})
 public class InvitationPost implements Serializable {
 
     private static final long serialVersionUID = 1L;

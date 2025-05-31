@@ -30,14 +30,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "reaction")
-@NamedQueries({
-    @NamedQuery(name = "Reaction.findAll", query = "SELECT r FROM Reaction r"),
-    @NamedQuery(name = "Reaction.findById", query = "SELECT r FROM Reaction r WHERE r.id = :id"),
-    @NamedQuery(name = "Reaction.findByReaction", query = "SELECT r FROM Reaction r WHERE r.reaction = :reaction"),
-    @NamedQuery(name = "Reaction.findByCreatedDate", query = "SELECT r FROM Reaction r WHERE r.createdDate = :createdDate"),
-    @NamedQuery(name = "Reaction.findByUpdatedDate", query = "SELECT r FROM Reaction r WHERE r.updatedDate = :updatedDate"),
-    @NamedQuery(name = "Reaction.findByDeletedDate", query = "SELECT r FROM Reaction r WHERE r.deletedDate = :deletedDate"),
-    @NamedQuery(name = "Reaction.findByActive", query = "SELECT r FROM Reaction r WHERE r.active = :active")})
 public class Reaction implements Serializable {
 
     private static final long serialVersionUID = 1L;

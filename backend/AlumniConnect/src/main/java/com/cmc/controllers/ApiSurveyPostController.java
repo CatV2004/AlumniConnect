@@ -59,8 +59,7 @@ public class ApiSurveyPostController {
 
     @Autowired
     private SurveyPostService surveyPostService;
-    @Autowired
-    private UserService userService;
+
     @Autowired
     private UserRepository userRepo;
 
@@ -68,13 +67,7 @@ public class ApiSurveyPostController {
     private PostImageService postImageService;
 
     @Autowired
-    private SurveyPostRepository surveyPostRepository;
-
-    @Autowired
     private UserSurveyOptionService userSurveyOptionService;
-
-    @Autowired
-    private SurveyQuestionRepository surveyQuestionRepository;
 
     @Autowired
     private SurveyStatisticService surveyStatisticService;
@@ -84,6 +77,22 @@ public class ApiSurveyPostController {
 
     @Autowired
     private PostRepository postRepo;
+
+    @GetMapping("/expired-survey-posts")
+    public ResponseEntity<?> getExpiredSurveyPosts(
+            @RequestParam Map<String, Object> params
+    ) {
+        try {
+            List<Post> posts = surveyPostService.findExpiredSurveyPosts(params);
+
+            return ResponseEntity.ok(ResponseDTO.success("Danh sách bài khảo sát đã hết hạn", posts));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseDTO.failure(500, "Đã xảy ra lỗi khi lấy danh sách khảo sát hết hạn"));
+        }
+    }
 
     @PostMapping("/survey-posts")
     public ResponseEntity<?> createSurveyPost(

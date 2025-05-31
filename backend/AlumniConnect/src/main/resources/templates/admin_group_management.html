@@ -78,29 +78,29 @@
                                     <div class="d-flex justify-content-center gap-2">
                                         <button class="btn btn-outline-info btn-sm rounded-pill"
                                                 th:onclick="'viewGroupDetail(\'' + ${group.id} + '\')'">
-                                            <i class="bi bi-eye"></i> Xem
+                                            <i class="bi bi-eye"></i> 
                                         </button>
                                         <button class="btn btn-outline-success btn-sm rounded-pill"
                                                 th:onclick="'openAddMembersModal(' + ${group.id} + ')'">
-                                            <i class="bi bi-person-plus"></i> Thêm thành viên
+                                            <i class="bi bi-person-plus"></i> 
                                         </button>
                                         <button class="btn btn-outline-primary btn-sm rounded-pill"
                                                 th:onclick="'openEditModal(&quot;' + ${group.id} + '&quot;)'">
-                                            <i class="bi bi-pencil-square"></i> Sửa
+                                            <i class="bi bi-pencil-square"></i> 
                                         </button>
                                         <button th:if="${group.active}"
                                                 class="btn btn-outline-danger btn-sm rounded-pill"
                                                 th:onclick="'toggleGroupStatus(\'' + ${group.id} + '\', false)'">
-                                            <i class="bi bi-x-circle"></i> Vô hiệu
+                                            <i class="bi bi-x-circle"></i>
                                         </button>
                                         <button th:if="${!group.active}"
                                                 class="btn btn-outline-success btn-sm rounded-pill"
                                                 th:onclick="'toggleGroupStatus(\'' + ${group.id} + '\', true)'">
-                                            <i class="bi bi-check-circle"></i> Kích hoạt
+                                            <i class="bi bi-check-circle"></i> 
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm rounded-pill"
                                                 th:onclick="'deleteGroupPermanently(' + ${group.id} + ')'">
-                                            <i class="bi bi-trash"></i> Xóa
+                                            <i class="bi bi-trash"></i> 
                                         </button>
                                     </div>
                                 </td>
@@ -223,7 +223,7 @@
                                         </button>
                                     </div>
                                     <div id="memberList" class="mt-3">
-                                        <!-- Danh sách thành viên sẽ được load bằng JS -->
+
                                     </div>
                                 </div>
                             </div>

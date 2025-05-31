@@ -9,10 +9,12 @@ import com.cmc.dtos.InvitationRequestDTO;
 import com.cmc.dtos.InvitationResponseDTO;
 import com.cmc.dtos.ResponseDTO;
 import com.cmc.pojo.InvitationPost;
+import com.cmc.pojo.Post;
 import com.cmc.pojo.Ugroup;
 import com.cmc.pojo.User;
 import com.cmc.repository.UserRepository;
 import com.cmc.service.InvitationService;
+import com.cmc.service.PostService;
 import com.cmc.service.UgroupService;
 import com.cmc.service.UserService;
 import com.cmc.validator.InvitationValidator;
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 /**
  *
@@ -63,6 +66,8 @@ public class AdminInvitationController {
     private UserService userService;
     @Autowired
     private InvitationValidator invitationValidator;
+    @Autowired
+    private  PostService postService;
 
     @GetMapping("")
     public String invitationsView(@RequestParam Map<String, String> params, Model model) {
@@ -79,7 +84,7 @@ public class AdminInvitationController {
         List<User> allUsers = userService.getUsers();
 
         List<GroupDTO> allGroups = groupSerice.findGroups();
-        
+
         allGroups.forEach(g -> System.out.println("groupname: " + g.getGroupName()));
 
         model.addAttribute("invitations", invitations);
@@ -87,9 +92,8 @@ public class AdminInvitationController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("totalItems", totalItems);
         model.addAttribute("size", size);
-        model.addAttribute("allUsers", allUsers); 
+        model.addAttribute("allUsers", allUsers);
         model.addAttribute("allGroups", allGroups);
-                
 
         return "admin_invitation_management";
     }
@@ -99,9 +103,9 @@ public class AdminInvitationController {
             @Valid @RequestBody InvitationRequestDTO invitationRequest,
             BindingResult result,
             Principal principal) {
-        
+
         this.invitationValidator.validate(invitationRequest, result);
-        if (result.hasErrors()){
+        if (result.hasErrors()) {
             String errors = result.getFieldErrors().stream()
                     .map(err -> err.getDefaultMessage())
                     .collect(Collectors.joining("; \n"));
@@ -173,6 +177,22 @@ public class AdminInvitationController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(responses);
+    }
+
+    @DeleteMapping("/{postId}/force")
+    public ResponseEntity<String> forceDeleteInvitation(
+            @PathVariable("postId") Long postId) {
+
+        Post post = postService.getPostById(postId);
+
+        if (post == null) {
+            return ResponseEntity.badRequest().body("Bài viết không tồn tại hoặc không đủ điều kiện để xóa.");
+        }
+
+        boolean deleted = postService.deletePostPermanently(postId);
+        return deleted
+                ? ResponseEntity.ok("Xóa vĩnh viễn bài mời tham gia thành công.")
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bài viết không tồn tại");
     }
 
     @GetMapping("/group/{groupId}")

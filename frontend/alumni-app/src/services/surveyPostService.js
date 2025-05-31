@@ -19,6 +19,23 @@ export const createSurvey = async (payload, token) => {
   }
 };
 
+export const fetchExpiredSurveyPosts = async (params = {}, token) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/expired-survey-posts`, {
+      params,
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching expired survey posts:", error);
+    if (error.response) throw error.response.data;
+    throw error;
+  }
+};
+
 export const getSurveyStatistics = async (surveyPostId, token) => {
   try {
     const response = await axios.get(

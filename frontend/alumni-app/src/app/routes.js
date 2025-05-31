@@ -17,6 +17,7 @@ import SurveyStatsPage from "../pages/SurveyStatsPage";
 import PrivateRoute from "../components/routing/PrivateRoute";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
 import InvitationDetailPage from "../pages/InvitationDetailPage";
+import ExpiredSurveyPostsPage from "../pages/ExpiredSurveyPostsPage";
 
 const RoutesConfig = () => (
   <Router>
@@ -35,6 +36,12 @@ const RoutesConfig = () => (
           path="/surveys/stats/:surveyPostId"
           element={
             <PrivateRoute roles={["ADMIN"]} element={<SurveyStatsPage />} />
+          }
+        />
+        <Route
+          path="/expired-survey-posts"
+          element={
+            <PrivateRoute roles={["ADMIN"]} element={<ExpiredSurveyPostsPage />} />
           }
         />
       </Route>
