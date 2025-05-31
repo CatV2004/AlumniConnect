@@ -90,10 +90,16 @@ public class ApiPostController {
         return ResponseEntity.ok(response);
     }
 
+//    @GetMapping("/posts/{postId}")
+//    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable("postId") Long postId) {
+//        PostResponseDTO postDto = postService.getPostResponseById(postId);
+//        return ResponseEntity.ok(postDto);
+//    }
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable("postId") Long postId) {
-        PostResponseDTO postDto = postService.getPostResponseById(postId);
-        return ResponseEntity.ok(postDto);
+    public ResponseEntity<Post> getPostById(
+            @PathVariable(value = "postId") Long postId
+    ) {
+        return new ResponseEntity<>(this.postService.getPostById(postId), HttpStatus.OK);
     }
 
     @PostMapping(path = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -102,13 +108,13 @@ public class ApiPostController {
             @RequestParam(name = "lockComment", required = false) Boolean lockComment,
             Principal principal,
             @RequestPart(name = "images", required = false) List<MultipartFile> images) {
-        
+
         String username = principal.getName();
         Post post = new Post();
-        if (content == null || "".equals(content)){
+        if (content == null || "".equals(content)) {
             return new ResponseEntity<>(post, HttpStatus.BAD_REQUEST);
         }
-        
+
         post.setContent(content);
         post.setLockComment(lockComment != null ? lockComment : false);
 
@@ -188,7 +194,7 @@ public class ApiPostController {
     public ResponseEntity<String> updateLockComment(
             @PathVariable Long postId) {
         Post p = this.postService.getPostById(postId);
-        
+
         int updated = postService.lockComment(postId);
         return updated > 0 ? ResponseEntity.ok("Cập nhật thành công!") : ResponseEntity.badRequest().body("Cập nhật thất bại!");
     }
@@ -200,7 +206,7 @@ public class ApiPostController {
 //    ) {
 //        this.postService.deletePost(postId);
 //    }
-    @PutMapping("/posts/{postId}")
+    @PutMapping("/posts/{postId}/delete")
     public ResponseEntity<String> deletePost(@PathVariable("postId") Long postId, Principal principal) {
         try {
             String username = principal.getName();
@@ -271,7 +277,7 @@ public class ApiPostController {
         post = user.getRole().equalsIgnoreCase("ADMIN")
                 ? postService.getPostById(postId)
                 : postService.getPostIdOfDL(postId);
-        
+
         if (post == null) {
             System.out.println("Không có bài post");
             return ResponseEntity.badRequest().body("Bài viết không tồn tại hoặc không đủ điều kiện để xóa.");

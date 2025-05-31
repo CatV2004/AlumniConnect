@@ -28,7 +28,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [privacy, setPrivacy] = useState("public");
   const fileInputRef = useRef(null);
-  const token = useSelector((state) => state.auth.token)
+  const token = useSelector((state) => state.auth.token);
   // Load post data if in edit mode
   useEffect(() => {
     if (postId) {
@@ -36,6 +36,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
         setIsLoadingPost(true);
         try {
           const postData = await getPostById(postId);
+          console.log("postData: ", postData);
 
           setContent(postData.content || "");
           setLockComment(postData.lockComment || false);
@@ -102,15 +103,18 @@ const PostForm = ({ onClose, user, postId = null }) => {
     const formData = new FormData();
     formData.append("content", content);
     formData.append("lockComment", lockComment);
-    formData.append("privacy", privacy);
+    // formData.append("privacy", privacy);
 
     // Append new images
     images.forEach((img) => formData.append("images", img));
+    console.log("images: ", images)
 
     // Append existing image IDs to keep
     existingImages.forEach((img) => {
+      console.log("img.id", img.id)
       formData.append("existingImages", img.id);
     });
+    console.log("existingImages: ", existingImages)
 
     try {
       setLoading(true);
@@ -121,7 +125,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
         toast.success("Post updated successfully!");
       } else {
         // Create new post
-        await createPost(formData, localStorage.getItem("token"));
+        await createPost(formData, token);
         toast.success("Post created successfully!");
       }
 

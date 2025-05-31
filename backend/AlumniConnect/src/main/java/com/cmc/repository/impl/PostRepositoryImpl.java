@@ -509,7 +509,6 @@ public class PostRepositoryImpl implements PostRepository {
             post.getPostImageSet().remove(image);
             session.remove(image);
 
-            // TODO: Xóa file khỏi Cloudinary nếu cần
             System.out.println("Đã xóa ảnh có ID: " + image.getId());
         }
     }

@@ -120,7 +120,7 @@ export const deleteImage = async (imageId, token) => {
 export const softDeletePost = async (postId, token) => {
   try {
     const response = await axios.put(
-      `${BASE_URL}/posts/${postId}`,
+      `${BASE_URL}/posts/${postId}/delete`,
       {},
       {
         headers: {
