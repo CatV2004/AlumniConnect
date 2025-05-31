@@ -99,7 +99,7 @@ public class PostMapper {
         dto.setSurveyType(survey.getSurveyType());
         dto.setId(survey.getId());
         dto.setEndTime(survey.getEndTime());
-
+        dto.setStatus(survey.getStatus());
         List<SurveyQuestionDTO> questionDTOs = survey.getSurveyQuestionSet().stream()
                 .map(this::toSurveyQuestionDTO)
                 .collect(Collectors.toList());

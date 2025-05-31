@@ -68,6 +68,14 @@ public class SurveyPost implements Serializable {
     @Column(name = "status", nullable = false)
     private SurveyStatus status = SurveyStatus.ACTIVE;
 
+    public SurveyStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SurveyStatus status) {
+        this.status = status;
+    }
+    
     public SurveyPost() {
     }
 

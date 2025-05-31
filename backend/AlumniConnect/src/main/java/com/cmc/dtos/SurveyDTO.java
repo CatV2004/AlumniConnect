@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import com.cmc.pojo.SurveyStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
  * @author FPTSHOP
  */
 public class SurveyDTO {
+
     private Long id;
     @NotBlank(message = "Không thể bỏ trống nội dung khảo sát!!!")
     private String content;
@@ -22,7 +24,16 @@ public class SurveyDTO {
     @Future(message = "Thời gian kết thúc phải nằm trong tương lai")
     private LocalDateTime endTime;
     private List<SurveyQuestionDTO> questions;
+    private SurveyStatus status;
 
+    public SurveyStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SurveyStatus status) {
+        this.status = status;
+    }
+    
     public Long getId() {
         return id;
     }
@@ -70,8 +81,5 @@ public class SurveyDTO {
     public void setUserId(UserDTO userId) {
         this.userId = userId;
     }
-    
-    
-    
-}
 
+}

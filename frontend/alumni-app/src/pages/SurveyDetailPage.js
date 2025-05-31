@@ -8,7 +8,7 @@ import {
 import { useSelector } from "react-redux";
 import { formatDateFromArray } from "../app/utils/dateUtils";
 import { motion } from "framer-motion";
-import { FiArrowLeft, FiCheck, FiCheckCircle, FiClock } from "react-icons/fi";
+import { FiArrowLeft, FiCheck, FiCheckCircle, FiClock, FiLock } from "react-icons/fi";
 import ProgressBar from "../components/ProgressBar";
 
 const SurveyDetailPage = () => {
@@ -23,6 +23,7 @@ const SurveyDetailPage = () => {
   const [progress, setProgress] = useState(0);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [surveyExpired, setSurveyExpired] = useState(false);
 
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -34,7 +35,11 @@ const SurveyDetailPage = () => {
 
         setHasAnswered(answeredStatus);
         setPost(surveyData);
-        console.log("surveyData: ", surveyData)
+        
+        // Check if survey is expired
+        if (surveyData.surveyPost?.status === "EXPIRED") {
+          setSurveyExpired(true);
+        }
 
         if (surveyData.surveyPost?.questions) {
           const initialResponses = {};
@@ -95,8 +100,13 @@ const SurveyDetailPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (surveyExpired) {
+      alert("Khảo sát này đã hết hạn và không thể gửi câu trả lời.");
+      return;
+    }
+    
     setSubmitting(true);
-    console.log("post.surveyPost.questions: ", post.surveyPost.questions)
 
     try {
       const answers = post.surveyPost.questions
@@ -116,7 +126,6 @@ const SurveyDetailPage = () => {
       if (answers.length !== post.surveyPost.questions.length) {
         throw new Error("Vui lòng trả lời tất cả các câu hỏi trước khi gửi");
       }
-      console.log("answers: ", answers);
 
       await selectMultipleSurveyOptions(answers, token);
 
@@ -138,7 +147,7 @@ const SurveyDetailPage = () => {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -149,8 +158,9 @@ const SurveyDetailPage = () => {
         </div>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-6 max-w-md bg-white rounded-lg shadow-md">
@@ -168,8 +178,9 @@ const SurveyDetailPage = () => {
         </div>
       </div>
     );
+  }
 
-  if (!post || !post.surveyPost)
+  if (!post || !post.surveyPost) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-6 max-w-md bg-white rounded-lg shadow-md">
@@ -189,10 +200,9 @@ const SurveyDetailPage = () => {
         </div>
       </div>
     );
+  }
 
-  const survey = post?.surveyPost;
-  if (!survey) return null;
-
+  const survey = post.surveyPost;
   const endTimeFormatted = formatDateFromArray(survey.endTime, {
     includeTime: true,
   });
@@ -222,19 +232,28 @@ const SurveyDetailPage = () => {
           </h1>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <div className="flex items-center bg-blue-50 px-3 py-1 rounded-full">
-              <FiClock className="mr-2 text-blue-600" />
+            <div className={`flex items-center px-3 py-1 rounded-full ${
+              surveyExpired ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600"
+            }`}>
+              <FiClock className="mr-2" />
               <span className="font-medium">
-                Kết thúc: {dateStr} {/* lúc {timeStr} */}
+                {surveyExpired ? "Đã kết thúc" : "Kết thúc"}: {dateStr}
               </span>
             </div>
 
-            <div className="flex items-center bg-green-50 px-3 py-1 rounded-full">
-              <FiCheck className="mr-2 text-green-600" />
+            <div className="flex items-center bg-green-50 px-3 py-1 rounded-full text-green-600">
+              <FiCheck className="mr-2" />
               <span className="font-medium">
                 {survey.questions.length} câu hỏi
               </span>
             </div>
+
+            {surveyExpired && (
+              <div className="flex items-center bg-red-50 px-3 py-1 rounded-full text-red-600">
+                <FiLock className="mr-2" />
+                <span className="font-medium">Đã hết hạn</span>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -253,22 +272,34 @@ const SurveyDetailPage = () => {
           </motion.div>
         )}
 
-        {hasAnswered ? (
+        {hasAnswered || surveyExpired ? (
           <>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6"
+              className={`border rounded-xl p-6 mb-6 ${
+                surveyExpired 
+                  ? "bg-red-50 border-red-200 text-red-800"
+                  : "bg-green-50 border-green-200 text-green-800"
+              }`}
             >
               <div className="flex items-center">
-                <FiCheckCircle className="text-green-500 text-2xl mr-3" />
+                {surveyExpired ? (
+                  <FiLock className="text-red-500 text-2xl mr-3" />
+                ) : (
+                  <FiCheckCircle className="text-green-500 text-2xl mr-3" />
+                )}
                 <div>
-                  <h3 className="text-lg font-medium text-green-800">
-                    Bạn đã hoàn thành khảo sát này
+                  <h3 className="text-lg font-medium">
+                    {surveyExpired 
+                      ? "Khảo sát này đã hết hạn" 
+                      : "Bạn đã hoàn thành khảo sát này"}
                   </h3>
-                  <p className="text-green-600">
-                    Cảm ơn bạn đã dành thời gian tham gia khảo sát.
+                  <p>
+                    {surveyExpired
+                      ? "Bạn không thể gửi câu trả lời cho khảo sát đã hết hạn."
+                      : "Cảm ơn bạn đã dành thời gian tham gia khảo sát."}
                   </p>
                 </div>
               </div>
@@ -276,13 +307,15 @@ const SurveyDetailPage = () => {
 
             <div className="bg-white rounded-xl shadow-sm p-6 text-center">
               <p className="text-gray-600">
-                Bạn có thể xem kết quả khảo sát khi chủ khảo sát công bố.
+                {surveyExpired
+                  ? "Khảo sát đã kết thúc vào ngày " + dateStr
+                  : "Bạn có thể xem kết quả khảo sát khi chủ khảo sát công bố."}
               </p>
             </div>
           </>
         ) : (
           <>
-            {/* Thanh tiến trình */}
+            {/* Progress bar */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">
@@ -295,7 +328,7 @@ const SurveyDetailPage = () => {
               <ProgressBar value={progress} />
             </div>
 
-            {/* Form khảo sát */}
+            {/* Survey form */}
             <motion.form
               onSubmit={handleSubmit}
               initial={{ opacity: 0 }}
@@ -305,7 +338,7 @@ const SurveyDetailPage = () => {
             >
               {survey.questions.map((question, qIndex) => (
                 <motion.div
-                  key={question.id || qIndex} // Sử dụng question.id thay vì index
+                  key={question.id || qIndex}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + qIndex * 0.05 }}
@@ -329,7 +362,7 @@ const SurveyDetailPage = () => {
                     <div className="space-y-3">
                       {question.options.map((option, oIndex) => (
                         <div
-                          key={option.id} // Sử dụng option.id thay vì index
+                          key={option.id}
                           className={`p-3 rounded-lg border transition ${
                             (
                               question.multiChoice
@@ -371,16 +404,16 @@ const SurveyDetailPage = () => {
                 </motion.div>
               ))}
 
-              {/* Nút submit */}
+              {/* Submit button */}
               <div className="sticky bottom-0 bg-white py-4 border-t border-gray-200">
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={submitting || progress < 100}
+                    disabled={submitting || progress < 100 || surveyExpired}
                     className={`px-6 py-3 rounded-lg font-medium transition ${
                       submitting
                         ? "bg-blue-400 cursor-not-allowed"
-                        : progress < 100
+                        : progress < 100 || surveyExpired
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
                     }`}

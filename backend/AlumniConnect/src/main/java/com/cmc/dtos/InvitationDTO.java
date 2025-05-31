@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import com.cmc.pojo.SurveyStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,6 +40,6 @@ public class InvitationDTO {
     public void setInvitedUserIds(List<Long> invitedUserIds) {
         this.invitedUserIds = invitedUserIds;
     }
-    
+
     
 }

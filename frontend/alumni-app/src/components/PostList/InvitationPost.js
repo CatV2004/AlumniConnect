@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 moment.locale("vi");
 
 const InvitationPost = ({ invitation, postId }) => {
-  console.log("invitation: ", invitation);
+  // console.log("invitation: ", invitation);
   if (!invitation) return null;
   const formatDate = (dateArray) => {
     if (!dateArray) return "";

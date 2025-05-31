@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { MoreVertical, Pencil, Trash2, Bookmark, Flag, Loader2 } from "lucide-react";
+import {
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Bookmark,
+  Flag,
+  Loader2,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { forceDeletePost, softDeletePost } from "../../services/postService";
@@ -10,7 +17,7 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteType, setDeleteType] = useState(null); // 'soft' or 'force'
-  
+
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
@@ -31,17 +38,21 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      if (deleteType === 'force') {
+      if (deleteType === "force") {
         await forceDeletePost(post.id, token);
         toast.success("Bài viết đã được xóa vĩnh viễn");
       } else {
         await softDeletePost(post.id, token);
         toast.success("Bài viết đã được xóa");
       }
-      
+
       dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
     } catch (error) {
-      toast.error(`Xóa bài viết thất bại: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Xóa bài viết thất bại: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
@@ -86,11 +97,13 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
 
             {(isOwner || isAdmin) && (
               <DropdownItem
-                onClick={() => openDeleteModal(isOwner ? 'soft' : 'force')}
+                onClick={() =>
+                  openDeleteModal(isOwner && !isAdmin ? "soft" : "force")
+                }
                 icon={<Trash2 className="w-4 h-4" />}
                 className="text-red-600 hover:bg-red-50"
               >
-                {isOwner ? "Xóa bài viết" : "Xóa vĩnh viễn"}
+                {isOwner && !isAdmin ? "Xóa bài viết" : "Xóa vĩnh viễn"}
               </DropdownItem>
             )}
 
@@ -100,7 +113,7 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
             >
               Lưu bài viết
             </DropdownItem>
-            
+
             {!isOwner && (
               <DropdownItem
                 onClick={handleReport}
@@ -118,15 +131,17 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {deleteType === 'force' ? 'Xóa vĩnh viễn bài viết' : 'Xóa bài viết'}
+              {deleteType === "force"
+                ? "Xóa vĩnh viễn bài viết"
+                : "Xóa bài viết"}
             </h3>
-            
+
             <p className="text-gray-600 mb-6">
-              {deleteType === 'force'
-                ? 'Bạn có chắc muốn xóa vĩnh viễn bài viết này? Hành động này không thể hoàn tác.'
-                : 'Bài viết sẽ được ẩn khỏi hệ thống nhưng có thể khôi phục sau.'}
+              {deleteType === "force"
+                ? "Bạn có chắc muốn xóa vĩnh viễn bài viết này? Hành động này không thể hoàn tác."
+                : "Bài viết sẽ được ẩn khỏi hệ thống nhưng có thể khôi phục sau."}
             </p>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -135,14 +150,14 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
               >
                 Hủy bỏ
               </button>
-              
+
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className={`px-4 py-2 rounded-md text-white transition-colors disabled:opacity-50 ${
-                  deleteType === 'force' 
-                    ? 'bg-red-600 hover:bg-red-700' 
-                    : 'bg-blue-600 hover:bg-blue-700'
+                  deleteType === "force"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {isDeleting ? (
@@ -150,8 +165,10 @@ const PostOptionsDropdown = ({ post, onEdit }) => {
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
                     Đang xóa...
                   </span>
+                ) : deleteType === "force" ? (
+                  "Xóa vĩnh viễn"
                 ) : (
-                  deleteType === 'force' ? 'Xóa vĩnh viễn' : 'Xóa bài viết'
+                  "Xóa bài viết"
                 )}
               </button>
             </div>
