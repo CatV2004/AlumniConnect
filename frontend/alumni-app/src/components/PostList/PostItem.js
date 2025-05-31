@@ -30,8 +30,9 @@ import FindReaction from "../Reaction/FindReaction";
 moment.locale("vi");
 
 const PostItem = ({ post }) => {
+  // console.log("posts: ", post);
+
   const role = useSelector((state) => state.auth.role);
-  // console.log("post: ", post);
   const user = useSelector((state) => state.auth);
 
   const [showComment, setShowComment] = useState(false);
@@ -229,8 +230,8 @@ const PostItem = ({ post }) => {
       </div>
 
       {/* Post Media */}
-      {post.postImages && post.postImages.length > 0 && (
-        <PostImagesGallery images={post.postImages} />
+      {post.postImageSet && post.postImageSet.length > 0 && (
+        <PostImagesGallery images={post.postImageSet} />
       )}
 
       {/* Survey Post */}
@@ -308,17 +309,17 @@ const PostItem = ({ post }) => {
         </div>
 
         {/* {!post.lockComment && ( */}
-          <button
-            onClick={toggleComments}
-            className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+        <button
+          onClick={toggleComments}
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
                text-gray-600 hover:text-blue-500 hover:bg-gray-100 
                transition-all duration-150 ease-in-out"
-          >
-            <FaRegCommentDots className="w-5 h-5" />
-            Comment
-          </button>
+        >
+          <FaRegCommentDots className="w-5 h-5" />
+          Comment
+        </button>
         {/* )} */}
-        
+
         {post.surveyPost && role === "ADMIN" && (
           <button
             onClick={() => setStatsModalOpen(true)}

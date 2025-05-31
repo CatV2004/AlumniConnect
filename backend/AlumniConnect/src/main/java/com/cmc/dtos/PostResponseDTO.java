@@ -23,7 +23,7 @@ public class PostResponseDTO {
 
     private UserDTO userId;
 
-    private List<String> postImages;
+      private List<PostImageDTO> postImageSet;
 
     private InvitationDTO invitationPost;
 
@@ -85,12 +85,12 @@ public class PostResponseDTO {
         this.userId = userId;
     }
 
-    public List<String> getPostImages() {
-        return postImages;
+    public List<PostImageDTO> getPostImageSet() {
+        return postImageSet;
     }
 
-    public void setPostImages(List<String> postImages) {
-        this.postImages = postImages;
+    public void setPostImageSet(List<PostImageDTO> postImageSet) {
+        this.postImageSet = postImageSet;
     }
 
     public InvitationDTO getInvitationPost() {

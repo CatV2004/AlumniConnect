@@ -90,17 +90,17 @@ public class ApiPostController {
         return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/posts/{postId}")
-//    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable("postId") Long postId) {
-//        PostResponseDTO postDto = postService.getPostResponseById(postId);
-//        return ResponseEntity.ok(postDto);
-//    }
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Post> getPostById(
-            @PathVariable(value = "postId") Long postId
-    ) {
-        return new ResponseEntity<>(this.postService.getPostById(postId), HttpStatus.OK);
+    public ResponseEntity<PostResponseDTO> getPostById(@PathVariable("postId") Long postId) {
+        PostResponseDTO postDto = postService.getPostResponseById(postId);
+        return ResponseEntity.ok(postDto);
     }
+//    @GetMapping("/posts/{postId}")
+//    public ResponseEntity<Post> getPostById(
+//            @PathVariable(value = "postId") Long postId
+//    ) {
+//        return new ResponseEntity<>(this.postService.getPostById(postId), HttpStatus.OK);
+//    }
 
     @PostMapping(path = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createPost(

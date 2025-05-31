@@ -6,11 +6,12 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const PostImagesGallery = ({ images }) => {
+  if (!images || images.length === 0) return null;
   if (images.length === 1) {
     return (
       <div className="w-full">
         <img
-          src={images[0]}
+          src={images[0].image}
           alt="post"
           className="w-full h-auto max-h-[500px] object-contain bg-black"
         />
@@ -28,11 +29,11 @@ const PostImagesGallery = ({ images }) => {
       autoplay={{ delay: 5000 }}
       className="w-full h-auto max-h-[500px] bg-black"
     >
-      {images.map((img, index) => (
-        <SwiperSlide key={index}>
+      {images.map((imgObj) => (
+        <SwiperSlide key={imgObj.id}>
           <img
-            src={img}
-            alt={`post-${index}`}
+            src={imgObj.image}
+            alt={`post-${imgObj.id}`}
             className="w-full h-auto max-h-[500px] object-contain"
           />
         </SwiperSlide>

@@ -9,6 +9,7 @@ package com.cmc.components;
  * @author FPTSHOP
  */
 import com.cmc.dtos.InvitationDTO;
+import com.cmc.dtos.PostImageDTO;
 import com.cmc.dtos.PostResponseDTO;
 import com.cmc.dtos.SurveyDTO;
 import com.cmc.dtos.SurveyOptionDTO;
@@ -43,15 +44,22 @@ public class PostMapper {
 
         dto.setUserId(toUserDTO(post.getUserId()));
 
-        List<String> imageUrls = post.getPostImageSet().stream()
-                .map(PostImage::getImage)
+        List<PostImageDTO> imageDTOs = post.getPostImageSet().stream()
+                .map(this::toPostImageDTO)
                 .collect(Collectors.toList());
-        dto.setPostImages(imageUrls);
+        dto.setPostImageSet(imageDTOs);
 
         dto.setInvitationPost(toInvitationDTO(post.getInvitationPost()));
         dto.setSurveyPost(toSurveyDTO(post.getSurveyPost()));
 
         return dto;
+    }
+    
+    private PostImageDTO toPostImageDTO(PostImage postImage) {
+        if (postImage == null) {
+            return null;
+        }
+        return new PostImageDTO(postImage.getId(), postImage.getImage());
     }
 
     private UserDTO toUserDTO(User user) {

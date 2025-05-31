@@ -20,7 +20,6 @@ const Home = () => {
       dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
     }
   }, [dispatch]);
-
   const handleDeletedPostsClick = () => {
     navigate("/deleted-posts");
   };

@@ -12,6 +12,14 @@ public class PostImageDTO {
     private Long id;
     private String image;
 
+    public PostImageDTO(Long id, String image) {
+        this.id = id;
+        this.image = image;
+    }
+
+    public PostImageDTO() {
+    }
+
     public Long getId() {
         return id;
     }

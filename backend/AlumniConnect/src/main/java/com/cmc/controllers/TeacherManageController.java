@@ -97,7 +97,7 @@ public class TeacherManageController {
         }
 
         TeacherDTO teacher = new TeacherDTO();
-        try {
+//        try {
             if (user != null) {
                 teacher.setUser(user);
             }
@@ -111,11 +111,11 @@ public class TeacherManageController {
                         .body(new ResponseMessage("Tạo tài khoản giảng viên thất bại."));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseMessage("Đã có lỗi xảy ra khi tạo tài khoản giảng viên."));
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new ResponseMessage("Đã có lỗi xảy ra khi tạo tài khoản giảng viên."));
+//        }
     }
 
     @PostMapping("/teachers/resetPassword/{id}")

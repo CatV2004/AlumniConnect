@@ -1,4 +1,5 @@
 function addTeacher(url) {
+    console.log("urrl:", url);
     const data = {
         username: document.getElementById("username").value,
         firstName: document.getElementById("firstName").value,

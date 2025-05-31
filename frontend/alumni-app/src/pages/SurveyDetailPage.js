@@ -34,6 +34,7 @@ const SurveyDetailPage = () => {
 
         setHasAnswered(answeredStatus);
         setPost(surveyData);
+        console.log("surveyData: ", surveyData)
 
         if (surveyData.surveyPost?.questions) {
           const initialResponses = {};
