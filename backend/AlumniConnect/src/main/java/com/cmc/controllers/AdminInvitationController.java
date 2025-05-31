@@ -44,6 +44,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 /**
  *
@@ -67,7 +68,7 @@ public class AdminInvitationController {
     @Autowired
     private InvitationValidator invitationValidator;
     @Autowired
-    private  PostService postService;
+    private PostService postService;
 
     @GetMapping("")
     public String invitationsView(@RequestParam Map<String, String> params, Model model) {
@@ -179,11 +180,45 @@ public class AdminInvitationController {
         return ResponseEntity.ok(responses);
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updatePostStatus(@PathVariable("id") long id,
+                                              @RequestBody Map<String, Object> payload) {
+        try {
+            if (!payload.containsKey("active")) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Thiếu trường 'active' trong request body"
+                ));
+            }
+
+            boolean active = (boolean) payload.get("active");
+            boolean result = postService.updateStatus(id, active);
+
+            if (result) {
+                String action = active ? "kích hoạt" : "vô hiệu hóa";
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "message", "Đã " + action + " bài viết thành công"
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                        "success", false,
+                        "message", "Không tìm thấy bài viết với ID = " + id
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "Có lỗi xảy ra: " + e.getMessage()
+            ));
+        }
+    }
+
     @DeleteMapping("/{postId}/force")
     public ResponseEntity<String> forceDeleteInvitation(
             @PathVariable("postId") Long postId) {
 
-        Post post = postService.getPostById(postId);
+        Post post = postService.getPostUnActiveById(postId);
 
         if (post == null) {
             return ResponseEntity.badRequest().body("Bài viết không tồn tại hoặc không đủ điều kiện để xóa.");
