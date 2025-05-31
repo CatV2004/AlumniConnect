@@ -105,39 +105,39 @@ public class User implements Serializable {
     private LocalDateTime deletedDate;
     @Column(name = "active")
     private Boolean active;
-    
+
     @ManyToMany(mappedBy = "userSet")
     @JsonIgnore
     private Set<InvitationPost> invitationPostSet;
-    
+
     @ManyToMany(mappedBy = "userSet")
     @JsonIgnore
     private Set<Ugroup> ugroupSet;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Set<Reaction> reactionSet;
-    
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Alumni alumni;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Set<SurveyDraft> surveyDraftSet;
-    
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Teacher teacher;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Set<Post> postSet;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Set<UserSurveyOption> userSurveyOptionSet;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Set<Comment> commentSet;
@@ -367,7 +367,12 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return this.role.equals("ADMIN") ? "Admin" : this.firstName + " " + this.lastName;
+        if ("ADMIN".equals(this.role)) {
+            return "Admin";
+        }
+        String fullName = (this.firstName != null ? this.firstName : "") + " "
+                + (this.lastName != null ? this.lastName : "");
+        return fullName.trim();
     }
 
 }

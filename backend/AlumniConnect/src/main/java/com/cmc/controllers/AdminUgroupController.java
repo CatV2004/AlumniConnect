@@ -56,15 +56,15 @@ public class AdminUgroupController {
     @Autowired
     private GroupValidator groupValidator;
 
-
     @PostMapping("")
     public ResponseEntity<?> createGroup(@Valid @RequestBody GroupDTO ugroupDTO, BindingResult result) {
         this.groupValidator.validate(ugroupDTO, result);
+
         if (result.hasErrors()) {
             String errorMessage = result.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.joining("\n")); 
-            Map<String, String> error = new  HashMap<>();
+                    .collect(Collectors.joining("\n"));
+            Map<String, String> error = new HashMap<>();
             error.put("message", errorMessage);
 
             return ResponseEntity.badRequest().body(error);

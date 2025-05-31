@@ -16,7 +16,7 @@ const ProfileTimeline = ({ posts, loadMore, hasMore, loading }) => {
       <PostList 
         posts={posts}
         loading={loading}
-        error={null} // Thêm prop error nếu cần
+        error={null}
         hasMore={hasMore}
         fetchMoreData={loadMore}
         customEmptyMessage={

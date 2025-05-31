@@ -10,6 +10,7 @@ const ProfileHeader = ({ user }) => {
   const coverInputRef = useRef(null);
   const { user: authUser, token } = useSelector((state) => state.auth);
   const isOwner = authUser?.id === user?.id;
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // State cho crop ảnh
   const [showModal, setShowModal] = useState(false);
@@ -66,6 +67,7 @@ const ProfileHeader = ({ user }) => {
   };
 
   const handleCrop = async () => {
+    setIsUpdating(true);
     const image = document.getElementById("crop-image");
     const blob = await getCroppedImg(image, crop);
 
@@ -82,6 +84,7 @@ const ProfileHeader = ({ user }) => {
     } catch (err) {
       console.error("Cập nhật ảnh thất bại", err);
     } finally {
+      setIsUpdating(false);
       setShowModal(false);
     }
   };
@@ -91,11 +94,18 @@ const ProfileHeader = ({ user }) => {
       {/* Cover Photo */}
       <div className="h-48 bg-gray-200 relative group">
         {user.cover && (
-          <img
-            src={user.cover}
-            alt="Cover"
-            className="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={user.cover}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+            {isUpdating && type === "cover" && (
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Upload cover */}
@@ -125,6 +135,11 @@ const ProfileHeader = ({ user }) => {
               alt="Avatar"
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
+            {isUpdating && type === "avatar" && (
+              <div className="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
             {isOwner && (
               <button
                 className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity"
@@ -158,6 +173,13 @@ const ProfileHeader = ({ user }) => {
           <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
             <h3 className="text-xl font-semibold mb-4">Chỉnh sửa ảnh</h3>
 
+            {/* Thêm overlay loading khi đang xử lý */}
+            {isUpdating && (
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-10 rounded-lg">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+
             <div className="relative max-h-[70vh] overflow-auto">
               {selectedImage && (
                 <ReactCrop
@@ -165,6 +187,7 @@ const ProfileHeader = ({ user }) => {
                   onChange={(c) => setCrop(c)}
                   onComplete={(c) => setCrop(c)}
                   aspect={type === "cover" ? 16 / 9 : 1}
+                  disabled={isUpdating} // Vô hiệu hóa crop khi đang loading
                 >
                   <img id="crop-image" src={selectedImage} alt="Crop preview" />
                 </ReactCrop>
@@ -175,14 +198,23 @@ const ProfileHeader = ({ user }) => {
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                disabled={isUpdating} // Vô hiệu hóa nút hủy khi đang loading
               >
                 Hủy
               </button>
               <button
                 onClick={handleCrop}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center justify-center gap-2"
+                disabled={isUpdating} // Vô hiệu hóa nút lưu khi đang loading
               >
-                Lưu thay đổi
+                {isUpdating ? (
+                  <>
+                    <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+                    Đang tải lên...
+                  </>
+                ) : (
+                  "Lưu thay đổi"
+                )}
               </button>
             </div>
           </div>

@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class GroupDTO {
 
     private Long id;
-    @NotBlank(message = "Tên nhóm không được để trống")
+    @NotBlank(message = "Tên nhóm không được để trốngs")
     private String groupName;
     private String createdDate;
     private String updatedDate;

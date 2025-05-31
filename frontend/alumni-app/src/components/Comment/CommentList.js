@@ -10,13 +10,13 @@ import CountComment from "./CountComment";
 moment.locale("vi");
 
 const CommentList = ({ post, showComment, setCountComment }) => {
-  console.log("p[ost: ", post);
+  // console.log("p[ost: ", post);
   const BASE_URL = "http://localhost:8080/AlumniConnect/api";
   const [comments, setComments] = useState([]);
   const [page, setPage] = useState(0);
   const [size] = useState(5);
   const [hasMore, setHasMore] = useState(true);
-  const [isComment, setIsComment] = useState(post.lockComment || false);
+  // console.log("post.lockComment: ", post.lockComment);
 
   useEffect(() => {
     setComments([]);
@@ -110,7 +110,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
         hasMoreReplies: true,
       }));
 
-      console.log(!res.data.last);
+      // console.log(!res.data.last);
 
       setComments((prevComments) =>
         updateCommentTree(prevComments, parentId, newReplies, !res.data.last)
@@ -186,7 +186,7 @@ const CommentList = ({ post, showComment, setCountComment }) => {
             handleCommentUpdated={handleCommentUpdated}
             showComment={showComment}
             handleDeleteComment={handleDeleteComment}
-            isComment={isComment}
+            isComment={!post.lockComment}
           />
         </div>
 
@@ -210,14 +210,13 @@ const CommentList = ({ post, showComment, setCountComment }) => {
     ));
   };
 
-  console.log(comments);
 
   return (
     <div className="space-y-2 gap-3">
       {renderComments(comments)}
 
       {hasMore && <CommentHasmore setPage={setPage} />}
-      {isComment && (
+      {!post.lockComment && (
         <CommentCreated post={post} onCommentAdded={handleNewComment} />
       )}
     </div>
