@@ -34,7 +34,7 @@ public class CommentComponentScheduled {
     @Autowired
     private PostComponents postComponents;
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(fixedRate = 36000)
     public void analyzeUnlabeledComments() {
         List<Comment> unlabeledComments = this.commentRepository.getUnlabeledComments();
 
