@@ -34,7 +34,7 @@ const PostItem = ({ post }) => {
   // console.log("post: ", post);
   const user = useSelector((state) => state.auth);
 
-  const [showComment, setShowComment] = useState(true);
+  const [showComment, setShowComment] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   const [isLiked, setIsLiked] = useState(false);
@@ -307,7 +307,7 @@ const PostItem = ({ post }) => {
           </button>
         </div>
 
-        {!post.lockComment && (
+        {/* {!post.lockComment && ( */}
           <button
             onClick={toggleComments}
             className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
@@ -317,7 +317,7 @@ const PostItem = ({ post }) => {
             <FaRegCommentDots className="w-5 h-5" />
             Comment
           </button>
-        )}
+        {/* )} */}
         
         {post.surveyPost && role === "ADMIN" && (
           <button

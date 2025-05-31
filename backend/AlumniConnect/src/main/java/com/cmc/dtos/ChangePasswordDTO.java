@@ -14,9 +14,10 @@ import jakarta.validation.constraints.Size;
  */
 public class ChangePasswordDTO {
     @NotBlank(message = "Bắt Buộc nhập password cũ")
+    @Size(min = 5,max=50, message = "Password phải ít nhất 6 ký tự")
     private String oldPassword;
     @NotBlank(message = "Password mới là bắt buộc")
-    @Size(min = 5,max=50, message = "Password phải ít nhất 6 ký tự")
+    @Size(min = 6,max=50, message = "Password phải ít nhất 6 ký tự")
     @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Password phải có ký tự đặc biệt")
     private String newPassword;
 
