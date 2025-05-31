@@ -4,6 +4,7 @@
  */
 package com.cmc.dtos;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ public class SurveyDTO {
     private String content;
     private UserDTO userId;
     private String surveyType;
+    @Future(message = "Thời gian kết thúc phải nằm trong tương lai")
     private LocalDateTime endTime;
     private List<SurveyQuestionDTO> questions;
 

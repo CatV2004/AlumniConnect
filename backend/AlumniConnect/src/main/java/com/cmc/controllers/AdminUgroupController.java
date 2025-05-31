@@ -56,13 +56,10 @@ public class AdminUgroupController {
     @Autowired
     private GroupValidator groupValidator;
 
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.addValidators(groupValidator);
-    }
 
     @PostMapping("")
     public ResponseEntity<?> createGroup(@Valid @RequestBody GroupDTO ugroupDTO, BindingResult result) {
+        this.groupValidator.validate(ugroupDTO, result);
         if (result.hasErrors()) {
             String errorMessage = result.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)

@@ -30,4 +30,6 @@ public interface InvitationPostRepository {
 
     long countInvitationPosts(Map<String, String> params);
     
+    boolean exitNameEvent(String name);
+    
 }

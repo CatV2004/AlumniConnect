@@ -18,4 +18,6 @@ public interface SurveyPostRepository {
     SurveyPost findById(Long id);
     
     List<SurveyPost> findAll();
+    
+    boolean exitSurveyContent(String content);
 }

@@ -18,18 +18,19 @@ const SurveyCreateForm = () => {
 
     try {
       // Kiểm tra nếu surveyData có error (từ validate)
-      if (surveyData.error) {
-        setMessage({ error: surveyData.error });
-        return;
-      }
+      // if (surveyData.error) {
+      //   setMessage({ error: surveyData.error });
+      //   return;
+      // }
 
       await createSurvey(surveyData, token);
 
       setMessage({ success: "✅ Tạo khảo sát thành công!" });
       dispatch(fetchSurveyPosts({ page: 1, size: 5, refresh: true }));
-      setTimeout(() => setShowModal(false), 1500); // Tự động đóng sau 1.5s
+      setTimeout(() => setShowModal(false), 2000); // Tự động đóng sau 1.5s
     } catch (err) {
       setMessage({ error: "❌ Tạo khảo sát thất bại: " + err.message });
+      console.log("Lỗi tại: ",err)
     } finally {
       setLoading(false);
     }

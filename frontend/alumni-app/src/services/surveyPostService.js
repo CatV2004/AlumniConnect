@@ -13,7 +13,9 @@ export const createSurvey = async (payload, token) => {
     return response.data;
   } catch (error) {
     console.error("Error creating survey:", error);
-    throw error;
+    if(error.response)
+      throw error.response?.data;
+    throw error
   }
 };
 

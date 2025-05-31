@@ -5,6 +5,7 @@
 package com.cmc.repository.impl;
 
 import com.cmc.dtos.TeacherDTO;
+import com.cmc.dtos.TeacherRequestDTO;
 import com.cmc.dtos.UserDTO;
 import com.cmc.pojo.Alumni;
 import com.cmc.pojo.Teacher;
@@ -57,7 +58,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
 
     @Override
     public boolean createTeacherAccount(TeacherDTO teacherDTO) {
-        UserDTO userDTO = teacherDTO.getUser();
+        TeacherRequestDTO userDTO = teacherDTO.getUser();
         User user = modelMapper.map(userDTO, User.class);
         Teacher teacher = modelMapper.map(teacherDTO, Teacher.class);
 

@@ -158,4 +158,14 @@ public class InvitationPostRepositoryImpl implements InvitationPostRepository {
 
         return session.createQuery(cq).getSingleResult();
     }
+
+    @Override
+    public boolean exitNameEvent(String name) {
+        Session session = this.getSession();
+        String hql = "SELECT count(u.id) FROM InvitationPost u WHERE u.eventName = :name";
+        Long count = (Long) session.createQuery(hql)
+                .setParameter("name", name)
+                .uniqueResult();
+        return count != null && count > 0;
+    }
 }
