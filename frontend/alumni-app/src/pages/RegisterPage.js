@@ -3,7 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiUser, FiLock, FiMail, FiPhone, FiImage, FiEye, FiEyeOff, FiCheck, FiX } from "react-icons/fi";
+import {
+  FiUser,
+  FiLock,
+  FiMail,
+  FiPhone,
+  FiImage,
+  FiEye,
+  FiEyeOff,
+  FiCheck,
+  FiX,
+} from "react-icons/fi";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -109,7 +119,7 @@ const RegisterPage = () => {
       }, 1500);
     } catch (err) {
       console.error("Registration failed: ", err);
-      setErrors(err)
+      setErrors(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -160,7 +170,9 @@ const RegisterPage = () => {
             >
               <div className="flex items-center">
                 <FiCheck className="mr-2 text-xl" />
-                <span>Đăng ký thành công! Bạn sẽ được chuyển đến trang đăng nhập.</span>
+                <span>
+                  Đăng ký thành công! Vui lòng chờ người quản trị xác nhận.
+                </span>
               </div>
             </motion.div>
           ) : (
@@ -195,7 +207,11 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
-                  {errors && errors.firstName && <div className="text-red-500 text-sm italic mt-1">{errors.firstName}</div>}
+                  {errors && errors.firstName && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.firstName}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -213,7 +229,11 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
-                  {errors && errors.lastName && <div className="text-red-500 text-sm italic mt-1">{errors.lastName}</div>}
+                  {errors && errors.lastName && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.lastName}
+                    </div>
+                  )}
                 </div>
 
                 {/* Email và SĐT */}
@@ -233,7 +253,11 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
-                  {errors && errors.email && <div className="text-red-500 text-sm italic mt-1">{errors.email}</div>}
+                  {errors && errors.email && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.email}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -251,8 +275,11 @@ const RegisterPage = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  {errors && errors.phone && <div className="text-red-500 text-sm italic mt-1">{errors.phone}</div>}
-
+                  {errors && errors.phone && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.phone}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mã sinh viên và Tên đăng nhập */}
@@ -271,8 +298,11 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
-                  {errors && errors.studentCode && <div className="text-red-500 text-sm italic mt-1">{errors.studentCode}</div>}
-
+                  {errors && errors.studentCode && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.studentCode}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -291,8 +321,11 @@ const RegisterPage = () => {
                       required
                     />
                   </div>
-                  {errors && errors.username && <div className="text-red-500 text-sm italic mt-1">{errors.username}</div>}
-
+                  {errors && errors.username && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.username}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mật khẩu */}
@@ -318,8 +351,11 @@ const RegisterPage = () => {
                     >
                       {showPassword.password ? <FiEyeOff /> : <FiEye />}
                     </button>
-                    {errors && errors.password && <div className="text-red-500 text-sm italic mt-1">{errors.password}</div>}
-
+                    {errors && errors.password && (
+                      <div className="text-red-500 text-sm italic mt-1">
+                        {errors.password}
+                      </div>
+                    )}
                   </div>
                   {formData.password && (
                     <motion.div
@@ -329,7 +365,15 @@ const RegisterPage = () => {
                     >
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                         <span>Độ mạnh mật khẩu:</span>
-                        <span className={`font-medium ${passwordStrength <= 2 ? "text-red-500" : passwordStrength === 3 ? "text-yellow-500" : "text-green-500"}`}>
+                        <span
+                          className={`font-medium ${
+                            passwordStrength <= 2
+                              ? "text-red-500"
+                              : passwordStrength === 3
+                              ? "text-yellow-500"
+                              : "text-green-500"
+                          }`}
+                        >
                           {getPasswordStrengthText()}
                         </span>
                       </div>
@@ -370,8 +414,11 @@ const RegisterPage = () => {
                       {showPassword.confirmPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
-                  {errors && errors.confirmPassword && <div className="text-red-500 text-sm italic mt-1">{errors.confirmPassword}</div>}
-
+                  {errors && errors.confirmPassword && (
+                    <div className="text-red-500 text-sm italic mt-1">
+                      {errors.confirmPassword}
+                    </div>
+                  )}
                 </div>
 
                 {/* Avatar */}
@@ -384,7 +431,11 @@ const RegisterPage = () => {
                       <label className="cursor-pointer">
                         <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-gray-300 hover:border-blue-500 transition">
                           {avatarPreview ? (
-                            <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                            <img
+                              src={avatarPreview}
+                              alt="Avatar preview"
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             <FiImage className="text-gray-400 text-xl" />
                           )}
@@ -410,6 +461,11 @@ const RegisterPage = () => {
                           Đã chọn: {avatar.name}
                         </motion.p>
                       )}
+                      {errors && errors.avatar && (
+                        <div className="text-red-500 text-sm italic mt-1">
+                          {errors.avatar}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -421,13 +477,33 @@ const RegisterPage = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${
+                    isSubmitting
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Đang đăng ký...
                     </span>

@@ -9,6 +9,7 @@ import { ChatService } from "../../services/chatService";
 import { db } from "../../app/firebaseConfig";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import useNotifications from "../../hooks/useNotifications";
+import { flushSync } from "react-dom";
 
 const Navbar = ({ onOpenChat }) => {
   const dispatch = useDispatch();
@@ -103,14 +104,13 @@ const Navbar = ({ onOpenChat }) => {
     };
   }, [user?.id]);
 
-  const handleLogout = async () => {
-    try {
+  const handleLogout = () => {
+    navigate("/login");
+
+    flushSync(() => {
       dispatch(logout());
-      setShowMenu(false);
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout failed", err);
-    }
+    });
+    setShowMenu(false);
   };
 
   const closeAllDropdowns = () => {

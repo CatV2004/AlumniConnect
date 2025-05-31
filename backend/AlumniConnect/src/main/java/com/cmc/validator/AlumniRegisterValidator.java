@@ -22,7 +22,7 @@ public class AlumniRegisterValidator implements Validator {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private UserRepository userRepo;
 
@@ -38,25 +38,24 @@ public class AlumniRegisterValidator implements Validator {
         if (dto.getEmail() != null && userService.existsByEmail(dto.getEmail())) {
             errors.rejectValue("email", "email", "Email đã được sử dụng");
         }
-        
-        if (dto.getStudentCode() != null && userService.existsByStudentCode(dto.getStudentCode())){
+
+        if (dto.getStudentCode() != null && userService.existsByStudentCode(dto.getStudentCode())) {
             errors.rejectValue("studentCode", "studentCode", "Trùng mã sinh viên!!!");
         }
-        
-        if (dto.getUsername() != null && userRepo.existsByUsername(dto.getUsername())){
+
+        if (dto.getUsername() != null && userRepo.existsByUsername(dto.getUsername())) {
             errors.rejectValue("username", "username", "Tên đăng nhập đã được sử dụng!!!");
         }
-        
-        
 
         MultipartFile avatar = dto.getAvatar();
-        if (avatar != null && avatar.isEmpty()) {
+        if (avatar == null || avatar.isEmpty()) {
+            errors.rejectValue("avatar", "avatar", "Ảnh đại diện là bắt buộc");
+        } else {
             String contentType = avatar.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
                 errors.rejectValue("avatar", "avatar", "Avatar phải là file ảnh (jpg, png,...)");
-            } else if (avatar.getSize() > 2 * 1024 * 1024) {
+            } else if (avatar.getSize() > 5 * 1024 * 1024) {
                 errors.rejectValue("avatar", "avatar", "Kích thước ảnh không vượt quá 5MB");
-
             }
         }
 

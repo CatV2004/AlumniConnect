@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { changePassword } from "../services/userService";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { FiLock, FiEye, FiEyeOff, FiCheck, FiX } from "react-icons/fi";
+import { FiLock, FiEye, FiEyeOff, FiCheck, FiX, FiAlertCircle } from "react-icons/fi";
 
 const ChangePasswordPage = () => {
   const token = useSelector((state) => state.auth.token);
@@ -13,7 +13,12 @@ const ChangePasswordPage = () => {
     newPassword: "",
     confirmPassword: "",
   });
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    general: ""
+  });
   const [showPassword, setShowPassword] = useState({
     old: false,
     new: false,
@@ -23,12 +28,10 @@ const ChangePasswordPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Hiệu ứng khi mount component
   useEffect(() => {
     document.title = "Đổi mật khẩu | Hệ thống";
   }, []);
 
-  // Kiểm tra độ mạnh mật khẩu
   useEffect(() => {
     if (form.newPassword) {
       const strength = calculatePasswordStrength(form.newPassword);
@@ -49,27 +52,55 @@ const ChangePasswordPage = () => {
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setError("");
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    // Clear error when user types
+    setErrors({ ...errors, [name]: "", general: "" });
   };
 
   const toggleShowPassword = (field) => {
     setShowPassword({ ...showPassword, [field]: !showPassword[field] });
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      general: ""
+    };
+
+    if (!form.oldPassword) {
+      newErrors.oldPassword = "Vui lòng nhập mật khẩu hiện tại";
+      isValid = false;
+    }
+
+    if (!form.newPassword) {
+      newErrors.newPassword = "Vui lòng nhập mật khẩu mới";
+      isValid = false;
+    } else if (passwordStrength < 3) {
+      newErrors.newPassword = "Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn";
+      isValid = false;
+    }
+
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu mới";
+      isValid = false;
+    } else if (form.newPassword !== form.confirmPassword) {
+      newErrors.confirmPassword = "Mật khẩu mới không khớp";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError("");
-
-    if (form.newPassword !== form.confirmPassword) {
-      setError("Mật khẩu mới không khớp.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (passwordStrength < 3) {
-      setError("Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.");
+    
+    if (!validateForm()) {
       setIsSubmitting(false);
       return;
     }
@@ -81,7 +112,34 @@ const ChangePasswordPage = () => {
         navigate(-1);
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Đã xảy ra lỗi khi đổi mật khẩu!");
+      // Xử lý lỗi từ backend
+      if (err.response?.data) {
+        const backendError = err.response.data;
+        
+        if (backendError.message === "Mật khẩu cũ không đúng") {
+          setErrors({
+            ...errors,
+            oldPassword: backendError.message,
+            general: ""
+          });
+        } else if (backendError.newPassword) {
+          setErrors({
+            ...errors,
+            newPassword: backendError.newPassword,
+            general: ""
+          });
+        } else {
+          setErrors({
+            ...errors,
+            general: backendError.message || "Đã xảy ra lỗi khi đổi mật khẩu!"
+          });
+        }
+      } else {
+        setErrors({
+          ...errors,
+          general: "Đã xảy ra lỗi khi đổi mật khẩu!"
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -99,6 +157,45 @@ const ChangePasswordPage = () => {
     if (passwordStrength === 3) return "Trung bình";
     return "Mạnh";
   };
+
+  // Hàm render input field để giảm code trùng lặp
+  const renderInputField = (field, label, placeholder) => (
+    <div>
+      <label className="block text-gray-700 text-sm font-medium mb-1">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          type={showPassword[field] ? "text" : "password"}
+          name={field}
+          placeholder={placeholder}
+          className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ${
+            errors[field] ? "border-red-500" : "border-gray-300"
+          }`}
+          value={form[field]}
+          onChange={handleChange}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => toggleShowPassword(field)}
+          className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+        >
+          {showPassword[field] ? <FiEyeOff /> : <FiEye />}
+        </button>
+      </div>
+      {errors[field] && (
+        <motion.p 
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-sm mt-1 flex items-start"
+        >
+          <FiAlertCircle className="mr-1 mt-0.5 flex-shrink-0" />
+          {errors[field]}
+        </motion.p>
+      )}
+    </div>
+  );
 
   return (
     <motion.div
@@ -137,7 +234,7 @@ const ChangePasswordPage = () => {
             </motion.div>
           ) : (
             <>
-              {error && (
+              {errors.general && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -145,60 +242,26 @@ const ChangePasswordPage = () => {
                 >
                   <div className="flex items-center">
                     <FiX className="mr-2 text-xl" />
-                    <span>{error}</span>
+                    <span>{errors.general}</span>
                   </div>
                 </motion.div>
               )}
 
               <div className="space-y-4">
                 {/* Mật khẩu hiện tại */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-1">
-                    Mật khẩu hiện tại
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword.old ? "text" : "password"}
-                      name="oldPassword"
-                      placeholder="Nhập mật khẩu hiện tại"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      value={form.oldPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => toggleShowPassword("old")}
-                      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword.old ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
-                </div>
+                {renderInputField(
+                  "oldPassword",
+                  "Mật khẩu hiện tại",
+                  "Nhập mật khẩu hiện tại"
+                )}
 
                 {/* Mật khẩu mới */}
                 <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-1">
-                    Mật khẩu mới
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword.new ? "text" : "password"}
-                      name="newPassword"
-                      placeholder="Nhập mật khẩu mới"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      value={form.newPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => toggleShowPassword("new")}
-                      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword.new ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
+                  {renderInputField(
+                    "newPassword",
+                    "Mật khẩu mới",
+                    "Nhập mật khẩu mới"
+                  )}
                   {form.newPassword && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
@@ -207,7 +270,11 @@ const ChangePasswordPage = () => {
                     >
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                         <span>Độ mạnh mật khẩu:</span>
-                        <span className={`font-medium ${passwordStrength <= 2 ? "text-red-500" : passwordStrength === 3 ? "text-yellow-500" : "text-green-500"}`}>
+                        <span className={`font-medium ${
+                          passwordStrength <= 2 ? "text-red-500" : 
+                          passwordStrength === 3 ? "text-yellow-500" : 
+                          "text-green-500"
+                        }`}>
                           {getPasswordStrengthText()}
                         </span>
                       </div>
@@ -225,29 +292,11 @@ const ChangePasswordPage = () => {
                 </div>
 
                 {/* Xác nhận mật khẩu mới */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-medium mb-1">
-                    Xác nhận mật khẩu mới
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword.confirm ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder="Nhập lại mật khẩu mới"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      value={form.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => toggleShowPassword("confirm")}
-                      className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword.confirm ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
-                </div>
+                {renderInputField(
+                  "confirmPassword",
+                  "Xác nhận mật khẩu mới",
+                  "Nhập lại mật khẩu mới"
+                )}
               </div>
 
               <div className="pt-2">
@@ -256,7 +305,9 @@ const ChangePasswordPage = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white transition ${
+                    isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center">

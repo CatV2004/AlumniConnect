@@ -100,10 +100,12 @@ public class ApiUserController {
                 -> errors.put(error.getField(), error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
     }
+    
     @InitBinder("loginDTO")
     public void initBinderLogin(WebDataBinder binder) {
         binder.addValidators(loginValidate);    
     }
+    
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequestDTO loginDTO, BindingResult result) {
         Map<String, Object> response = new HashMap<>();

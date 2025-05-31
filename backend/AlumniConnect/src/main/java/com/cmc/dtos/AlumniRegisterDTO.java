@@ -7,6 +7,7 @@ package com.cmc.dtos;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ public class AlumniRegisterDTO {
     @Size(min = 7,max=50, message = "Password phải ít nhất 8 ký tự")
     @Pattern(regexp = ".*[!@#$%^&*()].*", message = "Password phải có ký tự đặc biệt")
     private String password;
+    @NotNull(message = "Ảnh đại diện (avatar) là bắt buộc")
     private MultipartFile avatar;
     private MultipartFile cover;
     @NotBlank(message = "Họ là bắt buộc")
