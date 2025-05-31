@@ -6,6 +6,7 @@ package com.cmc.components;
 import com.cmc.pojo.Post;
 import com.cmc.repository.CommentRepository;
 import com.cmc.repository.PostRepository;
+import com.cmc.repository.SurveyPostRepository;
 import com.cmc.service.PostService;
 import com.cmc.service.SurveyPostService;
 import java.time.LocalDateTime;
@@ -34,6 +35,8 @@ public class PostComponents {
     
     @Autowired
     private SurveyPostService surveyPostService;
+    @Autowired
+    private SurveyPostRepository surveyPostRepository;
     
     public String authorization(String auth) {
         String token = auth.replace("Bearer ", "");
@@ -42,7 +45,7 @@ public class PostComponents {
     
     @Scheduled(fixedRate = 60000) //ms
     public void updateStatus() {
-        surveyPostService.updateExpiredStatus();
+        this.surveyPostRepository.updateExpiredStatus();
         System.out.println("Auto update survey status at " + LocalDateTime.now());
     }
     

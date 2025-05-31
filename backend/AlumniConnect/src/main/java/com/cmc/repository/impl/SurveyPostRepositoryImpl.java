@@ -77,10 +77,11 @@ public class SurveyPostRepositoryImpl implements SurveyPostRepository {
         String hql = "UPDATE SurveyPost s SET s.status = :expiredStatus "
                 + "WHERE s.endTime < :now AND s.status = :activeStatus";
         session.createQuery(hql)
-                .setParameter("expiredStatus", "EXPIRED")
-                .setParameter("activeStatus", "ACTIVE")
+                .setParameter("expiredStatus", SurveyStatus.EXPIRED)
+                .setParameter("activeStatus", SurveyStatus.ACTIVE)
                 .setParameter("now", LocalDateTime.now())
                 .executeUpdate();
+        System.out.println("----------------------------------------");
     }
 
     @Override

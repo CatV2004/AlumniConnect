@@ -100,6 +100,7 @@ public class AdminController {
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
+        binder.addValidators(userValidator);
         if (binder.getTarget() != null && userValidator.supports(binder.getTarget().getClass())) {
             binder.addValidators(userValidator);
         }
