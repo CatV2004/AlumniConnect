@@ -101,6 +101,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     public Comment getCommentById(Long id) {
         Session s = this.factory.getObject().getCurrentSession();
         return s.createNamedQuery("Comment.findById", Comment.class).setParameter("id", id).getSingleResult();
+//        return s.get(Comment.class, id);
     }
 
     @Override

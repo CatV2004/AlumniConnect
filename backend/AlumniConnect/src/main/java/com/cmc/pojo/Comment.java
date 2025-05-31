@@ -23,7 +23,6 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 /**
@@ -32,6 +31,10 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "comment")
+@NamedQueries({
+    @NamedQuery(name = "Comment.findByParentId", query = "SELECT c FROM Comment c WHERE c.parentId = :parentId AND c.active = TRUE"),
+    @NamedQuery(name = "Comment.findById", query = "SELECT c FROM Comment c WHERE c.id = :id AND c.active = TRUE")
+})
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -72,7 +75,7 @@ public class Comment implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User userId;
-    
+
     @JoinColumn(name = "label")
     @JsonIgnore
     private String label;
@@ -207,5 +210,5 @@ public class Comment implements Serializable {
     public void setLabel(String label) {
         this.label = label;
     }
-    
+
 }
