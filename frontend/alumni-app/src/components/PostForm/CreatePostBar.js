@@ -9,7 +9,7 @@ const CreatePostBar = ({ user }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (!user) {
+    if (user == null) {
       navigate("/login");
     } else {
       setShowModal(true);

@@ -41,12 +41,14 @@ document.getElementById('createGroupForm')?.addEventListener('submit', function 
 });
 
 function openEditModal(groupId) {
+    console.log("tesst ");
     fetch(`/AlumniConnect/admin/groups/${groupId}`)
             .then(response => response.json())
             .then(data => {
+                console.log("data: ", data);
                 document.getElementById('editGroupId').value = data.id;
                 document.getElementById('editGroupName').value = data.name;
-                document.getElementById('editGroupDescription').value = data.description || '';
+//                document.getElementById('editGroupDescription').value = data.description || '';
                 new bootstrap.Modal(document.getElementById('editGroupModal')).show();
             });
 }
@@ -95,6 +97,7 @@ document.getElementById('editGroupForm')?.addEventListener('submit', function (e
 });
 
 function viewGroupDetail(groupId) {
+    document.getElementById('detailGroupId').value = groupId;
     fetch(`/AlumniConnect/admin/groups/${groupId}`)
             .then(response => response.json())
             .then(data => {
@@ -108,11 +111,14 @@ function viewGroupDetail(groupId) {
 
                 const memberList = document.getElementById('memberList');
                 memberList.innerHTML = '';
+
                 if (data.members?.length > 0) {
                     data.members.forEach(member => {
                         const item = document.createElement('div');
-                        item.className = 'd-flex align-items-center mb-2';
+                        item.className = 'd-flex align-items-center justify-content-between mb-2 p-2 bg-white rounded';
+
                         item.innerHTML = `
+                    <div class="d-flex align-items-center">
                         <div class="flex-shrink-0 me-2">
                             <img src="${member.avatar || '/images/default-avatar.png'}"
                                 class="rounded-circle" width="40" height="40" alt="${member.firstName} ${member.lastName}">
@@ -120,7 +126,13 @@ function viewGroupDetail(groupId) {
                         <div class="flex-grow-1">
                             <h6 class="mb-0">${member.firstName} ${member.lastName}</h6>
                             <small class="text-muted">${member.email}</small>
-                        </div>`;
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger remove-member-btn" 
+                            onclick="removeMemberFromGroup(${groupId}, ${member.id}, this)">
+                        <i class="bi bi-trash"></i> Xóa
+                    </button>`;
+
                         memberList.appendChild(item);
                     });
                 } else {
@@ -165,6 +177,54 @@ function toggleGroupStatus(groupId, activate) {
                             title: 'Lỗi',
                             text: `Có lỗi xảy ra khi ${text} nhóm: ${error.message}`
                         });
+                    });
+        }
+    });
+}
+
+function removeMemberFromGroup(groupId, userId, buttonElement) {
+    Swal.fire({
+        title: 'Xác nhận xóa',
+        text: 'Bạn có chắc chắn muốn xóa thành viên này khỏi nhóm?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Hiển thị loading trên nút xóa
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            fetch(`/AlumniConnect/admin/groups/${groupId}/members/${userId}`, {
+                method: 'DELETE'
+            })
+                    .then(response => {
+                        if (!response.ok)
+                            throw new Error('Không thể xóa thành viên');
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: 'Đã xóa thành viên khỏi nhóm',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Làm mới danh sách thành viên
+                            viewGroupDetail(groupId);
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: error.message || 'Đã xảy ra lỗi khi xóa thành viên'
+                        });
+                    })
+                    .finally(() => {
+                        buttonElement.disabled = false;
+                        buttonElement.innerHTML = originalHtml;
                     });
         }
     });

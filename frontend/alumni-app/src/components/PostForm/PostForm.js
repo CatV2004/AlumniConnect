@@ -14,7 +14,7 @@ import {
   FaGlobeAmericas,
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts } from "../../features/posts/postSlice";
 
 const PostForm = ({ onClose, user, postId = null }) => {
@@ -28,7 +28,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [privacy, setPrivacy] = useState("public");
   const fileInputRef = useRef(null);
-
+  const token = useSelector((state) => state.auth.token)
   // Load post data if in edit mode
   useEffect(() => {
     if (postId) {
@@ -117,7 +117,7 @@ const PostForm = ({ onClose, user, postId = null }) => {
 
       if (postId) {
         // Update existing post
-        await updatePost(postId, formData, localStorage.getItem("token"));
+        await updatePost(postId, formData, token);
         toast.success("Post updated successfully!");
       } else {
         // Create new post

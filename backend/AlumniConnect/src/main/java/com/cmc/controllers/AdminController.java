@@ -58,9 +58,10 @@ public class AdminController {
     private UserService userService;
     @Autowired
     private CloudinaryService cloudinaryService;
-    
+
     @Autowired
     private UserValidator userValidator;
+    
 //    @Autowired
 //    private AuthenticationManager authenticationManager;
 //    @Autowired
@@ -76,8 +77,7 @@ public class AdminController {
             model.addAttribute("username", user);
         }
         return "admin_dashboard";
-    }
-
+    }   
     @GetMapping("/login")
     public String loginPage(
             @RequestParam(value = "error", required = false) String error,
@@ -98,9 +98,11 @@ public class AdminController {
         return "admin_register";
     }
 
-    @InitBinder("admin")
+    @InitBinder
     public void initBinder(WebDataBinder binder) {
-        binder.addValidators(userValidator);
+        if (binder.getTarget() != null && userValidator.supports(binder.getTarget().getClass())) {
+            binder.addValidators(userValidator);
+        }
     }
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

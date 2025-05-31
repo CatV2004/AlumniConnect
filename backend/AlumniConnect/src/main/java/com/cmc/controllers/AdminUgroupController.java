@@ -53,21 +53,23 @@ public class AdminUgroupController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private GroupValidator groupValidator;
+//    @Autowired;
+//    private GroupValidator groupValidator;
 
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.addValidators(groupValidator);
-    }
-
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.addValidators(groupValidator);
+//    }
     @PostMapping("")
     public ResponseEntity<?> createGroup(@Valid @RequestBody GroupDTO ugroupDTO, BindingResult result) {
+        if (ugroupService.isByGroupName(ugroupDTO.getGroupName())) {
+            result.rejectValue("groupName", "groupName.duplicate", "Tên Nhóm đã tồn tại !!!");
+        }
         if (result.hasErrors()) {
             String errorMessage = result.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.joining("\n")); 
-            Map<String, String> error = new  HashMap<>();
+                    .collect(Collectors.joining("\n"));
+            Map<String, String> error = new HashMap<>();
             error.put("message", errorMessage);
 
             return ResponseEntity.badRequest().body(error);

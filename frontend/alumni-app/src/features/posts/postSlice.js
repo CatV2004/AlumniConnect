@@ -23,7 +23,7 @@ export const fetchSurveyStatistics = createAsyncThunk(
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async ({ page = 1, size = 10, refresh = false }, { rejectWithValue }) => {
+  async ({ page = 1, size = 5, refresh = false }, { rejectWithValue }) => {
     try {
       const data = await fetchPostsService({ page, size });
       return {
@@ -41,7 +41,7 @@ export const fetchPosts = createAsyncThunk(
 
 export const fetchSurveyPosts = createAsyncThunk(
   "posts/fetchSurveyPosts",
-  async ({ page = 1, size = 10, refresh = false }, { rejectWithValue }) => {
+  async ({ page = 1, size = 3, refresh = false }, { rejectWithValue }) => {
     try {
       const data = await fetchPostsService({ page, size, hasSurvey: true });
       return {
@@ -59,13 +59,13 @@ export const fetchSurveyPosts = createAsyncThunk(
 
 export const createPost = createAsyncThunk(
   "posts/createPost",
-  async (formData, { getState, rejectWithValue, dispatch }) => {
+  async ({ formData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getState().auth.token;
       const response = await createPostService(formData, token);
 
       // Sau khi tạo post thành công, fetch lại dữ liệu từ trang 1
-      dispatch(fetchPosts({ page: 1, size: 10, refresh: true }));
+      dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
 
       return response.data;
     } catch (error) {
@@ -81,7 +81,7 @@ export const updatePost = createAsyncThunk(
       const token = getState().auth.token;
       const response = await updatePostService(postId, formData, token);
 
-      dispatch(fetchPosts({ page: 1, size: 10, refresh: true }));
+      dispatch(fetchPosts({ page: 1, size: 3, refresh: true }));
 
       return response;
     } catch (error) {

@@ -34,8 +34,7 @@ const PostItem = ({ post }) => {
   // console.log("post: ", post);
   const user = useSelector((state) => state.auth);
 
-
-  const [showComment, setShowComment] = useState(false);
+  const [showComment, setShowComment] = useState(true);
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
   const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   const [isLiked, setIsLiked] = useState(false);
@@ -47,13 +46,15 @@ const PostItem = ({ post }) => {
 
   const MAX_CONTENT_LENGTH = 300;
 
-
   useEffect(() => {
     const fetchReactions = async () => {
       const liked = await ReactionOfPost(post.id);
       const reactions = await CountReaction(post.id);
       setIsLiked(liked);
-      const totalCount = Object.values(reactions).reduce((sum, count) => sum + count, 0);
+      const totalCount = Object.values(reactions).reduce(
+        (sum, count) => sum + count,
+        0
+      );
       const types = Object.entries(reactions)
         .filter(([_, count]) => count > 0)
         .map(([type, _]) => type);
@@ -73,12 +74,12 @@ const PostItem = ({ post }) => {
         console.error("Lỗi khi fetch reaction của user:", err);
         setReactionType(null);
       }
-    }
+    };
 
     const fetchCommentByPost = async () => {
       const countC = await CountComment(post.id);
       setCommentCount(countC);
-    }
+    };
 
     if (user !== null) {
       fetchReactions();
@@ -104,7 +105,7 @@ const PostItem = ({ post }) => {
       newLikeCount = Math.max(newLikeCount - 1, 0);
 
       if (likeCount === 1) {
-        newReactionPost = newReactionPost.filter(r => r !== typeReaction);
+        newReactionPost = newReactionPost.filter((r) => r !== typeReaction);
       }
     }
 
@@ -112,13 +113,10 @@ const PostItem = ({ post }) => {
       newReactionPost.push(typeReaction);
     }
 
-
-
     setLikeCount(newLikeCount);
     setReactionType(isSameReaction ? null : typeReaction);
     setIsLiked(!isSameReaction);
     setReactionPost(newReactionPost);
-
 
     try {
       await addReaction(post.id, typeReaction);
@@ -143,20 +141,28 @@ const PostItem = ({ post }) => {
   const CurrentUserReactionIcon = () => {
     switch (reactionType) {
       case "LOVE":
-        return <FaHeart className={`w-5 h-5 ${isLiked ? "fill-red-500" : ""}`} />;
+        return (
+          <FaHeart className={`w-5 h-5 ${isLiked ? "fill-red-500" : ""}`} />
+        );
       case "HAHA":
-        return <FaLaugh className={`w-5 h-5 ${isLiked ? "fill-yellow-500" : ""}`} />;
+        return (
+          <FaLaugh className={`w-5 h-5 ${isLiked ? "fill-yellow-500" : ""}`} />
+        );
       default:
-        return <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />;
+        return (
+          <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
+        );
     }
   };
 
-
   const ReactionLabel = () => {
     switch (reactionType) {
-      case "LOVE": return "Love";
-      case "HAHA": return "Haha";
-      default: return "Like";
+      case "LOVE":
+        return "Love";
+      case "HAHA":
+        return "Haha";
+      default:
+        return "Like";
     }
   };
 
@@ -234,7 +240,7 @@ const PostItem = ({ post }) => {
 
       {/* Invitation Post */}
       {post.invitationPost && (
-        <InvitationPost invitation={post.invitationPost} postId ={post.id} />
+        <InvitationPost invitation={post.invitationPost} postId={post.id} />
       )}
 
       {/* Post Stats */}
@@ -242,15 +248,15 @@ const PostItem = ({ post }) => {
         <div className="flex justify-between text-sm text-gray-500">
           <span className="flex items-center gap-1">
             {likeCount}
-            {reactionPost && reactionPost.map((r, idx) => (
-              <ReactionIcon key={idx} reaction={r} />
-            ))}
+            {reactionPost &&
+              reactionPost.map((r, idx) => (
+                <ReactionIcon key={idx} reaction={r} />
+              ))}
             {reactionPost.length === 0 && " reaction"}
           </span>
           <span>{commentCount} comments</span>
         </div>
       </div>
-
 
       {/* Post Actions */}
       <div className="px-4 relative group py-2 border-t border-gray-100 flex justify-between text-sm font-medium">
@@ -258,15 +264,15 @@ const PostItem = ({ post }) => {
           onClick={() => toggleLike("LIKE")}
           className={`relative flex group items-center justify-center gap-2 w-full py-2 rounded-md 
                 transition-all duration-150 ease-in-out 
-                ${reactionType === "LOVE"
-              ? "text-red-500/80 font-semibold"
-              : reactionType === "HAHA"
-                ? "text-yellow-500/80 font-semibold"
-                : reactionType === "LIKE"
-                  ? "text-blue-600 font-semibold"
-                  : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
-            }`
-          }
+                ${
+                  reactionType === "LOVE"
+                    ? "text-red-500/80 font-semibold"
+                    : reactionType === "HAHA"
+                    ? "text-yellow-500/80 font-semibold"
+                    : reactionType === "LIKE"
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-600 hover:text-blue-500 hover:bg-gray-100"
+                }`}
         >
           {/* <FaThumbsUp className={`w-5 h-5 ${isLiked ? "fill-blue-600" : ""}`} />
           Like */}
@@ -276,37 +282,43 @@ const PostItem = ({ post }) => {
         {/* <div className="relative inline-block group w-max"> */}
 
         {/* Menu reaction (hiện khi hover) */}
-        <div className="absolute -top-10 left-20 translate-x-2 flex space-x-2 p-1 bg-white rounded-full shadow-lg
+        <div
+          className="absolute -top-10 left-20 translate-x-2 flex space-x-2 p-1 bg-white rounded-full shadow-lg
                     opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                    transition-all duration-200">
-          <button onClick={() => toggleLike("LIKE")}
-            className="p-1 rounded-full hover:bg-gray-300">
+                    transition-all duration-200"
+        >
+          <button
+            onClick={() => toggleLike("LIKE")}
+            className="p-1 rounded-full hover:bg-gray-300"
+          >
             <FaThumbsUp className="w-6 h-6 text-blue-600" />
           </button>
           <button
             onClick={() => toggleLike("LOVE")}
-            className="p-1 rounded-full hover:bg-gray-300">
+            className="p-1 rounded-full hover:bg-gray-300"
+          >
             <FaHeart className="w-6 h-6 text-red-500" />
           </button>
           <button
             onClick={() => toggleLike("HAHA")}
-            className="p-1 rounded-full hover:bg-gray-300">
+            className="p-1 rounded-full hover:bg-gray-300"
+          >
             <FaLaugh className="w-6 h-6 text-yellow-500" />
           </button>
         </div>
 
-
-
-        <button
-          onClick={toggleComments}
-          className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
+        {!post.lockComment && (
+          <button
+            onClick={toggleComments}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-md 
                text-gray-600 hover:text-blue-500 hover:bg-gray-100 
                transition-all duration-150 ease-in-out"
-        >
-          <FaRegCommentDots className="w-5 h-5" />
-          Comment
-        </button>
-
+          >
+            <FaRegCommentDots className="w-5 h-5" />
+            Comment
+          </button>
+        )}
+        
         {post.surveyPost && role === "ADMIN" && (
           <button
             onClick={() => setStatsModalOpen(true)}
@@ -334,7 +346,11 @@ const PostItem = ({ post }) => {
       {/* Comments Section */}
       {showComment && (
         <div className="bg-gray-50 p-4 border-t border-gray-100">
-          <CommentList post={post} showComment={setShowComment} setCountComment={setCommentCount} />
+          <CommentList
+            post={post}
+            showComment={setShowComment}
+            setCountComment={setCommentCount}
+          />
           {/* <CommentCreated post={post} /> */}
         </div>
       )}
@@ -354,7 +370,6 @@ const PostItem = ({ post }) => {
         />
       )}
     </div>
-
   );
 };
 export default PostItem;
