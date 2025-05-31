@@ -210,7 +210,7 @@ const CommentItem = ({ comment, post, userId, onCommentAdded, handleCommentUpdat
                                     </div>
                                 </div>
                             )}
-                        </div>
+                        </div>  
                     </div>
                 </div>
             )}
