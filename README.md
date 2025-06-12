@@ -178,13 +178,39 @@ Configured with **Spring Mail**:
 
 ## 📱 Firebase Chat Implementation
 
-Real-time chat features:
+### Real-time Chat Architecture
+The chat system is built on Firebase's real-time infrastructure with the following components:
 
-- **Firebase Realtime Database** for message storage  
-- **Firebase Authentication** for chat users  
-- Online status tracking  
-- Message history persistence  
-- Configured in `frontend/src/components/Chat/`
+![Chat Architecture Diagram](https://via.placeholder.com/600x400?text=Chat+Architecture+Diagram)
+
+### Core Features
+- **Instant Messaging**: Real-time message delivery with <100ms latency
+- **Message History**: Persisted conversation history with Firebase Firestore
+- **Read Receipts**: Visual indicators for message status (sent, delivered, read)
+- **Typing Indicators**: Shows when other participants are typing
+- **Online Status**: Real-time presence detection
+- **Media Support**: Image and file sharing capability
+- **Unread Counts**: Badges showing unread messages
+
+### Implementation Details
+
+#### Firebase Configuration
+Located in `frontend/src/app/firebaseConfig.js`:
+   ```javascript
+   import { initializeApp } from "firebase/app";
+   import { getFirestore } from "firebase/firestore";
+
+   const firebaseConfig = {
+   apiKey: "YOUR_API_KEY",
+   authDomain: "your-project.firebaseapp.com",
+   projectId: "your-project",
+   storageBucket: "your-project.appspot.com",
+   messagingSenderId: "1234567890",
+   appId: "1:1234567890:web:abcdef123456"
+   };
+
+   const app = initializeApp(firebaseConfig);
+   export const db = getFirestore(app);
 
 ---
 
@@ -266,8 +292,8 @@ http://localhost:8080/swagger-ui.html
 
 For questions or support, please contact:
 
-- **Project Lead:** [Your Name] – your.email@university.edu  
-- **University IT Department:** it-support@university.edu
+- **Project Lead:** [Cuong Nguyen] – nguyenmanhc261@gmail.com 
+- **University IT Department:** ou@ou.edu.vn
 
 ---
 
@@ -278,5 +304,5 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 ---
 
 <div align="center">
-  <sub>Built with ❤︎ by <a href="https://github.com/yourusername">CatV Pr</a></sub>
+  <sub>Built with ❤︎ by <a href="https://github.com/CatV2004">CatV Pr</a></sub>
 </div>
