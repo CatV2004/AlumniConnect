@@ -211,6 +211,7 @@ Located in `frontend/src/app/firebaseConfig.js`:
 
    const app = initializeApp(firebaseConfig);
    export const db = getFirestore(app);
+   ```
 
 ---
 
