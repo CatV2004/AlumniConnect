@@ -13,6 +13,7 @@
 ## 📚 Table of Contents
 
 - [Introduction](#-introduction)
+- [Demo](#-demo)
 - [Key Features](#-key-features)
 - [Technology Stack](#-technology-stack)
 - [Installation & Run](#-installation--run)
@@ -26,6 +27,14 @@
 
 ## 📌 Introduction
 **Alumni Social Network** is a dedicated social platform for alumni, lecturers, and university administrators. It offers essential social features such as posts, comments, interactions, as well as advanced features like surveys, statistics, event management, and real-time chat.
+
+---
+
+## 🎥 Demo
+
+Click the image below to watch a short video demonstration of the project:
+
+[![Watch the demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
 
 ---
 
@@ -84,13 +93,6 @@
 - **MySQL**: Relational database
 
 ---
-
-## 🎥 Demo
-
-Click the image below to watch a short video demonstration of the project:
-
-[![Watch the demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
-
 
 ## 🚀 Installation & Run
 
