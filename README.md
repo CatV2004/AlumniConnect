@@ -1,3 +1,4 @@
+
 # 🎓 Alumni Social Network
 
 ![Alumni Social Network Banner](https://via.placeholder.com/1200x400?text=Alumni+Social+Network)
@@ -98,37 +99,132 @@
    ```bash
    git clone https://github.com/yourusername/alumni-social-network.git
    cd alumni-social-network
-Configure the database
+   ```
 
-Create a database named alumni_db in MySQL.
+2. **Backend Setup**
+   ```bash
+   cd backend
+   # Configure database in application.properties
+   nano src/main/resources/application.properties
 
-Update your database connection settings in application.properties.
+   # Build and run
+   mvn clean install
+   mvn spring-boot:run
+   ```
 
-Run the backend
+3. **Frontend Setup**
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
 
-bash
-Sao chép
-Chỉnh sửa
-cd backend
-mvn spring-boot:run
-Run the frontend
+4. **Firebase Configuration**
+- Create a Firebase project at https://firebase.google.com/
+- Add your Firebase config in frontend/src/firebase.js
+- Enable Firebase Realtime Database and Authentication
 
-bash
-Sao chép
-Chỉnh sửa
-cd frontend
-npm install
-npm start
-Access the application
+5. **Environment Variables**
+- Create a .env file in the backend with:
+   ```bash
+   SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/alumni_db
+   SPRING_DATASOURCE_USERNAME=root
+   SPRING_DATASOURCE_PASSWORD=yourpassword
+   SPRING_MAIL_USERNAME=your-email@gmail.com
+   SPRING_MAIL_PASSWORD=your-email-password
+   SENTIMENT_API_KEY=your-sentiment-api-key
+   ```
 
-Frontend: http://localhost:3000
+---
 
-Admin Panel: http://localhost:8080/admin
+## 📊 Sentiment Analysis Integration
 
-📂 Project Structure
-csharp
-Sao chép
-Chỉnh sửa
+The system uses **Sentiment API** to analyze comments:
+
+- Comments are analyzed in real-time  
+- Negative sentiment comments are flagged  
+- Automatic deletion occurs within 24 hours for toxic content  
+- Threshold can be adjusted in `SentimentAnalysisService.java`  
+
+---
+
+## 🔌 WebSocket Configuration
+
+Real-time features use **STOMP over WebSocket**:
+
+- **Endpoint:** `/ws`
+- **Topics:**
+  - `/topic/notifications` – For system notifications  
+  - `/user/queue/private` – For private messages  
+- Configured in `WebSocketConfig.java`
+
+---
+
+## 📧 Email Service
+
+Configured with **Spring Mail**:
+
+- **SMTP settings:** in `application.properties`  
+- **Templates:** in `resources/templates/email/`
+
+**Triggers:**
+
+- Account creation  
+- Password reset  
+- Event invitations  
+- Important notifications  
+
+---
+
+## 📱 Firebase Chat Implementation
+
+Real-time chat features:
+
+- **Firebase Realtime Database** for message storage  
+- **Firebase Authentication** for chat users  
+- Online status tracking  
+- Message history persistence  
+- Configured in `frontend/src/components/Chat/`
+
+---
+
+## 📈 ChartJS Integration
+
+Statistics dashboard features:
+
+- User growth over time  
+- Post engagement metrics  
+- Survey result visualization  
+- Responsive chart components  
+- Custom date range filtering  
+
+---
+
+## 🤝 Contributing
+
+1. Fork the project  
+2. Create your feature branch  
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+
+3. Commit your changes  
+   ```bash
+   git commit -m "Add AmazingFeature"
+   ```
+
+4. Push to the branch  
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+
+5. Open a Pull Request
+
+---
+
+## 📂 Project Structure
+
+```
 alumni-social-network/
 ├── backend/               # Spring Boot application
 │   ├── src/
@@ -140,29 +236,47 @@ alumni-social-network/
 │   └── package.json
 ├── docs/                  # Documentation
 └── README.md
-🌟 Demo Accounts
-Role	Email	Password
-Admin	admin@university.edu	admin123
-Lecturer	teacher@university.edu	ou@123
-Alumni	alumni@example.com	alumni123
+```
 
-Note: Lecturer accounts must change their password upon the first login.
+---
 
-📄 API Documentation
-You can access the API documentation via Swagger UI after starting the backend:
+## 🌟 Demo Accounts
 
-bash
-Sao chép
-Chỉnh sửa
+| Role     | Email                   | Password   |
+|----------|-------------------------|------------|
+| Admin    | admin@university.edu    | admin123   |
+| Lecturer | teacher@university.edu  | ou@123     |
+| Alumni   | alumni@example.com      | alumni123  |
+
+> ⚠️ Note: Lecturer accounts must change their password within 24 hours after first login.
+
+---
+
+## 📄 API Documentation
+
+After starting the backend server, access Swagger UI:
+
+```
 http://localhost:8080/swagger-ui.html
-📬 Contact
-If you have any questions or would like to contribute, please contact:
+```
 
-Name: [Your Name]
-Email: your.email@example.com
-Website: https://yourwebsite.com
+---
 
-📜 License
-This project is licensed under the MIT License.
+## 📬 Contact
 
-<div align="center"> <sub>Built with ❤︎ by <a href="https://github.com/yourusername">Your Name</a></sub> </div> ```
+For questions or support, please contact:
+
+- **Project Lead:** [Your Name] – your.email@university.edu  
+- **University IT Department:** it-support@university.edu
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <sub>Built with ❤︎ by <a href="https://github.com/yourusername">CatV Pr</a></sub>
+</div>
