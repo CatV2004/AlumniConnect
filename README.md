@@ -85,6 +85,13 @@
 
 ---
 
+## 🎥 Demo
+
+Click the image below to watch a short video demonstration of the project:
+
+[![Watch the demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
+
+
 ## 🚀 Installation & Run
 
 ### System Requirements
