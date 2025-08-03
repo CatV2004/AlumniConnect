@@ -297,5 +297,6 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 ---
 
 <div align="center">
-  <sub>Built with ❤︎ by <a href="https://github.com/CatV2004">CatV Pr</a></sub>
+  <sub>Built with ❤︎ by <a href="https://github.com/CatV2004">CatV Pr</a> & <a href="https://github.com/TrinhQuoc-Dat">Trịnh Quốc Đạt</a></sub>
 </div>
+
