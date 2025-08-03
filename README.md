@@ -258,23 +258,6 @@ Statistics dashboard features:
 
 ---
 
-## 📂 Project Structure
-
-```
-alumni-social-network/
-├── backend/               # Spring Boot application
-│   ├── src/
-│   ├── pom.xml
-│   └── application.properties
-├── frontend/              # React application
-│   ├── public/
-│   ├── src/
-│   └── package.json
-├── docs/                  # Documentation
-└── README.md
-```
-
----
 
 ## 🌟 Demo Accounts
 
