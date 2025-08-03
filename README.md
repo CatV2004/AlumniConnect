@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![React](https://img.shields.io/badge/frontend-react-blue.svg)]()
-[![Spring Boot](https://img.shields.io/badge/backend-springboot-green.svg)]()
+[![Spring MVC](https://img.shields.io/badge/backend-springboot-green.svg)]()
 
 ---
 
