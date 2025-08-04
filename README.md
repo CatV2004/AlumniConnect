@@ -1,7 +1,7 @@
 
 # 🎓 Alumni Social Network
 
-![Alumni Social Network Banner](https://via.placeholder.com/1200x400?text=Alumni+Social+Network)
+![Alumni Social Network Banner](https://ik.imagekit.io/xpfqvs5zs/unnamed.png?updatedAt=1754295756183)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
